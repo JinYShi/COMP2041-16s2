@@ -1,0 +1,169 @@
+=====Searching a Dictionary with Less=====
+a) 2000G
+b) 1G and then /z
+c) G and then ?ooz
+
+=====Applying Unix Tools to a Dictionary=====
+a) % wc -w words.txt 
+   390582
+b) egrep -v "'s" words.txt | wc -w 
+   299840
+c) % cat -n words.txt | egrep -w "100000"
+   100000 adviser
+   ??? figure out how to cut
+d) % cat -n words.txt | egrep -w  "700"
+   700 Adirondack
+e) % head -n 200000 words.txt| tail -n 1
+#   geodynamics's
+   
+=====Finding Unusual Words with Regular Exrpessions=====
+a)% egrep "lmn" words.txt
+#Selmner
+#Selmner's
+#almner
+#almners
+#calmness
+#calmness's
+#calmnesses
+
+b)% egrep "zz" words.txt | egrep -v "'s"
+too many words to put here...
+++
+
+c)  % egrep -i [aeiou]{4} words.txt | wc -w
+207
+
+
+d)% egrep -i .*a[a-z]*[e][a-z]*[i][a-z]*[o][a-z]*[u] words.txt
+??? better way?
+
+#abstemious
+#abstemiously
+#abstemiousness
+#abstemiousness's
+#abstemiousnesses
+#abstentious
+#adenocarcinomatous
+#adventitious
+#adventitiously
+#adventitiousness
+#adventitiousness's
+#adventitiousnesses
+#aeruginous
+#amentiferous
+#androdioecious
+#andromonoecious
+#anemophilous
+#antenniferous
+#antireligious
+#arenicolous
+#argentiferous
+#arsenious
+#arteriovenous
+#asclepiadaceous
+#autoecious
+#autoeciously
+#bacteriophagous
+#caesalpiniaceous
+#caesious
+#cavernicolous
+#chaetiferous
+#facetious
+#facetiously
+#facetiousness
+#facetiousness's
+#facetiousnesses
+#flagelliferous
+#garnetiferous
+#haemoglobinous
+#hamamelidaceous
+#lateritious
+#paroecious
+#quadrigeminous
+#sacrilegious
+#sacrilegiously
+#sacrilegiousness
+#sacrilegiousness's
+#sacrilegiousnesses
+#sarraceniaceous
+#supercalifragilisticexpialidocious
+#ultrareligious
+#ultraserious
+#valerianaceous
+
+e)% egrep -i [a-z]*[a][a-z]*[e][a-z]*[i][a-z]*[o][a-z]*[u] words.txt | wc -w
+53
+
+f)CHALLENGE
+words that contain exactly 5 vowels in the order aeiou
+% egrep -i ^[^aeiou]*[a][^aeiou]*[e][^aeiou]*[i][^aeiou]*[o][^aeiou]*[u][^aeiou]*$ words.txt
+
+9 letter words
+% egrep "^[a-z]{9}$" words.txt
+
+g)% fgrep -f words9.txt words.txt # this gives words that still include 9 letter
+% fgrep -f words9.txt words.txt | egrep [a-z][a-z]{9} # this gives words with more than 9 letters
+=====egreping MPs=====
+a) % egrep 'Member for W' parliament.txt
+
+??? %I tried with cut -d' ' -f6 parliament.txt | egrep ^W
+??? and I saw awk and different ways of trying to do it but couldnt 
+??? find an efficient way
+
+b)% egrep '\w+\s+Andrew+\s' parliament.txt
+
+c)% egrep 'y+:' parliament.txt
+
+d)% egrep 'y+:' parliament.txt | egrep 'y+,'
+
+d)% egrep y+:\|y+, parliament.txt
+
+e)% egrep ng+'\s'\|ng+:\|ng+, parliament.txt
+
+f)% egrep -i '\s'+[aeiou]+'\w'+[aeiou]+: parliament.txt
+
+g)% egrep 'for+\s+\w+\s+\w+,' parliament.txt
+
+=====Pipelining MPs=====
+a)% cut -d"," -f2 parliament.txt | sort | uniq -c | sort -n | sed 's/ *[0-9]*  //'
+
+b)CHALLENGE 
+#includes titles like Dr but still returns correct answer
+% cut -d" " -f2 parliament.txt |sort | uniq -c |sort | tail -2 |head -1 | sed 's/ *[0-9]* //'
+#correct solution 
+% sed 's/(Mrs |Mr |Dr )//' parliament.txt | sed 's/Mr //' | sed 's/Hon //g' |  sed 's/Ms //' | sed 's/The //' |  sed 's/Dr //' | cut -d' ' -f1 | sort | uniq -c | sort | tail -2 | head -1 | sed 's/ *[0-9]* //'
+??? more efficient way
+
+=====Counting classes=====
+a)wc -l classes.txt
+314 classes
+
+b)% cut -c1-8 classes.txt |  uniq -c | wc -l
+
+c)% cut -c1-8 classes.txt | sort | uniq -c | sort -n | tail -1
+
+d)% egrep 'TLB'\|'TUT' classes.txt | cut -d'-' -f2 | cut -d$'\t' -f2 |sort | uniq -c | sort | tail -1
+13 Quad G041
+
+e)% egrep 'TLB'\|'TUT' |cut -d$'\t' -f4 | cut -d' ' -f2 | sort | uniq -c | sort -n | tail -1
+   25 12-13
+   
+f)% sort -k1,1 -k2,2 classes.txt| cut -c1-12 | uniq -c | sort | tail -3 | cut -c9-16
+??? how to take only the rows with the highest value. I could only do this question because 
+??? I knew that 3 rows had the highest number
+
+g)CHALLENGE
+% egrep 'COMP' classes.txt|sort -k1,1 -k2,2 | cut -c1-12 | uniq -c | sort | egrep "[^0-1] [A-Z]{4}" | cut -c9-16 | uniq -d
+
+CHALLENGE: Interesting Regexps
+a)matches any line containing at least one A and at least one B. For example:
+% egrep 'A.*B|B.*A' < file1
+
+b)Only A and B such that all pairs of adjacent As occur before any pairs of adjacent Bs.
+% egrep '[B][B][B]*[A][B]*$|[A][B][A][A][A]|[A]*[B][B]$|^[AB]([A][B])*$|^[AB]([B][A])*$|^[A]*$' file2
+
+c)number of A is divisible by 4
+% egrep '^(B*AB*AB*AB*AB*)*$' file4
+
+d)Only the characters A and B such that there are 
+% egrep '^([AB][AB])*$' file4 | egrep '^[A]*[B]*$'

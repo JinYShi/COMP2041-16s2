@@ -1,0 +1,174 @@
+Test identify_poet_1 (-a -W	"./identify_poet.pl poem1.txt") - failed (Incorrect output)
+
+Your program produced these 1 lines of output:
+poem1.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+
+The correct 1 lines of output for this test were:
+poem1.txt most resembles the work of John Keats (log-probability=-2720.9)
+
+The difference between your output and the correct output is:
+- poem1.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+?                                      ^^^^^^^^^^^^^^^^                      ^ ^^^^ ^
+
++ poem1.txt most resembles the work of John Keats (log-probability=-2720.9)
+?                                      ^^^^^^                      ^ ^^^ ^
+
+
+You can reproduce this test by executing these commands:
+
+./identify_poet.pl poem1.txt
+
+
+Test identify_poet_2 (-a -W	"./identify_poet.pl poem2.txt") - failed (Incorrect output)
+
+Your program produced these 1 lines of output:
+poem2.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+
+The correct 1 lines of output for this test were:
+poem2.txt most resembles the work of Percy Bysshe Shelley (log-probability=-777.0)
+
+The difference between your output and the correct output is:
+- poem2.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
++ poem2.txt most resembles the work of Percy Bysshe Shelley (log-probability=-777.0)
+
+You can reproduce this test by executing these commands:
+
+./identify_poet.pl poem2.txt
+
+
+Test identify_poet_3 (-a -W	"./identify_poet.pl poem3.txt") - failed (errors)
+
+Your program produced these errors:
+Use of uninitialized value $poet in hash element at ./identify_poet.pl line 92, <F> line 22.
+Use of uninitialized value $likeliest in printf at ./identify_poet.pl line 100, <F> line 22.
+Use of uninitialized value $highest in printf at ./identify_poet.pl line 100, <F> line 22.
+You can reproduce this test by executing these commands:
+
+./identify_poet.pl poem3.txt
+
+
+Test identify_poet_4 (-a -W	"./identify_poet.pl poem4.txt") - failed (Incorrect output)
+
+Your program produced these 1 lines of output:
+/home/cs2041/public_html/lab/lab07/autotest/poem4.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+
+The correct 1 lines of output for this test were:
+/home/cs2041/public_html/lab/lab07/autotest/poem4.txt most resembles the work of William Blake (log-probability=-155.4)
+
+The difference between your output and the correct output is:
+- /home/cs2041/public_html/lab/lab07/autotest/poem4.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+?                                                                                           --  -------                   ^^^^^ ^
+
++ /home/cs2041/public_html/lab/lab07/autotest/poem4.txt most resembles the work of William Blake (log-probability=-155.4)
+?                                                                                            ++                   + ^^ ^
+
+
+You can reproduce this test by executing these commands:
+
+./identify_poet.pl /home/cs2041/public_html/lab/lab07/autotest/poem4.txt
+
+
+Test identify_poet_5 (-a -W	"./identify_poet.pl poem5.txt") - failed (Incorrect output)
+
+Your program produced these 1 lines of output:
+/home/cs2041/public_html/lab/lab07/autotest/poem5.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+
+The correct 1 lines of output for this test were:
+/home/cs2041/public_html/lab/lab07/autotest/poem5.txt most resembles the work of Walt Whitman (log-probability=-274.2)
+
+The difference between your output and the correct output is:
+- /home/cs2041/public_html/lab/lab07/autotest/poem5.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+?                                                                                    ^^^ ^^^^^^^^^^^^^^                  ^ ^^^^ ^
+
++ /home/cs2041/public_html/lab/lab07/autotest/poem5.txt most resembles the work of Walt Whitman (log-probability=-274.2)
+?                                                                                   ++++++ ^^ ^                  ^ ^^ ^
+
+
+You can reproduce this test by executing these commands:
+
+./identify_poet.pl /home/cs2041/public_html/lab/lab07/autotest/poem5.txt
+
+
+Test identify_poet_6 (-a -W	"./identify_poet.pl poem6.txt") - failed (Incorrect output)
+
+Your program produced these 1 lines of output:
+/home/cs2041/public_html/lab/lab07/autotest/poem6.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+
+The correct 1 lines of output for this test were:
+/home/cs2041/public_html/lab/lab07/autotest/poem6.txt most resembles the work of Elizabeth Barrett Browning (log-probability=-375.8)
+
+The difference between your output and the correct output is:
+- /home/cs2041/public_html/lab/lab07/autotest/poem6.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+?                                                                                  ^^^   ^  ^ ^^ ^^^^^^                  ^^^^ ---
+
++ /home/cs2041/public_html/lab/lab07/autotest/poem6.txt most resembles the work of Elizabeth Barrett Browning (log-probability=-375.8)
+?                                                                                  ^  + ^^^^  ^^^^ ^^^ ^^^^^^                  ^^^^^
+
+
+You can reproduce this test by executing these commands:
+
+./identify_poet.pl /home/cs2041/public_html/lab/lab07/autotest/poem6.txt
+
+
+Test identify_poet_all (-a -W	"./identify_poet.pl poem?.txt") - failed (Incorrect output)
+
+Your program produced these 6 lines of output:
+/home/cs2041/public_html/lab/lab07/autotest/poem1.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+/home/cs2041/public_html/lab/lab07/autotest/poem2.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+/home/cs2041/public_html/lab/lab07/autotest/poem3.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+/home/cs2041/public_html/lab/lab07/autotest/poem4.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+/home/cs2041/public_html/lab/lab07/autotest/poem5.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+/home/cs2041/public_html/lab/lab07/autotest/poem6.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+
+The correct 6 lines of output for this test were:
+/home/cs2041/public_html/lab/lab07/autotest/poem1.txt most resembles the work of John Keats (log-probability=-2720.9)
+/home/cs2041/public_html/lab/lab07/autotest/poem2.txt most resembles the work of Percy Bysshe Shelley (log-probability=-777.0)
+/home/cs2041/public_html/lab/lab07/autotest/poem3.txt most resembles the work of Robert Frost (log-probability=-720.2)
+/home/cs2041/public_html/lab/lab07/autotest/poem4.txt most resembles the work of William Blake (log-probability=-155.4)
+/home/cs2041/public_html/lab/lab07/autotest/poem5.txt most resembles the work of Walt Whitman (log-probability=-274.2)
+/home/cs2041/public_html/lab/lab07/autotest/poem6.txt most resembles the work of Elizabeth Barrett Browning (log-probability=-375.8)
+
+The difference between your output and the correct output is:
+- /home/cs2041/public_html/lab/lab07/autotest/poem1.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+?                                                                                  ^^^^^^^^^^^^^^^^                      ^ ^^^^ ^
+
++ /home/cs2041/public_html/lab/lab07/autotest/poem1.txt most resembles the work of John Keats (log-probability=-2720.9)
+?                                                                                  ^^^^^^                      ^ ^^^ ^
+
+- /home/cs2041/public_html/lab/lab07/autotest/poem2.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+?                                                                                  ^^  -------- ^^^^^^^                  ^^^^^^ ^
+
++ /home/cs2041/public_html/lab/lab07/autotest/poem2.txt most resembles the work of Percy Bysshe Shelley (log-probability=-777.0)
+?                                                                                  ^^^^^^^^^^^^^^^^   ^                  ^^^^ ^
+
+- /home/cs2041/public_html/lab/lab07/autotest/poem3.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+?                                                                                  ^^^^^^^^^^^^  ----                    ^ ^^^^ ^
+
++ /home/cs2041/public_html/lab/lab07/autotest/poem3.txt most resembles the work of Robert Frost (log-probability=-720.2)
+?                                                                                  ^^^   ++++ +                  ^^ ^ ^
+
+- /home/cs2041/public_html/lab/lab07/autotest/poem4.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+?                                                                                           --  -------                   ^^^^^ ^
+
++ /home/cs2041/public_html/lab/lab07/autotest/poem4.txt most resembles the work of William Blake (log-probability=-155.4)
+?                                                                                            ++                   + ^^ ^
+
+- /home/cs2041/public_html/lab/lab07/autotest/poem5.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+?                                                                                    ^^^ ^^^^^^^^^^^^^^                  ^ ^^^^ ^
+
++ /home/cs2041/public_html/lab/lab07/autotest/poem5.txt most resembles the work of Walt Whitman (log-probability=-274.2)
+?                                                                                   ++++++ ^^ ^                  ^ ^^ ^
+
+- /home/cs2041/public_html/lab/lab07/autotest/poem6.txt most resembles the work of William Butler Yeats (log-probability=121186.3)
+?                                                                                  ^^^   ^  ^ ^^ ^^^^^^                  ^^^^ ---
+
++ /home/cs2041/public_html/lab/lab07/autotest/poem6.txt most resembles the work of Elizabeth Barrett Browning (log-probability=-375.8)
+?                                                                                  ^  + ^^^^  ^^^^ ^^^ ^^^^^^                  ^^^^^
+
+
+You can reproduce this test by executing these commands:
+
+./identify_poet.pl /home/cs2041/public_html/lab/lab07/autotest/poem?.txt
+
+
+0 tests passed  7 tests failed
