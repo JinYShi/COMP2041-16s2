@@ -1,0 +1,127 @@
+/*
+ * written by andrewt@cse.unsw.edu.au September 2016
+ * as a starting point for COMP2041/9041 assignment 2
+ * http://cgi.cse.unsw.edu.au/~cs2041/assignments/matelook/
+ *
+ * Change (or replace) the CSS below to create you own look-and-feel
+ *
+ * You will probably want to add  CSS to this file too
+ */
+
+.matelook_heading {
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  border: none;
+  font: normal 76px/1 "amaranth", Helvetica, sans-serif;
+  color: #7b00ff;
+  text-align: center;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+}
+
+.matelook_subheading {
+  padding-top: 0.42em
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  border: none;
+  font: normal 36px/1 "amaranth", Helvetica, sans-serif;
+  color: #7b00ff;
+  text-align: center;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+}
+.matelook_subsubheading {
+  padding-top: 0.42em
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  border: none;
+  font: normal 18px/1 "amaranth", Helvetica, sans-serif;
+  color: #7b00ff;
+  text-align: center;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+}
+
+
+.matelook_user_details {
+    background-color: #C7BEDD;
+    color: #204142;
+
+    border:thin solid #204142;
+    border-radius: 1em;
+    padding-left: 1em;
+    padding-bottom: 0.42em;
+}
+
+.matelook_mates {
+    background-color: #C7BEDD;
+    color: #204142;
+    border:thin solid #204142;
+    border-radius: 1em;
+    padding-left: 1em;
+    padding-right: 30em;
+    text-align: center;
+    border-right: 150px;
+    border-left: 80px;
+}
+.matelook_mate {
+    background-color:  #cc99ff;
+    border:thin solid #9933ff;
+    border-radius: 0.42em;
+    color: black;
+    padding-bottom: 0.42em;
+    padding-right: 0.42em;
+    padding-left: 0.42em;
+    padding-top: 0.42em;
+}
+.matelook_button {
+    background-color: #7CC1DE;
+    border:thin solid #904142;
+    border-radius: 0.42em;
+    color: #7533BF;
+}
+
+.matelook_post_block {
+    background-color: #C7BEDD;
+    color: #204142;
+    border:thin solid #204142;
+    border-radius: 1em;
+    padding-left: 0.42em;
+    padding-right: 0.42em;
+}
+
+.matelook_post {
+    background-color:  #cc99ff;
+    border:thin solid #9933ff;
+    border-radius: 0.42em;
+    color: black;
+    padding-bottom: 0.42em;
+    padding-right: 0.42em;
+    padding-left: 0.42em;
+    padding-top: 0.42em;
+}
+
+.matelook_comment {
+    background-color:#d9b3ff;
+    border:thin solid #9933ff;
+    border-radius: 0.42em;
+    color: black;
+    padding-bottom: 0.42em;
+    padding-right: 0.42em;
+    padding-left: 0.42em;
+    padding-top: 0.42em;
+}
+
+.matelook_comment_comment {
+    background-color:#e6ccff;
+    border:thin solid #9933ff;
+    border-radius: 0.42em;
+    color: black;
+    padding-bottom: 0.42em;
+    padding-right: 0.42em;
+    padding-left: 0.42em;
+    padding-top: 0.42em;
+}
