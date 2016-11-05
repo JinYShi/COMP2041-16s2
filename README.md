@@ -15,4 +15,5 @@ spec: http://www.cse.unsw.edu.au/~cs2041/assignments/plpy/
 Written in Python. 
 Produce a CGI script matelook.cgi which provides the core features of matelook.</br>
 Create a simple but fully functional social media web site for UNSW students. </br>
-spec: http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/assignments/matelook/
+spec: http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/assignments/matelook/ </br>
+view matelook(login page commented out): cgi.cse.unsw.edu.au/~z5075755/ass2/matelook.cgi
