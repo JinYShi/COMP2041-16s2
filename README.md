@@ -1,6 +1,7 @@
 # COMP2041-16s2
 Software Construction: Techniques and Tools (COMP2041) Coursework </br>
 Course Website: http://www.cse.unsw.edu.au/~cs2041/
+Slides and other material are from the link above. 
 
 ## Labs
 Written in Shell, Perl and Python. (Also contains CGI scripts with HTML) </br>
