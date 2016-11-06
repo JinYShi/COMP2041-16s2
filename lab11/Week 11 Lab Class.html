@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/answers.py?lab/week11.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Week 11 Lab Class</title>
+<link href="./Week 11 Lab Class_files/2041.css" rel="stylesheet">
+<script src="./Week 11 Lab Class_files/2041.js.download"></script>
+</head>
+<body data-shoptagr-mini="yes">
+<div class="container">
+<div id="heading"><a class="heading_link" target="_blank" id="left_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">COMP[29]041 16s2</a>
+Perl is perfect for  dynamic web content
+<a class="heading_link" target="_blank" id="right_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">Software Construction</a></div>
+<div class="tutlab lab">
+<h3>Aims</h3>
+Generating dynamic web content using Perl.
+<h3>Assessment</h3>
+<table border="0" cellpadding="3">
+<tbody><tr><td><b>Submission:</b></td><td><code>give cs2041 lab11 guess_number.cgi guess_number.css play_guess_number.cgi [reduce.pl regex_prime.pl]</code></td></tr>
+<tr><td><b>Deadline:</b></td><td>either during the lab, or Sunday 18 October 11:59pm (midnight)</td></tr>
+<tr><td><b>Assessment:</b></td><td>
+Make sure that you are familiar with the
+<a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/assessment.html">lab assessment criteria</a>.
+</td></tr>
+</tbody></table>
+<h3>Exercise: adding CSS to the  CGI Guessing Game</h3>
+
+In your tutorial you constructed a CGI script like this which allows the user to play a simple number guessing game, where the script picks a a number between 1 and 100 and the user guesses it.
+
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+use CGI qw/:all/;
+use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
+
+# Simple CGI script written by andrewt@cse.unsw.edu.au
+# Outputs a form which will rerun the script
+# An input field of type hidden is used to pass an integer
+# to successive invocations
+
+$max_number_to_guess = 99;
+
+print &lt;&lt;eof;
+Content-Type: text/html
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;title&gt;Guess A Number&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+eof
+
+warningsToBrowser(1);
+
+$number_to_guess = param('number_to_guess');
+$guess = param('guess');
+
+$game_over = 0;
+
+if (defined $number_to_guess and defined $guess) {
+    $guess =~ s/\D//g;
+    $number_to_guess =~ s/\D//g;
+    if ($guess == $number_to_guess) {
+        print "You guessed right, it was $number_to_guess.\n";
+        $game_over = 1;
+    } elsif ($guess &lt; $number_to_guess) {
+        print "Its higher than $guess.\n";
+    } else {
+        print "Its lower than $guess.\n";
+    }
+} else {
+    $number_to_guess = 1 + int(rand $max_number_to_guess);
+    print "I've  thought of number 0..$max_number_to_guess\n";
+}
+
+if ($game_over) {
+print &lt;&lt;eof;
+    &lt;form method="POST" action=""&gt;
+        &lt;input type="submit" value="Play Again"&gt;
+    &lt;/form&gt;
+eof
+} else {
+print &lt;&lt;eof;
+    &lt;form method="POST" action=""&gt;
+        &lt;input type="textfield" name="guess"&gt;
+        &lt;input type="hidden" name="number_to_guess" value="$number_to_guess"&gt;
+    &lt;/form&gt;
+eof
+}
+
+print &lt;&lt;eof;
+&lt;/body&gt;
+&lt;/html&gt;
+eof
+</pre>
+<div class="cgi_display">
+<div class="cgi_display_title">
+<a target="_blank" href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/cgi/guess_number/guess_number.cgi">guess_number.cgi</a>
+</div>
+<div class="cgi_output_panel">
+<iframe class="cgi_output_display" src="./Week 11 Lab Class_files/guess_number.html" onload="show_html_source(this)">
+</iframe>
+</div>
+<div class="html_source_panel">
+<div class="html_source_display">&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Guess A Number&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+I've  thought of number 0..99
+    &lt;form method="POST" action=""&gt;
+        &lt;input type="textfield" name="guess"&gt;
+        &lt;input type="hidden" name="number_to_guess" value="24"&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</div>
+</div>
+</div>
+
+
+Change <code>guess_number.cgi</code> to include some CSS.  Put the CSS in a file named <code>guess_number.css</code>
+<p>
+The CSS must style at least two elements on the page.
+</p><p>
+Its not important what the CSS does - although feel free to  offend your tutor's sense of aesthetics.
+
+</p><h4>Hints</h4>
+
+Look at the <a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/assignments/matelook/matelook.cgi.txt">starting point code</a> for assignment 2
+<p></p><p>
+Look at the <a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/assignments/matelook/matelook.css">CSS file</a> for assignment 2
+</p><p>
+These commands will get you started:
+
+</p><pre class="command_line"><kbd class="shell">cd ~/public_html/lab11</kbd>
+<kbd class="shell">chmod 755 . ..</kbd>
+<kbd class="shell">chmod 755 guess_number.cgi</kbd>
+<kbd class="shell">vi guess_number.cgi</kbd>
+<kbd class="shell">firefox http://www.cse.unsw.edu.au/~z5555555/lab11/guess_number.cgi &amp;</kbd>
+</pre>
+
+When you make progress on <code>guess_number.cgi</code> don't forget to push it to gitlab.cse.unsw.edu.au using the usual commands.
+
+<pre class="command_line"><kbd class="shell">git add guess_number.cgi guess_number.css </kbd>
+<kbd class="shell">git commit -m 'CSS being included'</kbd>
+<kbd class="shell">git push</kbd>
+</pre>
+<div class="answer">
+
+guess_number.cgi with CSS added:
+
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+use CGI qw/:all/;
+use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
+
+# Simple CGI script written by andrewt@cse.unsw.edu.au
+# Outputs a form which will rerun the script
+# An input field of type hidden is used to pass an integer
+# to successive invocations
+
+$max_number_to_guess = 99;
+
+print &lt;&lt;eof;
+Content-Type: text/html
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;title&gt;Guess A Number&lt;/title&gt;
+    &lt;link href="guess_number.css" rel="stylesheet"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=\"message_text"&gt;
+eof
+
+warningsToBrowser(1);
+
+$number_to_guess = param('number_to_guess');
+$guess = param('guess');
+
+$game_over = 0;
+
+if (defined $number_to_guess and defined $guess) {
+    $guess =~ s/\D//g;
+    $number_to_guess =~ s/\D//g;
+    if ($guess == $number_to_guess) {
+        print "You guessed right, it was $number_to_guess.\n";
+        $game_over = 1;
+    } elsif ($guess &lt; $number_to_guess) {
+        print "Its higher than $guess.\n";
+    } else {
+        print "Its lower than $guess.\n";
+    }
+} else {
+    $number_to_guess = 1 + int(rand $max_number_to_guess);
+    print "I've  thought of number 0..$max_number_to_guess\n";
+}
+
+print "&lt;/div&gt;\n";
+
+if ($game_over) {
+print &lt;&lt;eof;
+    &lt;form method="POST" action=""&gt;
+        &lt;input type="submit" value="Play Again" class="play_again_button"&gt;
+    &lt;/form&gt;
+eof
+} else {
+print &lt;&lt;eof;
+    &lt;form method="POST" action=""&gt;
+        &lt;input type="textfield" name="guess" class="input_number"&gt;
+        &lt;input type="hidden" name="number_to_guess" value="$number_to_guess"&gt;
+    &lt;/form&gt;
+eof
+}
+
+print &lt;&lt;eof;
+&lt;/body&gt;
+&lt;/html&gt;
+eof
+</pre>
+
+Some not very useful CSS stolen from the assignment:
+
+
+<pre class="program">.message_text {
+    padding-top: 1em;
+    padding-bottom: 1em;
+    font-size: x-large;
+    font-weight: bold;
+}
+
+.input_number {
+    background-color: #ABCDEF;
+    color: #204142;
+    border:thin solid #204142;
+    border-radius: 1em;
+    padding-left: 0.42em;
+}
+
+.play_again_button {
+    background-color: #FEDBCA;
+    border:thin solid #904142;
+    border-radius: 0.42em;
+    color: #904142;
+}
+</pre>
+</div>
+<h3>Exercise: Let the  CGI Script Guess</h3>
+
+Write a Perl CGI script which instead plays the number guessing game.
+The user chooses a number between  1 and 100 and then the script attempts to guess it.
+<p></p><p>
+Your script should use an optimal guessing strategy (simple binary search).
+</p><p>
+Here is an example implementation:
+
+
+
+</p><div class="cgi_display">
+<div class="cgi_display_title">
+<a target="_blank" href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/cgi/guess_number/play_guess_number.cgi">play_guess_number.cgi</a>
+</div>
+<div class="cgi_output_panel">
+<iframe class="cgi_output_display" src="./Week 11 Lab Class_files/play_guess_number.html" onload="show_html_source(this)">
+</iframe>
+</div>
+<div class="html_source_panel">
+<div class="html_source_display">&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;A Guessing Game Player&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form method="POST" action=""&gt;
+        My guess is: 50
+        &lt;input type="submit" name="higher" value="Higher?"&gt;
+        &lt;input type="submit" name="correct" value="Correct?"&gt;
+        &lt;input type="submit" name="lower" value="Lower?"&gt;
+        &lt;input type="hidden" name="low_limit" value="1"&gt;
+        &lt;input type="hidden" name="high_limit" value="100"&gt;
+        &lt;input type="hidden" name="guess" value="50"&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</div>
+</div>
+</div>
+<h4>Hints</h4>
+
+Use 3 hidden variables to store upper and lower bounds and your last guess.
+<p></p><p>
+Look at the <a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/code/cgi/index.html">CGI examples from lectures</a>
+particularly the  <a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/code/cgi/multiple_submit_buttons.cgipm.cgi">Handling multiple submit buttons example</a> (<a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/code/cgi/multiple_submit_buttons.cgipm++.cgi.txt">src</a>)
+</p><p>
+Note in the <a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/cgi/code/cgi/cgi_examples.html">CGI examples</a>
+from lectures you have been shown a CGI script with multiple submit buttons in a form:
+
+
+</p><pre class="program">#!/usr/bin/perl -w
+# Simple CGI script written by andrewt@cse.unsw.edu.au
+# Outputs a form which will rerun the script
+# An input field of type hidden is used to pass an integer
+# to successive invocations
+# Two submit buttons are used to produce different actions
+
+use CGI qw/:all/;
+use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
+
+print &lt;&lt;eof;
+Content-Type: text/html
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;title&gt;Handling Multiple Submit Buttons&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+eof
+warningsToBrowser(1);
+
+$hidden_variable = param("x") || 0;
+
+if (defined param("increment")) {
+	$hidden_variable++;
+} elsif (defined param("decrement")) {
+	$hidden_variable--;
+}
+
+print &lt;&lt;eof;
+&lt;h2&gt;$hidden_variable&lt;/h2&gt;
+&lt;form method="post" action=""&gt;
+&lt;input type=hidden name="x" value="$hidden_variable"&gt;
+&lt;input type="submit" name="increment" value="Increment"&gt;
+&lt;input type="submit" name="decrement" value="Decrement"&gt;
+&lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+eof
+</pre>
+<div class="cgi_display">
+<div class="cgi_display_title">
+<a target="_blank" href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/cgi/guess_number/multiple_submit_buttons.cgipm.cgi">multiple_submit_buttons.cgipm.cgi</a>
+</div>
+<div class="cgi_output_panel">
+<iframe class="cgi_output_display" src="./Week 11 Lab Class_files/multiple_submit_buttons.cgipm.html" onload="show_html_source(this)">
+</iframe>
+</div>
+<div class="html_source_panel">
+<div class="html_source_display">&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Handling Multiple Submit Buttons&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h2&gt;0&lt;/h2&gt;
+&lt;form method="post" action=""&gt;
+&lt;input type="hidden" name="x" value="0"&gt;
+&lt;input type="submit" name="increment" value="Increment"&gt;
+&lt;input type="submit" name="decrement" value="Decrement"&gt;
+&lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</div>
+</div>
+</div>
+
+
+You can get started similar to last week, so if you want to use the example
+CGI script from lectures as a starting point you might do this:
+<p></p><p>
+</p><pre class="command_line"><kbd class="shell">cd ~/public_html/lab11</kbd>
+<kbd class="shell">cp -p guess_number.cgi play_guess_number.cgi</kbd>
+<kbd class="shell">chmod 755 .</kbd>
+<kbd class="shell">chmod 755 play_guess_number.cgi</kbd>
+<kbd class="shell">vi play_guess_number.cgi</kbd>
+<kbd class="shell">firefox http://www.cse.unsw.edu.au/~z5555555/lab11/play_guess_number.cgi &amp;</kbd>
+</pre>
+
+When you make progress on <code>play_guess_number.cgi</code> don't forget to push it to gitlab.cse.unsw.edu.au using the usual commands.
+
+<pre class="command_line"><kbd class="shell">git add play_guess_number.cgi</kbd>
+<kbd class="shell">git commit -m 'first part implemented'</kbd>
+<kbd class="shell">git push</kbd>
+</pre>
+<div class="answer">
+Sample solution for play_guess_number.cgi
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+use CGI qw/:all/;
+use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
+
+# Simple CGI script written by andrewt@cse.unsw.edu.au
+# Script tries to guess a number between 1 and 100
+
+print &lt;&lt;eof;
+Content-Type: text/html
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;title&gt;A Guessing Game Player&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+eof
+
+warningsToBrowser(1);
+
+# we guessed right
+if (param('correct')) {
+    print &lt;&lt;eof;
+    &lt;form method="POST" action=""&gt;
+        I win!!!!
+       &lt;input type="submit" value="Play Again"&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+eof
+    exit 0;
+}
+
+
+$low_limit = param('low_limit');
+$high_limit = param('high_limit');
+$last_guess = param('guess');
+
+# limit missing so we must be starting a new game
+
+if (!defined $low_limit || !defined $high_limit) {
+    $low_limit = 1;
+    $high_limit = 100;
+} elsif (defined $last_guess) {
+    if (defined param('lower')) {
+        $high_limit = $last_guess - 1;
+    } elsif (defined param('higher')) {
+        $low_limit = $last_guess + 1;
+    }
+}
+
+$guess = int (($low_limit + $high_limit)/2);
+
+print &lt;&lt;eof;
+    &lt;form method="POST" action=""&gt;
+        My guess is: $guess
+        &lt;input type="submit" name="higher" value="Higher?"&gt;
+        &lt;input type="submit" name="correct" value="Correct?"&gt;
+        &lt;input type="submit" name="lower" value="Lower?"&gt;
+        &lt;input type="hidden" name="low_limit" value="$low_limit"&gt;
+        &lt;input type="hidden" name="high_limit" value="$high_limit"&gt;
+        &lt;input type="hidden" name="guess" value="$guess"&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+eof
+</pre>
+</div>
+<p></p>
+<h3>Challenge Exercise: Perl Reduce</h3>
+
+Write a Perl function <code>reduce</code> which takes two arguments a
+reference to some Perl code and a list.  It should reduce the list to
+a single value by calling the code, setting the variables $a and $b each time.
+The first call will be with $a and $b set to the first two elements of the list, subsequent calls will be done by setting $a to the result of the previous call and $b to the next element in the list.
+<p>
+If the list is empty then undef should be returned, if the only contains one element
+then should be returned with out the code being executed.
+</p><p>
+A number of common list operations can be defined in terms of reduce.
+For example:
+
+</p><pre class="program">$sum = reduce { $a + $b } 1 .. 10;
+$min = reduce { $a &lt; $b ? $a : $b } 5..10;
+$maxstr = reduce { $a gt $b ? $a : $b } 'aa'..'ee';
+$concat = reduce { $a . $b } 'J'..'P';
+$sep = '-';
+$join = reduce { "$a$sep$b" }  'A'..'E';
+print "$sum $min $maxstr $concat $join\n";
+</pre>
+
+should print:
+
+<pre class="program">55 5 ee JKLMNOP A-B-C-D-E
+</pre>
+
+Hint, you can find a suitable prototype for reduce by looking at the quicksort
+examples from lectures. Without a suitable prototype you'll need to call
+reduce in a slightly more clumsy manner:
+
+<pre class="command_line">$sum = reduce sub { $a + $b }, 1 .. 10;
+$min = reduce sub { $a &lt; $b ? $a : $b }, 5..10;
+$maxstr = reduce sub { $a gt $b ? $a : $b }, 'aa'..'ee';
+$concat = reduce sub { $a . $b }, 'J'..'P';
+$sep = '-';
+$join = reduce sub { "$a$sep$b" }, 'A'..'E';
+print "$sum $min $maxstr $concat $join\n";
+</pre>
+
+You are not permitted to use <code>List::Util</code> which contains a reduce function.
+<p></p><p>
+Don't look for other people solutions - see if you can come up with your own.
+
+</p><div class="answer">
+Sample solution for reduce.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+# simple implementation of reduce
+# List::util has a more robust implementation
+sub reduce(&amp;@) {
+    my ($code, @list) = @_;
+    return undef if !@list;
+    local $a = shift @list;
+    while (@list) {
+        local $b = shift @list;
+        $a = &amp;$code;
+    }
+    return $a;
+}
+$sum = reduce { $a + $b } 1 .. 10;
+$min = reduce { $a &lt; $b ? $a : $b } 5..10;
+$maxstr = reduce { $a gt $b ? $a : $b } 'aa'..'ee';
+$concat = reduce { $a . $b } 'J'..'P';
+$sep = '-';
+$join = reduce { "$a$sep$b" }  'A'..'E';
+print "$sum $min $maxstr $concat $join\n";
+</pre>
+</div>
+<h3>Challenge Exercise: Unary  Reduce</h3>
+
+Write a Perl or Python regex which matches unary number iff it is composite (not prime).
+<p></p><p>
+In other words write a regex that matches a string of <i>n</i> ones iff <i>n</i> is composite.
+</p><p>
+For example this Perl:
+
+</p><pre class="program">$regex = ?;
+foreach $n (1..100) {
+    $unary = 1 x $n;
+    print "$n = $unary unary - ";
+    if ($unary =~ $regex) {
+        print "composite\n"
+    } else {
+        print "prime\n";
+    }
+}
+</pre>
+
+with the regex added should print:
+
+<pre class="program">1 = 1 unary - composite
+2 = 11 unary - prime
+3 = 111 unary - prime
+4 = 1111 unary - composite
+5 = 11111 unary - prime
+6 = 111111 unary - composite
+7 = 1111111 unary - prime
+8 = 11111111 unary - composite
+9 = 111111111 unary - composite
+10 = 1111111111 unary - composite
+11 = 11111111111 unary - prime
+12 = 111111111111 unary - composite
+13 = 1111111111111 unary - prime
+....
+</pre>
+
+Hint: you can't do this with a true regular expression, i.e using <code>|*()</code> alone,
+you need to use features that Perl and Python add.
+<p></p><p>
+Don't google for other people solutions - see if you can come up with your own.
+
+</p><div class="answer">
+Sample solution for regex_prime.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+# regex widely repeated - apparently originally by http://www.abigail.be/
+$regex = '^1?$|^(11+?)\1+$';
+foreach $n (1..100) {
+    $unary = 1 x $n;
+    print "$n = $unary unary - ";
+    if ($unary =~ $regex) {
+        print "composite\n"
+    } else {
+        print "prime\n";
+    }
+}</pre>
+</div>
+<h3>Finalising</h3>
+You must show your solutions to your tutor and be able to explain
+how they work.
+Once your tutor has discussed your answers with you, you should
+submit them using:
+<pre class="command_line"><kbd class="shell">give cs2041 lab11 guess_number.cgi guess_number.css play_guess_number.cgi [reduce.pl regex_prime.pl]</kbd>
+</pre>
+Whether you discuss your solutions
+with your tutor this week or next week, you must submit them before
+the above deadline.
+<p></p></div>
+</div>
+
+
+
+<div id="extension-is-installed"></div></body></html>

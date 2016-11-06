@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/answers.py?lab/week05.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Week 05 Lab Class</title>
+<link href="./Week 05 Lab Class_files/2041.css" rel="stylesheet">
+</head>
+<body data-shoptagr-mini="yes">
+<div class="container">
+<div id="heading"><a class="heading_link" target="_blank" id="left_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">COMP[29]041 16s2</a>
+Welcome to Perl.
+<a class="heading_link" target="_blank" id="right_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">Software Construction</a></div>
+<div class="tutlab lab">
+<h3>Aims</h3>
+Getting started with Perl programming.
+<h3>Assessment</h3>
+<table border="0" cellpadding="3">
+<tbody><tr><td><b>Submission:</b></td><td><code>give cs2041 lab05 digits.pl echon.pl tail.pl</code><br> also submit <code>shuffle.pl</code> and <code>shuffle_test.sh</code>  if you attempt these challenge exercises</td></tr>
+<tr><td><b>Deadline:</b></td><td>either during the lab, or Monday 29 August 11:59pm (midnight)</td></tr>
+<tr><td><b>Assessment:</b></td><td>
+Make sure that you are familiar with the
+<a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/assessment.html">lab assessment criteria</a>.
+</td></tr>
+</tbody></table>
+<p>
+</p><h3>Background</h3>
+<p></p><p>
+We have covered only a small amount of Perl in lectures. In fact, to
+cover the whole language in detail would take a whole semester, so
+we're going to rely on you finding out about the language yourself
+in tutes, labs and assignments. A good place to start is
+the Perl documentation &amp; tutorial links on the class home page
+For example you might find these useful:
+</p>
+<ul>
+<li> <a target="doc" href="http://search.cpan.org/dist/perl/pod/perlsyn.pod">Perl language syntax</a>
+</li><li> <a target="doc" href="http://search.cpan.org/dist/perl/pod/perlsub.pod">Perl functions</a>
+</li><li> <a target="doc" href="http://search.cpan.org/dist/perl/pod/perlop.pod">Perl operators</a>
+</li></ul>
+<h3>Storing lab work  on gitlab.cse.unsw.edu.au</h3>
+
+For this and future labs you are going to use a version control system named git
+to store copies of your lab work in a repository at gitlab.cse.unsw.edu.au.
+<p>
+Don't panic this is easy to do and will ensure you have a complete backup of all work on
+your lab and can return to its state at any stage.
+</p><p>
+It will also allow your tutor to check you are progressing on the lab as
+they can access your gitlab repository
+
+</p><h3>Adding Your SSH Key to Gitlab</h3>
+<ol class="separated_list">
+<li>
+First print your CSE ssh key (if you have one:. This command should should do it.
+<pre class="command_line"><kbd class="shell">cat ~/.ssh/id_rsa.pub</kbd>
+ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAyNSzIDylSPAAGLzUXdw359UhO+tlN6wWprSBc9gu6t3IQ1rvHhPoD6wcRXnonY6ytb00GpS4XRFuhCghx2JNVkXFykJYt3XNr1xkPItMmXr/DRIYrtxTs5sn9el3hHZIgELY8jJZpgIo303kgnF0MsB7XpqCzg7Iv6JGkv7aEoYC/MNr07hXE8iQjYIHDMdO9HxGI80GyMqb1hF+RSpQTNvXQvH56juu9VXt5OwJjOqSVa4SfsEICqdn+3k9w8Z4EaD93Eeog3hz0RoTrme8h/sJenXydJ0w9ZOs0By4fjqKFYPsYEs1K6SHma+kPByZM9COgKHZwOZHH1m24HOITQ== z5555555@williams</pre>
+</li><li>
+
+If you couldn't print a ssh key with the above command, you need to generate an ssh key.
+You can do it like this (just hit return for each  questions).
+<pre class="command_line"><kbd class="shell">ssh-keygen</kbd>
+Generating public/private rsa key pair.
+Enter file in which to save the key (/import/kamen/3/z5555555/.ssh/id_rsa):
+Created directory '/import/kamen/3/z5555555/.ssh'.
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /import/kamen/3/z5555555/.ssh/id_rsa.
+Your public key has been saved in /import/kamen/3/z5555555/.ssh/id_rsa.pub.
+The key fingerprint is:
+b8:02:31:8b:bf:f5:56:fa:b0:1c:36:89:ad:e1:cb:ad z5555555@williams
+The key's randomart image is:
+...
+</pre>
+</li><li>
+Now add your ssh key to gitlab:
+</li><li>
+Go to <a href="https://gitlab.cse.unsw.edu.au/profile/keys/new">https://gitlab.cse.unsw.edu.au/profile/keys/new</a>
+Click on <span class="btn btn-success">Sign in</span>
+</li><li>
+Supply  your UNSW login (e.g. z5555555) and zPass and click the <span class="btn-primary btn">UNSW Sign in</span> button.
+</li><li>
+Cut-and-paste your ssh-key (the entire 200+ character line printed by <code>cat ~/.ssh/id_rsa.pub</code>) into the "<b>Key</b>" field.
+<p>
+Don't cut-and paste z5555555's ssh key above - cut-and-paste your ssh-key!
+</p></li><li>
+At this point, your screen should look something like this:
+<p>
+<img style="border:thin solid;border-radius:10px;" src="./Week 05 Lab Class_files/Add_SSH_Keys_Settings.png">
+</p><p>
+</p></li><li>
+click the green <span class="btn btn-success">Add key</span> button
+</li></ol>
+<p></p><p>
+<!--
+
+Follow these steps to push to create a git repository on gitlab.cse.unsw.edu.au.
+
+<ol class="separated_list">
+<li>
+Go to <a href="https://gitlab.cse.unsw.edu.au/groups/16s2COMP2041">https://gitlab.cse.unsw.edu.au/groups/16s2COMP2041</a>
+<li>
+Click on <span class="btn btn-success">Sign in</span>
+<li>
+Supply  your UNSW login (e.g. z5555555) and zPass and click the <span class="btn-primary btn">UNSW Sign in</span> button.
+<li>
+Click on <span class="btn btn-success">New Project</span>
+<li>
+If your UNSW id is <code>z5555555</code> then in the
+<b>Project path</b> field enter <span class="btn">z5555555-lab06</span>
+<p>
+Make sure you enter only  'z' followed by your student number followed by <code>-lab06</code>, don't include any spaces.
+<li>
+Do not change the "<b>Namespace</b> field it must be <span class="btn">16s2COMP2041</span>
+<li>
+Make sure the <b>Visibility Level</b> is Private - otherwise your code will be visible to all students.
+<li>
+At this point, your screen should look something like this:
+<p>
+<img style="border:thin solid;border-radius:10px;" src="New_Project_GitLab.png">
+<p>
+Click the <span class="btn btn-success">Create Project</span> button button.
+It should take less than a minute for your repository to be created.
+</ol>
+You now have a git repository on gitlab.cse.unsw.edu.au for the lab
+
+-->
+</p><h3>Creating a Git Repository  in your CSE account</h3>
+
+A repository for your COMP[29]041 labs has already been created for you on <code>gitlab.cse.unsw.edu.au</code>.
+<p></p><p>
+You'll  also need a git repository for your labs in your CSE account.
+</p><p>
+The instructions below will create a new directory for your COMP[29]041 labs named  <b>2041-labs</b>.
+</p><p>
+From now on put the files for each lab in a sub-directory of this lab.
+</p><p>
+You can if you wish move earlier labs into this directory as well but do this <b>after</b> following the instructions below.
+</p><p>
+Make sure you replace <i>5555555</i> below by your student number!
+</p><p>
+</p><pre class="command_line"><kbd class="shell">cd</kbd>
+<kbd class="shell">git clone gitlab@gitlab.cse.unsw.EDU.AU:z<i>5555555</i>/16s2-comp2041-labs 2041-labs</kbd>
+Cloning into '2041-labs'...
+<kbd class="shell">chmod 700 2041-labs</kbd>
+<kbd class="shell">cd 2041-labs</kbd>
+<kbd class="shell">ln -sf /home/cs2041/public_html/scripts/autotest-pre-commit-hook .git/hooks/pre-commit</kbd>
+<kbd class="shell">ls -la</kbd>
+drwx------   3 z5555555 z5555555  4096 Aug 27 14:44 .
+drwxr-x--x 107 z5555555 z5555555 16384 Aug 27 14:51 ..
+drwx------   7 z5555555 z5555555  4096 Aug 27 14:44 .git
+drwx------   7 z5555555 z5555555  4096 Aug 27 14:44 lab05
+drwx------   7 z5555555 z5555555  4096 Aug 27 14:44 lab06
+...
+<kbd class="shell">cd lab05</kbd>
+</pre>
+<p></p><p>
+You now have a git repository in your CSE account for this and future week's lab work.
+The sub-directory <code>.git</code> is where git stores information.
+</p><p>
+Create the files for this week's lab in <b>2041-labs/lab05</b>
+and push them to gitlab.cse.unsw.edu.au when every you make some progress.
+</p><p>
+BTW the line
+</p><p>
+</p><pre class="command_line"><kbd class="shell">ln -s /home/cs2041/public_html/16s2/scripts/autotest-pre-commit-hook .git/hooks/pre-commit</kbd>
+</pre>
+<p></p><p>
+results in git running autotests for every commit.
+This should be useful to you and is small example of customizing git for building
+a software system.
+
+
+</p>
+<h3>Exercise: Mapping Digits</h3>
+
+
+Write a Perl script <code>digits.pl</code> that reads from standard input and writes to standard output
+mapping all digit characters whose values are
+less than 5 into the character '<code>&lt;</code>' and all digit characters
+whose values are greater than 5 into the character '<code>&gt;</code>'.
+The digit character '5' should be left unchanged.
+<p>
+</p><table border="1" cellpadding="6">
+<tbody><tr><th>Sample Input Data</th><th>Corresponding Output</th></tr>
+<tr valign="top"><td>
+<pre>1 234 5 678 9
+</pre>
+</td><td>
+<pre>&lt; &lt;&lt;&lt; 5 &gt;&gt;&gt; &gt;
+</pre>
+</td></tr><tr valign="top"><td>
+<pre>I can think of 100's
+of other things I'd rather
+be doing than these 3 questions
+</pre>
+</td><td>
+<pre>I can think of &lt;&lt;&lt;'s
+of other things I'd rather
+be doing than these &lt; questions
+</pre>
+</td></tr>
+<tr valign="top"><td>
+<pre>A line with lots of numbers:
+123456789123456789123456789
+A line with all zeroes
+000000000000000000000000000
+A line with blanks at the end
+1 2 3
+</pre>
+</td><td>
+<pre>A line with lots of numbers:
+&lt;&lt;&lt;&lt;5&gt;&gt;&gt;&gt;&lt;&lt;&lt;&lt;5&gt;&gt;&gt;&gt;&lt;&lt;&lt;&lt;5&gt;&gt;&gt;&gt;
+A line with all zeroes
+&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+A line with blanks at the end
+&lt; &lt; &lt;
+</pre>
+</td></tr>
+<tr valign="top"><td>
+<pre>Input with absolutely 0 digits in it
+Well ... apart from that one ...
+</pre>
+</td><td>
+<pre>Input with absolutely &lt; digits in it
+Well ... apart from that one ...
+</pre>
+</td></tr>
+<tr valign="top"><td>
+<pre>1 2 4 8 16 32 64 128 256 512 1024
+2048 4096 8192 16384 32768 65536
+</pre>
+</td><td>
+<pre>&lt; &lt; &lt; &gt; &lt;&gt; &lt;&lt; &gt;&lt; &lt;&lt;&gt; &lt;5&gt; 5&lt;&lt; &lt;&lt;&lt;&lt;
+&lt;&lt;&lt;&gt; &lt;&lt;&gt;&gt; &gt;&lt;&gt;&lt; &lt;&gt;&lt;&gt;&lt; &lt;&lt;&gt;&gt;&gt; &gt;55&lt;&gt;
+</pre>
+</td></tr>
+</tbody></table>
+<div class="answer">
+Sample solution #0 for digits.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+while ($line = &lt;STDIN&gt;) {
+    $line =~ s/[0-4]/&lt;/g;
+    $line =~ s/[6-9]/&gt;/g;
+    print $line;
+}
+</pre>
+
+Sample solution #1 for digits.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+# using the implicit variable $_
+while (&lt;STDIN&gt;) {
+    s/[0-4]/&lt;/g;
+    s/[6-9]/&gt;/g;
+    print;
+}
+</pre>
+
+Sample solution #2 for digits.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+while (&lt;STDIN&gt;) {
+    tr/0-9/&lt;&lt;&lt;&lt;&lt;5&gt;&gt;&gt;&gt;/;
+    print;
+}
+</pre>
+</div>
+
+
+
+As usual you can run some tests on your script like this:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab05 digits.pl</kbd>
+</pre>
+Also do your own testing!
+
+<h3>Pushing to gitlab.cse.unsw.edu.au</h3>
+
+When you make some progress with <code>digits.pl</code> do this to push it to gitlab.cse.unsw.edu.au.
+
+<pre class="command_line"><kbd class="shell">git add digits.pl </kbd>
+<kbd class="shell">git commit -a -m "first version"</kbd>
+[master 4cdfa5f] first version
+ 1 file changed, 17 insertions(+)
+ create mode 100755 .pl
+<kbd class="shell">git push -u origin master</kbd>
+Counting objects: 3, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (2/2), 239 bytes, done.
+Total 2 (delta 1), reused 0 (delta 0)
+To gitlab@calliope1.cse.unsw.EDU.AU:z5555555/16s2-comp2041-labs.git
+   36ccb2b..4cdfa5f  master -&gt; master
+</pre>
+
+Later on when you have made more progress with <code>digits.pl</code> do this to commit the new version &amp; push it to gitlab.
+
+<pre class="command_line"><kbd class="shell">git commit -a -m "digits.pl passes autotests"</kbd>
+...
+<kbd class="shell">git push</kbd>
+</pre>
+
+If you explore at https://gitlab.cse.unsw.edu.au/z<i>5555555</i>/16s2-comp2041-labs (replacing <i>5555555</i> with your student number you'll find both versions of <code>digits.pl</code>
+<p></p><p>
+Follow the same steps for all the programs you write from now on for COMP[29]041.
+
+
+</p><h3>Exercise: Repeated Echo</h3>
+
+
+Write a Perl script <code>echon.pl</code> which given exactly two arguments, an integer <i>n</i>
+and a string, prints the string <i>n</i> times. For example:
+
+
+<pre class="command_line"><kbd class="shell">./echon.pl 5 hello
+</kbd><samp>hello
+hello
+hello
+hello
+hello
+</samp></pre>
+<pre class="command_line"><kbd class="shell">./echon.pl 0 nothing
+</kbd><samp></samp></pre>
+<pre class="command_line"><kbd class="shell">./echon.pl 1 goodbye
+</kbd><samp>goodbye
+</samp></pre>
+
+Your script should print an error message if it is not given
+exactly 2 arguments. For example:
+
+
+<pre class="command_line"><kbd class="shell">./echon.pl
+</kbd><samp>Usage: ./echon.pl &lt;number of lines&gt; &lt;string&gt;
+</samp></pre>
+<pre class="command_line"><kbd class="shell">./echon.pl 1 2 3
+</kbd><samp>Usage: ./echon.pl &lt;number of lines&gt; &lt;string&gt;
+</samp></pre>
+<div class="answer">
+Sample solution #0 for echon.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+if (@ARGV != 2) {
+    die "Usage: $0 &lt;number of lines&gt; &lt;string&gt;\n";
+}
+if ($ARGV[0] !~ /^\d+$/) {
+    die "$0: argument 1 must be a non-negative integer\n";
+}
+foreach ($i=0; $i &lt; $ARGV[0]; $i++) {
+    print "$ARGV[1]\n";
+}
+</pre>
+
+Sample solution #1 for echon.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+die "Usage: $0 &lt;number of lines&gt; &lt;string&gt;\n" if @ARGV != 2;
+die "$0: argument 1 must be a non-negative integer\n" if $ARGV[0] !~ /^\d+$/;
+foreach (1..$ARGV[0]) {
+    print "$ARGV[1]\n";
+}
+</pre>
+
+Sample solution #2 for echon.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+die "Usage: $0 &lt;number of lines&gt; &lt;string&gt;\n" if @ARGV != 2;
+die "$0: argument 1 must be a non-negative integer\n" if $ARGV[0] !~ /^\d+$/;
+print "$ARGV[1]\n" foreach 1..$ARGV[0];
+</pre>
+
+Sample solution #3 for echon.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+die "Usage: $0 &lt;number of lines&gt; &lt;string&gt;\n" if @ARGV != 2;
+die "$0: argument 1 must be a non-negative integer\n" if $ARGV[0] !~ /^\d+$/;
+print "$ARGV[1]\n" x $ARGV[0];
+</pre>
+</div>
+
+
+
+As usual use <code>autotest</code> to assist in testing your code and
+push <code>echon.pl</code> to <code>gitlab.cse.unsw.edu.au</code> every time you make
+some progress with it.
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab05 echon.pl</kbd>
+...
+<kbd class="shell">git add echon.pl </kbd>
+<kbd class="shell">git commit -a -m "first version of echon.pl"</kbd>
+...
+<kbd class="shell">git push</kbd>
+...
+</pre>
+<h3>Exercise: Tail</h3>
+<h4>Perl file manipulation</h4>
+<p></p><p>
+The standard approach in Perl for dealing with a collection of files
+whose names are supplied as command line arguments, is something like:
+</p>
+<pre class="command_line">#!/usr/bin/perl -w
+@files = ();
+foreach $arg (@ARGV) {
+    if ($arg eq "--version") {
+        print "$0: version 0.1\n";
+        exit(0);
+    }
+    # handle other options
+    # ...
+    else {
+        push @files, $arg;
+    }
+}
+foreach $f (@files) {
+    open(F,"&lt;$f") or die "$0: Can't open $f: $!\n";
+    # process F
+    #...
+    close(F);
+}
+</pre>
+<p>
+Write a Perl script to implement the Unix <code>tail</code> command.
+It should support the following features of <code>tail</code>:
+</p>
+<ul>
+<li> read from files supplied as command line arguments
+</li><li> read from standard input if no file name arguments are supplied
+</li><li> display the error message <code>tail.pl: can't open <i>FileName</i></code> for any unreadable file
+</li><li> display the last <i>N</i> lines of each file (default <i>N</i> = 10)
+</li><li> can adjust the number of lines displayed via an optional first argument <code>-</code><i>N</i>
+</li><li> if there are more than one named files, separate each by
+    <code>==&gt; <i>FileName</i> &lt;==</code>
+</li></ul>
+<p>
+To assist with testing your solution, there are three small t
+files: <a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/perl/tail/t1.txt">t1.txt</a>, <a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/perl/tail/t2.txt">t2.txt</a>, and
+<a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/perl/tail/t3.txt">t3.txt</a>.  Copy these files to your current directory.
+
+</p><pre class="command_line"><kbd class="shell">cp /home/cs2041/public_html/lab/perl/tail/t?.txt .</kbd>
+</pre>
+
+Using these data files, your program
+should behave as follows:
+
+
+<pre class="command_line"><kbd class="shell">./tail.pl &lt;t1.txt
+</kbd><samp>Data 1 ... Line 2
+Data 1 ... Line 3
+Data 1 ... Line 4
+Data 1 ... Line 5
+Data 1 ... Line 6
+Data 1 ... Line 7
+Data 1 ... Line 8
+Data 1 ... Line 9
+Data 1 ... Line 10
+Data 1 ... Last line
+</samp><kbd class="shell">./tail.pl t1.txt
+</kbd><samp>Data 1 ... Line 2
+Data 1 ... Line 3
+Data 1 ... Line 4
+Data 1 ... Line 5
+Data 1 ... Line 6
+Data 1 ... Line 7
+Data 1 ... Line 8
+Data 1 ... Line 9
+Data 1 ... Line 10
+Data 1 ... Last line
+</samp><kbd class="shell">./tail.pl -5 t1.txt
+</kbd><samp>Data 1 ... Line 7
+Data 1 ... Line 8
+Data 1 ... Line 9
+Data 1 ... Line 10
+Data 1 ... Last line
+</samp><kbd class="shell">./tail.pl -5 t2.txt
+</kbd><samp>A one line file.
+</samp><kbd class="shell">./tail.pl -5 t1.txt t2.txt t3.txt
+</kbd><samp>==&gt; t1.txt &lt;==
+Data 1 ... Line 7
+Data 1 ... Line 8
+Data 1 ... Line 9
+Data 1 ... Line 10
+Data 1 ... Last line
+==&gt; t2.txt &lt;==
+A one line file.
+==&gt; t3.txt &lt;==
+one
+word
+on
+each
+line
+</samp><kbd class="shell">./tail.pl -2 tX.txt
+</kbd><samp>./tail.pl: can't open tX.txt
+</samp></pre>
+<b>Hint:</b> use the above template for Perl file processing to get started
+with your script. You <em>must</em> use the <code>-w</code> flag
+in your script, and you must write your code in such a way as
+to ensure that no warning messages are produced.
+
+<div class="answer">
+Sample solution for tail.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+$max = 10;
+if (@ARGV &gt; 0 &amp;&amp; $ARGV[0] =~ /-([0-9]+)/) {
+    ($max = $ARGV[0]) =~ s/-//;;
+    shift @ARGV;
+}
+if (@ARGV == 0) {
+    @lines = &lt;&gt;;
+    $first = @lines - $max;
+    $first = 0 if $first &lt; 0;
+    print @lines[$first..$#lines];
+}
+else {
+    $showFnames = (@ARGV &gt; 1);
+    foreach $f (@ARGV) {
+        if (!open(F, "&lt;$f")) {
+            die "$0: can't open $f\n";
+        }
+        print "==&gt; $f &lt;==\n" if ($showFnames);
+        @lines = &lt;F&gt;;
+        $first = @lines - $max;
+        $first = 0 if $first &lt; 0;
+        print @lines[$first..$#lines];
+        close F;
+    }
+}
+</pre>
+</div>
+<p></p>
+
+As usual use <code>autotest</code> to assist in testing your code and
+push <code>echon.pl</code> to <code>gitlab.cse.unsw.edu.au</code> every time you make
+some progress with it.
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab05 tail.pl</kbd>
+...
+<kbd class="shell">git add tail.pl </kbd>
+<kbd class="shell">git commit -a -m "initial tail.pl"</kbd>
+...
+<kbd class="shell">git push</kbd>
+...
+</pre>
+<h3>Challenge Exercise: Shuffling Lines</h3>
+
+
+Write a Perl script <code>shuffle.pl</code> which prints its input with the
+lines in random order.
+For example:
+
+
+<pre class="command_line"><kbd class="shell">i=0;while test $i -lt 5; do echo $i; i=$((i + 1)); done|./shuffle.pl
+</kbd><samp>1
+4
+0
+3
+2
+</samp></pre>
+<pre class="command_line"><kbd class="shell">i=0;while test $i -lt 5; do echo $i; i=$((i + 1)); done|./shuffle.pl
+</kbd><samp>2
+4
+1
+3
+0
+</samp></pre>
+
+You are not permitted to use <code>List::Util</code> (it contains a shuffle function).
+<p>
+Don't look for other people solutions - see if you can come up with your own.
+
+<b>Hint:</b> the perl function <i>rand</i> returns a floating point number between 0 and its argument.
+For example:
+
+
+</p><pre class="command_line"><kbd class="shell">perl -e 'print rand(42), "\n"'
+</kbd><samp>21.2127977184229
+</samp><kbd class="shell">perl -e 'print rand(42), "\n"'
+</kbd><samp>14.4704465012275
+</samp></pre>
+<b>Hint:</b> perl ignores the fractional part of a number if you use it to index an array
+
+<div class="answer">
+Sample solution for shuffle.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+# simple implementation of http://en.wikipedia.org/wiki/Fisher-Yates_shuffle
+@lines = &lt;&gt;;
+print splice(@lines, rand(@lines), 1) while @lines;
+</pre>
+
+Sample solution using List::Util
+
+
+<pre class="program">#!/usr/bin/perl -w
+use List::Util 'shuffle';
+print shuffle(&lt;&gt;);
+</pre>
+</div>
+<h3>Challenge Question: Testing Shuffling Lines</h3>
+<p></p><p>
+There is no dryrun test for <code>shuffle.pl</code>.
+Testing (pseudo)random programs is more difficult.
+because there are multiple correct outputs for a given input.
+</p><p>
+Write a shell script <code>shuffle_test.sh</code> which tests <code>shuffle.pl</code>.
+</p><p>
+Try to test that all outputs are correct and all correct outputs are being generated.
+
+</p><div class="answer">
+Sample solution that just checks coverage
+
+
+<pre class="program">#!/bin/sh
+
+input=/tmp/shuffle_test0$$
+output=/tmp/shuffle_test1$$
+sorted_output=/tmp/shuffle_test2$$
+all_output=/tmp/shuffle_test3$$
+
+number_of_lines=4
+number_of_test_runs=256
+
+# create an input file with 1 integer per line in sorted order
+# and calculate how many permutations are possible
+i=1
+factorial=1
+while test $i -le $number_of_lines
+do
+    echo $i
+    factorial=$(($factorial * $i))
+    i=$(($i + 1))
+done &gt;$input
+
+run=1
+while test $run -le $number_of_test_runs
+do
+    ./shuffle.pl &lt;$input &gt;$output
+    sort -n $output &gt;$sorted_output
+
+    # after sorting output should be identical to input
+    if diff $sorted_output $input &gt;/dev/null
+    then
+        # append result of this execution to $all_output as a single line
+        echo `cat $output` &gt;&gt;$all_output
+    else
+        echo Testing failed, input was:
+        cat $input
+        echo Testing failed, output was:
+        cat $output
+        exit 1
+    fi
+    run=$(($run + 1))
+done
+
+n_different_outputs=`sort $all_output|uniq|wc -l`
+if test $n_different_outputs -eq $factorial
+then
+    echo All possible outputs produced
+    exit 0
+else
+    echo In $number_of_test_runs executions only $n_different_outputs of $factorial outputs produced
+    exit 1
+fi
+
+rm -f $input $output $sorted_output $all_output</pre>
+</div>
+<div class="answer">
+A more elaborate solution from Donny Yang which takes a more statistical approach
+
+
+<pre class="program">#!/bin/sh
+
+input=/tmp/shuffle_test0$$
+output=/tmp/shuffle_test1$$
+sorted_output=/tmp/shuffle_test2$$
+all_output=/tmp/shuffle_test3$$
+
+number_of_lines=4
+number_of_test_runs=256
+
+# create an input file with 1 integer per line in sorted order
+# and calculate how many permutations are possible
+i=1
+factorial=1
+while test $i -le $number_of_lines
+do
+    echo $i
+    factorial=$(($factorial * $i))
+    i=$(($i + 1))
+done &gt;$input
+
+run=1
+while test $run -le $number_of_test_runs
+do
+    ./shuffle.pl &lt;$input &gt;$output
+    sort -n $output &gt;$sorted_output
+
+    # after sorting output should be identical to input
+    if diff $sorted_output $input &gt;/dev/null
+    then
+        # append result of this execution to $all_output as a single line
+        echo `cat $output` &gt;&gt;$all_output
+    else
+        echo Testing failed, input was:
+        cat $input
+        echo Testing failed, output was:
+        cat $output
+        exit 1
+    fi
+    run=$(($run + 1))
+done
+
+n_different_outputs=`sort $all_output|uniq|wc -l`
+if test $n_different_outputs -eq $factorial
+then
+    echo All possible outputs produced
+    exit 0
+else
+    echo In $number_of_test_runs executions only $n_different_outputs of $factorial outputs produced
+    exit 1
+fi
+
+rm -f $input $output $sorted_output $all_output</pre>
+</div>
+
+
+
+Don't forget to push <code>shuffle.pl</code> and <code>shuffle_test.sh</code>  to <code>gitlab.cse.unsw.edu.au</code> if and when you work on them.
+
+<h3>Finalising</h3>
+You must show your solutions to your tutor and be able to explain
+how they work.
+Once your tutor has discussed your answers with you, you should
+submit them using:
+<pre class="command_line"><kbd class="shell">give cs2041 lab05 digits.pl echon.pl tail.pl [shuffle.pl shuffle_test.sh]</kbd>
+</pre>
+Whether you discuss your solutions
+with your tutor this week or next week, you must submit them before
+the above deadline.
+<script src="./Week 05 Lab Class_files/2041.js.download"></script>
+<p></p></div>
+</div>
+
+
+
+<div id="extension-is-installed"></div></body></html>

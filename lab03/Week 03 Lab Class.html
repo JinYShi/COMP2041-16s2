@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/answers.py?lab/week03.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Week 03 Lab Class</title>
+<link href="./Week 03 Lab Class_files/2041.css" rel="stylesheet">
+</head>
+<body data-shoptagr-mini="yes">
+<div class="container">
+<div id="heading"><a class="heading_link" target="_blank" id="left_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">COMP[29]041 16s2</a>
+Simple Shell Scripts
+<a class="heading_link" target="_blank" id="right_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">Software Construction</a></div>
+<div class="tutlab lab">
+<h3>Aims</h3>
+This exercise aims to give you practice with using the Unix shell
+for processing collections of files.
+<h3>Assessment</h3>
+<table border="0" cellpadding="3">
+<tbody><tr><td><b>Submission:</b></td><td><code>give cs2041 lab03 digits.sh echon.sh file_sizes.sh</code> also submit <code>courses.sh</code>  if you attempt the challenge exercises</td></tr>
+<tr><td><b>Deadline:</b></td><td>either during the lab,  Monday 15 August 11:59pm (midnight)</td></tr>
+<tr><td><b>Assessment:</b></td><td>
+Make sure that you are familiar with the
+<a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/assessment.html">lab assessment criteria</a>.
+</td></tr>
+</tbody></table>
+<h3>Exercise 1: Mapping Digits</h3>
+
+
+Write a program <code>digits.sh</code> that reads from standard input and writes to standard output
+mapping all digit characters whose values are
+less than 5 into the character '<code>&lt;</code>' and all digit characters
+whose values are greater than 5 into the character '<code>&gt;</code>'.
+The digit character '5' should be left unchanged.
+<p>
+</p><center>
+<table border="1" cellpadding="6">
+<tbody><tr><th>Sample Input Data</th><th>Corresponding Output</th></tr>
+<tr valign="top"><td>
+<pre>1 234 5 678 9
+</pre>
+</td><td>
+<pre>&lt; &lt;&lt;&lt; 5 &gt;&gt;&gt; &gt;
+</pre>
+</td></tr><tr valign="top"><td>
+<pre>I can think of 100's
+of other things I'd rather
+be doing than these 3 questions
+</pre>
+</td><td>
+<pre>I can think of &lt;&lt;&lt;'s
+of other things I'd rather
+be doing than these &lt; questions
+</pre>
+</td></tr>
+<tr valign="top"><td>
+<pre>A line with lots of numbers:
+123456789123456789123456789
+A line with all zeroes
+000000000000000000000000000
+A line with blanks at the end
+1 2 3
+</pre>
+</td><td>
+<pre>A line with lots of numbers:
+&lt;&lt;&lt;&lt;5&gt;&gt;&gt;&gt;&lt;&lt;&lt;&lt;5&gt;&gt;&gt;&gt;&lt;&lt;&lt;&lt;5&gt;&gt;&gt;&gt;
+A line with all zeroes
+&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+A line with blanks at the end
+&lt; &lt; &lt;
+</pre>
+</td></tr>
+<tr valign="top"><td>
+<pre>Input with absolutely 0 digits in it
+Well ... apart from that one ...
+</pre>
+</td><td>
+<pre>Input with absolutely &lt; digits in it
+Well ... apart from that one ...
+</pre>
+</td></tr>
+<tr valign="top"><td>
+<pre>1 2 4 8 16 32 64 128 256 512 1024
+2048 4096 8192 16384 32768 65536
+</pre>
+</td><td>
+<pre>&lt; &lt; &lt; &gt; &lt;&gt; &lt;&lt; &gt;&lt; &lt;&lt;&gt; &lt;5&gt; 5&lt;&lt; &lt;&lt;&lt;&lt;
+&lt;&lt;&lt;&gt; &lt;&lt;&gt;&gt; &gt;&lt;&gt;&lt; &lt;&gt;&lt;&gt;&lt; &lt;&lt;&gt;&gt;&gt; &gt;55&lt;&gt;
+</pre>
+</td></tr>
+</tbody></table>
+</center>
+<div class="answer">
+Sample solution for digits.sh
+
+
+<pre class="program">#!/bin/sh
+tr '0123456789' '&lt;&lt;&lt;&lt;&lt;5&gt;&gt;&gt;&gt;'
+</pre>
+</div>
+
+
+
+You can run some tests on your script like this:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab03 digits.sh</kbd>
+</pre>
+
+Also do your own testing!
+
+<h3>Exercise 2: Repeated Echo</h3>
+
+
+Write a shell script  a program <code>echon.sh</code> which given exactly two arguments, an integer <i>n</i>
+and a string, prints the string <i>n</i> times. For example:
+<p></p><p>
+</p><pre class="command_line"><kbd class="shell">./echon.sh 5 hello</kbd>
+hello
+hello
+hello
+hello
+hello
+<kbd class="shell">./echon.sh 0 nothing</kbd>
+<kbd class="shell">./echon.sh 1 goodbye</kbd>
+goodbye
+</pre>
+<p></p><p>
+Your script should print exactly the error message below if it is not given
+exactly 2 arguments:
+</p><p>
+</p><pre class="command_line"><kbd class="shell">./echon.sh </kbd>
+Usage: ./echon.sh &lt;number of lines&gt; &lt;string&gt;
+<kbd class="shell">./echon.sh 1 2 3</kbd>
+Usage: ./echon.sh &lt;number of lines&gt; &lt;string&gt;
+</pre>
+<p></p><p>
+Also get your script to print this error message if
+its first argument isn't a non-negative integer:
+</p><p>
+</p><pre class="command_line"><kbd class="shell">./echon.sh hello world</kbd>
+./echon.sh: argument 1 must be a non-negative integer
+<kbd class="shell">./echon.sh -42 lines</kbd>
+./echon.sh: argument 1 must be a non-negative integer
+</pre>
+<p></p><p>
+Although its better practice to print your error messages to <code>stderr</code>
+print your error messages to stdout for this exercise.
+</p><p>
+Hint: you'll need to use the shell <code>if</code>, <code>while</code> and <code>exit</code> statements,
+shell arithmetic and the <code>test</code> command.
+
+</p><div class="answer">
+<b>Discussion:</b>
+Straight-forward shell programming except for checking that
+the first argument is an integer
+<p>
+We could use the shell <code>case</code> to check the number of command-line args
+and also to check that the first argument is a non-negative integer.
+</p><p>
+Note the display of a usage message, which gives useful feedback
+to the user about they should have done.
+Note also the use of <code>exit</code> to terminate the script if
+an error is discovered in the command line arguments.
+</p></div>
+<div class="answer">
+<div class="program_description">
+Sample solution for echon.sh
+</div>
+<pre class="program">#!/bin/sh
+
+# check command-line args
+if test $# != 2
+then
+    echo "Usage: $0 &lt;number of lines&gt; &lt;string&gt;"
+    exit 1
+fi
+
+# standard error redirected because test will print
+# a warning message if $1 is not an integer
+
+if test "$1" -ge 0 2&gt;/dev/null
+then
+    :
+else
+    echo "$0: argument 1 must be a non-negative integer"
+    exit 1
+fi
+
+number_of_lines=$1
+text=$2
+
+line_count=0
+while test $line_count -lt $number_of_lines
+do
+    echo $text
+    line_count=$(($line_count + 1))
+done
+
+exit 0
+</pre>
+</div>
+
+
+
+You can run some tests on your script like this:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab03 echon.sh</kbd>
+</pre>
+
+Also do your own testing!
+
+
+<h3>Exercise 3: Files Sizes</h3>
+
+
+Write a shell script <code>file_sizes.sh</code> which prints the names of the files
+in the current directory splitting them into three categories:  <i>small</i>, <i>medium-sized</i> and <i>large</i>.
+A file is considered <i>small</i> if it contains less than 10 lines, <i>medium-sized</i> if contains less than
+100 lines, otherwise it is considered  <i>large</i>.
+<p></p><p>
+Your script should always print exactly three lines of output.
+Files should be listed in alphabetic order on each line.
+Your shell-script should match character-for-character
+the output shown in the example below.
+Notice the creation of a separate direcory for testing and the use of
+the script from the last question to produce test files.
+You could also produce test files manually using an editor.
+</p><p>
+</p><pre class="command_line"><kbd class="shell">mkdir test</kbd>
+<kbd class="shell">cd test</kbd>
+<kbd class="shell">../echon.sh 5 text &gt;a</kbd>
+<kbd class="shell">../echon.sh 505 text &gt;bbb</kbd>
+<kbd class="shell">../echon.sh 17 text &gt;cc</kbd>
+<kbd class="shell">../echon.sh 10 text &gt;d</kbd>
+<kbd class="shell">../echon.sh 1000 text &gt;e</kbd>
+<kbd class="shell">../echon.sh 0 text &gt;empty</kbd>
+<kbd class="shell">ls -l</kbd>
+total 24
+-rw-r--r-- 1 andrewt andrewt   25 Mar 24 10:37 a
+-rw-r--r-- 1 andrewt andrewt 2525 Mar 24 10:37 bbb
+-rw-r--r-- 1 andrewt andrewt   85 Mar 24 10:37 cc
+-rw-r--r-- 1 andrewt andrewt   50 Mar 24 10:37 d
+-rw-r--r-- 1 andrewt andrewt 5000 Mar 24 10:37 e
+-rw-r--r-- 1 andrewt andrewt    0 Mar 24 10:37 empty
+<kbd class="shell">../file_sizes.sh </kbd>
+Small files: a empty
+Medium-sized files: cc d
+Large files: bbb e
+<kbd class="shell">rm cc d</kbd>
+<kbd class="shell">../echon.sh 10000 . &gt;lots_of_dots</kbd>
+<kbd class="shell">ls -l</kbd>
+total 36
+-rw-r--r-- 1 andrewt andrewt    25 Mar 24 10:37 a
+-rw-r--r-- 1 andrewt andrewt  2525 Mar 24 10:37 bbb
+-rw-r--r-- 1 andrewt andrewt  5000 Mar 24 10:37 e
+-rw-r--r-- 1 andrewt andrewt     0 Mar 24 10:37 empty
+-rw-r--r-- 1 andrewt andrewt 20000 Mar 24 10:39 lots_of_dots
+<kbd class="shell">../file_sizes.sh </kbd>
+Small files: a empty
+Medium-sized files:
+Large files: bbb e lots_of_dots
+<kbd class="shell"></kbd>
+</pre>
+<p></p><p>
+</p><p>
+Hint: you can use the command <code>wc</code> to discover how many lines are in a file.
+You probably want to use the shell's back quotes, its<code>if</code> statement, and
+the <code>test</code> command and
+
+</p><div class="answer">
+
+A nice example of accumulating a results in variables.
+<p>
+Sample solution for file_sizes.sh
+
+
+</p><pre class="program">#!/bin/sh
+
+for file in *
+do
+    lines=`wc -l &lt;$file`
+    if test $lines -lt 10
+    then
+        small_files="$small_files $file"
+    elif test $lines -lt 100
+    then
+        medium_files="$medium_files $file"
+    else
+        large_files="$large_files $file"
+    fi
+done
+
+echo "Small files:$small_files"
+echo "Medium-sized files:$medium_files"
+echo "Large files:$large_files"
+
+exit 0
+</pre>
+<p></p></div>
+
+
+
+You can run some tests on your script like this:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab03 file_sizes.sh </kbd>
+</pre>
+
+Also do your own testing!
+
+
+<h3>Challenge Exercise: Scraping Courses</h3>
+
+
+Write a shell script <code>courses.sh</code> which prints a list of UNSW courses with
+the given prefix by extracting them from the UNSW handbook webpages. For example:
+
+<pre class="command_line"><kbd class="shell">courses.sh OPTM</kbd>
+OPTM2111 Optometry 2A
+OPTM2190 Introduction to Clinical Optometry
+OPTM2211 Optometry 2B
+OPTM2291 Primary Care Optometry
+OPTM3111 Optometry 3A
+OPTM3131 Ocular Disease 3A
+OPTM3211 Optometry 3B
+OPTM3231 Ocular Disease 3B
+OPTM4110 Optometry 4A
+OPTM4131 Clinical Optometry 4A
+OPTM4151 Ocular Therapeutics 4A
+OPTM4211 Optometry 4B
+OPTM4231 Clinical Optometry 4B
+OPTM4251 Ocular Therapeutics 4B
+OPTM4271 Professional Optometry
+OPTM4291 Optometry, Medicine &amp; Patient Management
+OPTM5111 Clinical Optometry 5A
+OPTM5131 Specialist Clinical Optometry 5A
+OPTM5151 Clinical Ocular Therapeutics 5A
+OPTM5171 Research Project 5A
+OPTM5211 Clinical Optometry 5B
+OPTM5231 Specialist Clinical Optometry 5B
+OPTM5251 Clinical Ocular Therapeutics 5B
+OPTM5271 Research Project 5B
+OPTM7001 Introduction to Community Eye Health
+OPTM7002 Epidemiology &amp; Biostatistics for Needs Assessment
+OPTM7003 Epidemiology of Blinding Eye Diseases
+OPTM7004 Advocacy and Education in Community Eye Health
+OPTM7005 Eye Health Economics and Sustainability
+OPTM7006 Eye Care Program Management
+OPTM7007 Community Eye Health Project
+OPTM7103 Behavioural Optometry 1
+OPTM7104 Advanced Contact Lens Studies 1
+OPTM7108 Research Skills in Optometry
+OPTM7110 Public Health Optometry
+OPTM7115 Visual Neuroscience
+OPTM7117 Ocular Therapy 2
+OPTM7203 Behavioural Optometry 2
+OPTM7205 Specialty Contact Lens Studies
+OPTM7213 Ocular Therapy
+OPTM7301 Advanced Clinical Optometry
+OPTM7302 Evidence Based Optometry
+OPTM7308 Research Project
+OPTM7444 Business Skills in Optometry
+OPTM7511 Advanced Ocular Disease 1
+OPTM7521 Advanced Ocular Disease 2
+<kbd class="shell">courses.sh MATH|wc</kbd>
+    126     585    4874
+<kbd class="shell">courses.sh COMP|grep Soft</kbd>
+COMP2041 Software Construction: Techniques and Tools
+COMP3141 Software System Design and Implementation
+COMP3431 Robotic Software Architecture
+COMP4001 Object-Oriented Software Development
+COMP4161 Advanced Topics in Software Verification
+COMP4181 Language-based Software Safety
+COMP9041 Software Construction: Techniques and Tools
+COMP9181 Language-based Software Safety
+COMP9431 Robotic Software Architecture
+<kbd class="shell">courses.sh MINE|grep Rock</kbd>
+MINE3630 Rock Breakage
+MINE8640 Geotechnical Hazards in Hard Rock Mines
+MINE8660 Geotechnical Engineering for Underground Hard Rock
+</pre>
+
+Your script must download the handbook web pages and extract the information from them when it is run.
+
+<h4>Hints</h4>
+
+This task can be done using the usual tools of grep, sed, sort &amp; uniq but the regular expressions take some thought.
+<p></p><p>
+The UNSW handbook uses seperate web pages for  undergraduate and postgraduate courses.
+These two web pages would need to be downloaded for the above example (JAPN):
+<a href="http://www.handbook.unsw.edu.au/vbook2016/brCoursesByAtoZ.jsp?StudyLevel=Undergraduate&amp;descr=O"><code>http://www.handbook.unsw.edu.au/vbook2016/brCoursesByAtoZ.jsp?StudyLevel=Undergraduate&amp;descr=O</code></a>
+and
+<a href="http://www.handbook.unsw.edu.au/vbook2016/brCoursesByAtoZ.jsp?StudyLevel=Postgraduate&amp;descr=O"><code>http://www.handbook.unsw.edu.au/vbook2016/brCoursesByAtoZ.jsp?StudyLevel=Postgraduate&amp;descr=O</code></a>.
+</p><p>
+Make sure courses which occur in both postgraduate &amp; undergraduate handbooks aren't repeated.
+</p><p>
+<code>cat -A</code> can be useful to check for non-printing characters.
+</p><p>
+The command <code>wget</code> can be used to download a web page and has option which
+allow it to be used in shell pipelines. For example:
+</p><pre class="command_line"><kbd class="shell">wget -q -O- "http://www.handbook.unsw.edu.au/vbook2016/brCoursesByAtoZ.jsp?StudyLevel=Undergraduate&amp;descr=O"|grep OPTM</kbd>
+  &lt;TD class="" align="left"&gt;OPTM2111&lt;/TD&gt;
+  &lt;TD class=""&gt;&lt;A href="http://www.handbook.unsw.edu.au/undergraduate/courses/2016/OPTM2111.html"&gt;Optometry 2A&lt;/A&gt;&lt;/TD&gt;
+  &lt;TD class="evenTableCell" align="left"&gt;OPTM2190&lt;/TD&gt;
+  &lt;TD class="evenTableCell"&gt;&lt;A href="http://www.handbook.unsw.edu.au/undergraduate/courses/2016/OPTM2190.html"&gt;Introduction to Clinical Optometry &lt;/A&gt;&lt;/TD&gt;
+<i>....</i>
+</pre>
+<div class="answer">
+<div class="program_description">
+Sample solution for courses.sh
+</div>
+<pre class="program">#!/bin/sh
+
+# written by andrewt@cse.unsw.edu.au Aug 2015 as a COMP2041 programming example
+if test $# != 1
+then
+    echo "Usage: $0 &lt;course-prefix&gt;"
+    exit 1
+fi
+
+# get current year (e. 2015)
+year=`date '+%Y'`
+course_prefix=$1
+first_letter=`echo $course_prefix|sed 's/\(.\).*/\1/'`
+base_url="http://www.handbook.unsw.edu.au/vbook$year/brCoursesByAtoZ.jsp"
+ugrad_url="$base_url?StudyLevel=Undergraduate&amp;descr=$first_letter"
+pgrad_url="$base_url?StudyLevel=Postgraduate&amp;descr=$first_letter"
+
+wget -q -O- "$ugrad_url" "$pgrad_url"|
+egrep "$course_prefix[0-9][0-9][0-9][0-9].html"|
+sed "s/.*\($course_prefix[0-9][0-9][0-9][0-9]\)\.html[^&gt;]*&gt; *\([^&lt;]*\).*/\1 \2/"|
+sed 's/ *$//'|
+sort|
+uniq
+</pre>
+</div>
+
+
+
+You can run some tests on your script like this:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab03 courses.sh</kbd>
+</pre>
+
+Also do your own testing!
+
+<h3>Finalising</h3>
+
+You must show your solutions to your tutor and be able to explain
+how they work.
+Once your tutor has discussed your answers with you, you should
+submit them using:
+<pre class="command_line"><kbd class="shell">give cs2041 lab03 digits.sh echon.sh file_sizes.sh [courses.sh]</kbd>
+</pre>
+Only submit <code>courses.sh</code>  if you attempt the challenge exercise.
+<p></p><p>
+Whether you discuss your solutions
+with your tutor this week or next week, you must submit them before
+the above deadline.
+
+<script src="./Week 03 Lab Class_files/2041.js.download"></script>
+</p></div>
+</div>
+
+
+
+<div id="extension-is-installed"></div></body></html>

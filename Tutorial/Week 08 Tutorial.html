@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/answers.py?tut/week08.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Week 08 Tutorial</title>
+<link href="./Week 08 Tutorial_files/2041.css" rel="stylesheet">
+</head>
+<body data-shoptagr-mini="yes">
+<div class="container">
+<div id="heading"><a class="heading_link" target="_blank" id="left_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">COMP[29]041 16s2</a>
+You can do anything with Perl
+<a class="heading_link" target="_blank" id="right_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">Software Construction</a></div>
+<div class="tutlab tut">
+<ol>
+<li>
+
+Write a Perl program, <code>tags.pl</code> which given the URL of a web
+page fetches it by running <i>wget</i> and prints the HTML tags it uses.
+<p>
+The tag should be converted to lower case and printed in sorted order
+with a count of often each is used.
+</p><p>
+Don't count closing tags.
+</p><p>
+Make sure you don't print tags within HTML comments.
+</p><p>
+For example:
+
+</p><pre class="command_line"><kbd class="shell">./tags.pl http://www.cse.unsw.edu.au</kbd>
+a 141
+body 1
+br 14
+div 161
+em 3
+footer 1
+form 1
+h2 2
+h4 3
+h5 3
+head 1
+header 1
+hr 3
+html 1
+img 12
+input 5
+li 99
+link 3
+meta 4
+noscript 1
+p 18
+script 14
+small 3
+span 3
+strong 4
+title 1
+ul 25
+</pre>
+
+Note the  counts in the above example will not be current - the CSE pages changes almost daily.
+
+<div class="answer">
+Sample solution for tags.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+# written by andrewt@cse.unsw.edu.au as a COMP2041 example
+# fetch specified web page and count the HTML tags in them
+
+# There are better ways to fetch web pages (e.g. HTTP::Request::Common)
+# The regex code below doesn't handle a number of cases.  It is often
+# better to use a library to properly parse HTML before processing it.
+# But beware illegal HTML is common &amp; often causes problems for parsers.
+
+foreach $url (@ARGV) {
+    $webpage = `wget -q -O- '$url'`;
+    $webpage =~ tr/A-Z/a-z/;
+    $webpage =~ s/&lt;!--.*?--&gt;//g; # remove comments
+    @tags = $webpage =~ /&lt;\s*(\w+)/g;
+    foreach $tag (@tags) {
+        $tag_count{$tag}++;
+    }
+}
+foreach $tag (sort keys %tag_count) {
+    print "$tag $tag_count{$tag}\n";
+}
+</pre>
+</div>
+<p></p></li><li>
+
+Add an -f option to tags.pl which indicated the tags are to printed
+in order of frequency.
+<p>
+</p><pre class="command_line"><kbd class="shell">tags.pl -f http://www.cse.unsw.edu.au</kbd>
+head 1
+noscript 1
+html 1
+form 1
+title 1
+footer 1
+header 1
+body 1
+h2 2
+hr 3
+h4 3
+span 3
+link 3
+small 3
+h5 3
+em 3
+meta 4
+strong 4
+input 5
+img 12
+br 14
+script 14
+p 18
+ul 25
+li 99
+a 141
+div 161
+</pre>
+<div class="answer">
+Sample solution for tags.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+# written by andrewt@cse.unsw.edu.au as a COMP2041 example
+# fetch specified web page and count the HTML tags in them
+
+# The regex code below doesn't handle a number of cases.  It is often
+# better to use a library to properly parse HTML before processing it.
+# But beware illegal HTML is common &amp; often causes problems for parsers.
+
+use LWP::Simple;
+
+$sort_by_frequency = 0;
+foreach $arg (@ARGV) {
+    if ($arg eq "-f") {
+        $sort_by_frequency = 1;
+    } else {
+        push @urls, $arg;
+    }
+}
+foreach $url (@urls) {
+    $webpage = get $url;
+    $webpage =~ tr/A-Z/a-z/;
+    $webpage =~ s/&lt;!--.*?--&gt;//g; # remove comments
+    @tags = $webpage =~ /&lt;\s*(\w+)/g;
+    foreach $tag (@tags) {
+        $tag_count{$tag}++;
+    }
+}
+if ($sort_by_frequency) {
+    @sorted_tags = sort {$tag_count{$a} &lt;=&gt; $tag_count{$b}} keys %tag_count;
+} else {
+    @sorted_tags = sort keys %tag_count;
+}
+print "$_ $tag_count{$_}\n" foreach @sorted_tags;</pre>
+</div>
+<p></p></li><li>
+
+Write a Perl function which takes an integer argument n
+and reads the next n lines of input and returns them
+as a string.
+
+<div class="answer">
+
+Two sample solutions with extra code to run the function:
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+$n = shift @ARGV or die "Usage: $0 &lt;n-lines&gt;\n";
+
+sub n_lines0 {
+    my ($n) = @_;
+    my $text = "";
+    while ($n-- &gt; 0) {
+        $text .= &lt;&gt;;
+    }
+    return $text;
+}
+
+sub n_lines1 {
+    my ($n) = @_;
+    my $text = "";
+    $text .= &lt;&gt; foreach (1..$n);
+    return $text;
+}
+
+print n_lines1($n);
+</pre>
+</div>
+</li><li>
+
+Write a Perl program <code>./shpl.pl</code> which reads Shell and outputs Perl for example:
+
+<pre class="command_line">while ls important_file &gt;/dev/null
+do
+        echo "all OK"
+        sleep 1
+done
+echo "Panic important_file gone"
+</pre>
+
+Your program should produce this output:
+
+<pre class="command_line">while (!system "ls important_file &gt;/dev/null") {
+        print "all OK\n";
+        system("sleep 1");
+}
+print "Panic important_file gone\n";
+</pre>
+
+Assume that the only Shell features that you need to
+handle specially are while loops &amp; echo statements, and
+assume the Shell is nicely formatted.  Don't worry about the "#!" line.
+<p>
+Write a quick version using regexes which does no checking just translates
+</p><p>
+Then write a longer version that checks the syntax of the Shell while loops are correct,
+including handling nested while loops.  Hint: use recursive functions.
+
+</p><div class="answer">
+
+Readable implementation of line-by-line translation with no checking.
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+use strict;
+
+while (my $line = &lt;&gt;) {
+    chomp $line;
+    if ($line =~ /^(\s+)/) {
+        print $1; # preserve indents
+        $line =~ s/^\s+//;
+    }
+    $line =~ s/\s+$//;
+
+    if ($line =~ /^#!/) {
+        print "#!/usr/bin/perl -w\n";
+    } elsif ($line =~ /while/) {
+        $line =~ s/while //;
+        print "while (!system \"$line\") {\n";
+    } elsif ($line =~ /^do$/) {
+        next;
+    } elsif ($line =~ /done$/) {
+        print "}\n";
+    } elsif ($line =~ /echo/) {
+        $line =~ s/echo //;
+        $line =~ s/\"//g;
+        print "print \"$line\\n\";\n";
+    } elsif ($line =~ /sleep/) {
+        print "system(\"$line\")\n";
+    } elsif ($line =~ /^\s*#/ || $line =~ /^\s*/) {
+        print "$line\n";
+    } else { # Lines we can't translate are turned into comments
+        print "#$line\n";
+    }
+}
+</pre>
+
+More concise implementation of line-by-line translation with no checking.
+Note use of $_.
+Style of first solution preferable for its readability &amp; maintainability, if you are thinking about the assignment
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+while (&lt;&gt;) {
+    if (/^(\s*)while\s+(.*)/) {
+        print "$1while (!system \"$2\") {\n";
+    } elsif (/^\s*do\b/) {
+    } elsif (/^(\s*)done\b/) {
+        print "$1}\n";
+    } elsif (/^(\s*)echo\s+"(.*)"/) {
+        print "$1print \"$2\";\n";
+    } elsif (/^(\s*)(\S.*)/) {
+        print "$1system \"$2\";\n";
+    } else {
+        print;
+    }
+}</pre>
+
+Even more concise but even less readable implementation of line-by-line translation with no checking.
+Note use of -p command line option.  Style is useful for quick code for one-off use.
+Do not use this style for the assignment.
+
+
+<pre class="program">#!/usr/bin/perl -wp
+s/^\s*do\b/{/ or
+s/^(\s*while)\s+(.*)\n/$1 (!system \"$2\") / or
+s/^(\s*)done\b/$1}/ or
+s/^(\s*)echo\s+"(.*)"/$1print \"$2\\n\";/ or
+s/^(\s*)(\S.*)/$1system \"$2\";/;
+</pre>
+
+Sample recursive implementation which checks while loop syntax.
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+sub translate_statement {
+	if ($shell[0] =~ /\s*while\b/) {
+		return translate_while();
+	} elsif ($shell[0] =~ /\s*echo\b/) {
+		return translate_echo();
+	} else{
+		my $shell = shift @shell;
+		if ($shell =~ /^(\s*)(\S.*)/) {
+			return "$1system \"$2\";\n"
+		} else {
+			return $shell;
+		}
+	}
+}
+
+sub translate_while {
+	my @while_perl = ();
+	my $shell = shift @shell;
+	$shell =~ /^(\s*)while\s+(.*)/ or die;
+	push @while_perl, "$1while (!system \"$2\") {\n";
+	$shell = shift @shell;
+	die "syntax error: expected do" if $shell !~ /^\s*do\b/;
+	while (@shell &amp;&amp; $shell[0] !~ /^(\s*)done\b/) {
+		push @while_perl, translate_statement();
+	}
+	$shell = shift(@shell) || "";
+	$shell =~ /^(\s*)done\b/ or die "syntax error: expected done";
+	push @while_perl, "$1}\n";
+	return @while_perl; 
+}
+
+sub translate_echo {
+	my $shell = shift @shell;
+	$shell =~ /^(\s*)echo\s+"(.*)"/ or die;
+	return "$1print \"$2\\n\";\n";
+}
+
+# global array containing input shell statements is
+# is consumed as Shell is translated to Perl
+
+@shell = &lt;&gt;;
+@perl = ();
+while (@shell) {
+	push @perl, translate_statement();
+}
+print @perl;</pre>
+
+Sample recursive implementation which checks while loop syntax and does its own indentation
+rather hten relying on the shell script being correctly indented.
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+sub translate_statement {
+	my ($indent) = @_;
+	if ($shell[0] =~ /\s*while\b/) {
+		return translate_while($indent);
+	} elsif ($shell[0] =~ /\s*echo\b/) {
+		return translate_echo($indent);
+	} else {
+		my $shell = shift @shell;
+		if ($shell =~ /^\s*(\S.*)/) {
+			return (" " x $indent)."system \"$1\";\n"
+		} else {
+			return "\n";
+		}
+	}
+}
+
+sub translate_while {
+	my ($indent) = @_;
+	my @while_perl = ();
+	my $shell = shift @shell;
+	$shell =~ /^\s*while\s+(.*)/ or die;
+	push @while_perl, (" " x $indent)."while (!system \"$1\") {\n";
+	$shell = shift @shell;
+	die "syntax error: expected do" if $shell !~ /^\s*do\b/;
+	while (@shell &amp;&amp; $shell[0] !~ /^\s*done\b/) {
+		push @while_perl, translate_statement($indent + 4);
+	}
+	$shell = shift(@shell) || "";
+	$shell =~ /^\s*done\b/ or die "syntax error: expected done";
+	push @while_perl, (" " x $indent)."}\n";
+	return @while_perl; 
+}
+
+sub translate_echo {
+	my ($indent) = @_;
+	my $shell = shift @shell;
+	$shell =~ /^\s*echo\s+"(.*)"/ or die;
+	return  (" " x $indent)."print \"$1\\n\";\n";
+}
+
+# global array containing input shell statements is
+# is consumed as Shell is translated to Perl
+
+@shell = &lt;&gt;;
+@perl = ();
+while (@shell) {
+	push @perl, translate_statement(0);
+}
+print @perl;</pre>
+</div>
+<p></p></li><li>
+Give Perl code which given the name of a C function
+searches the C source files (*.c) in the current directory
+for calls of the function, declarations &amp; definitons of the function
+and prints a message indicating the file and line number, in the format below.
+<p>
+You can assume functions are defined with the type, name and paramaters on a single
+non-indented line.  You can assume function bodies are always indented.
+</p><p>
+You don't have to handle multi line comments.
+Try to avoid matching the function name in strings or single line comments
+For example:
+
+
+</p><pre class="command_line"><kbd class="shell">cat half.c
+</kbd><samp>double half(double x) {
+    return  x/2;
+}
+</samp><kbd class="shell">cat main.c
+</kbd><samp>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+double half(double x);
+
+int main(int argc, char *argv[]) {
+    return  half(atoi(argv[1]));
+}
+</samp><kbd class="shell">./print_function_uses.pl half
+</kbd><samp>a.c:1 function half defined
+half.c:1 function half defined
+main.c:4 function half declared
+main.c:7 function half used
+</samp></pre>
+<div class="answer">
+
+Perl sample solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+$function = $ARGV[0] or die "Usage: $0 &lt;function-name&gt;\n";
+
+foreach $c_file (glob "*.c") {
+    open CF, "&lt;$c_file" or die "$0: can not open $c_file: $!\n";
+    while ($line = &lt;CF&gt;) {
+        # remove single-line comments &amp; strings (breaks if strings contain ")
+        $line =~ s/\/\/.*//;
+        $line =~ s/\/\*.*?\*\///;
+        $line =~ s/".*?"//;
+        # note use of \b (word boundary) to match function
+        $line =~ /\b$function\s*\(/ or next;
+        print "$c_file:$. function $function ";
+        # if line is indented it should be a call to the function
+        if ($line =~ /^\s/) {
+            print "used\n";
+        } elsif ($line =~ /;/) {
+            print "declared\n";
+        } else {
+            print "defined\n";
+        }
+    }
+    close CF;
+}</pre>
+
+Python sample solution
+
+
+<pre class="program">#!/usr/bin/python
+import glob, sys, re
+
+if len(sys.argv) != 2:
+    sys.stdout.write("Usage: %s &lt;function-name&gt;\n\n" % sys.argv[0])
+    sys.exit(1)
+
+function = sys.argv[1]
+
+for c_file in glob.glob("*.c"):
+    with open(c_file) as cf:
+        # note use of \b (word boundary) to match function
+        function_regex = r'\b%s\s*\(' % function
+        line_number = 0
+        for line in cf:
+            line_number = line_number + 1
+            # remove single-line comments &amp; strings (breaks if strings contain ")
+            line = re.sub(r'\/\/.*', '', line)
+            line = re.sub(r'".*?"', '', line)
+            if not re.search(function_regex, line):
+                continue
+            # if line is indented it should be a call to the function
+            if re.search(r'^\s', line):
+                which = "used"
+            elif re.search(r';', line):
+                which = "declared"
+            else:
+                which = "defined"
+            print("%s:%d function %s %s" % (c_file, line_number, function,  which))
+</pre>
+</div>
+<p></p></li><li>
+
+Give Perl code which  given a  C program as input
+finds the definitions of single parameter functions and prints
+separately the function's type, name and the parameters name &amp; type.
+Assume all these occur on a single non-indented line in the C source code.
+You can assume function bodies are always indented.
+Allow for white space occuring anywhere in the function header.
+You can assume that types in the program don't contain square or round brackets.
+For example:
+
+
+<pre class="command_line"><kbd class="shell">cat a.c
+</kbd><samp>double half(int *x) {
+    return  *x/2.0;
+}
+</samp><kbd class="shell">./print_function_types.pl a.c
+</kbd><samp>function type='double'
+function name='half'
+parameter type='int *'
+parameter name='x'
+</samp></pre>
+<div class="answer">
+Perl sample solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+while ($line = &lt;&gt;) {
+    $line =~ /^([a-zA-Z_].*)\((.*)\)/ or next;
+    $function_start = $1;
+    $parameter = $2;
+    $function_type = $function_start;
+    $function_type =~ s/\s*([a-zA-Z_]\w*)\s*$// or next;
+    $function_name = $1;
+    $parameter_type = $parameter;
+    $parameter_type =~ s/\s*([a-zA-Z_]\w*)\s*$// or next;
+    $parameter_name = $1;
+    print "function type='$function_type'\n";
+    print "function name='$function_name'\n";
+    print "parameter type='$parameter_type'\n";
+    print "parameter name='$parameter_name'\n";
+}</pre>
+</div>
+</li><li>
+Write a Perl script C_include.pl which given the name of a C source file
+prints the file replacing any '#include' lines with the contents
+of the included file, if the included file itself contains
+a #include line these should also be processed.
+<p>
+Assume the source files contain only quoted ("") include directives
+which contain the files's actual path name. For example:
+
+
+</p><pre class="command_line"><kbd class="shell">cat f.c
+</kbd><samp>#include "true.h"
+
+int main(int argc, char *argv[]) {
+    return  TRUE || FALSE;
+}
+</samp><kbd class="shell">cat true.h
+</kbd><samp>#define TRUE 1
+#include "false.h"
+</samp><kbd class="shell">cat false.h
+</kbd><samp>#define FALSE 0
+</samp><kbd class="shell">./C_include.pl f.c
+</kbd><samp>#define TRUE 1
+#define FALSE 0
+
+int main(int argc, char *argv[]) {
+    return  TRUE || FALSE;
+}
+</samp></pre>
+<div class="answer">
+
+Perl sample solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+# Given C source files interpolate #include "FILE" directives recursively.
+sub include_file($);
+
+sub include_file($) {
+    my ($file) = @_;
+    # this function is recursive so a local filehandle is essential
+    open my $f, "&lt;$file" or die "$0: can not open $file: $!";
+    while ($line = &lt;$f&gt;) {
+        if ($line =~ /^#\s*include\s*"([^"]*)"/) {
+            include_file($1);
+        } else {
+            print $line;
+        }
+    }
+    close $f;
+}
+
+foreach $file (@ARGV) {
+    include_file($file);
+}</pre>
+</div>
+<p></p></li><li>
+Modify C_include.pl so that it handles both <code>""</code> and <code>&lt;&gt;</code> directives.
+It should search the directories <code>/usr/include/</code>, <code>/usr/local/include</code>
+and /<code>usr/include/x86_64-linux-gnu</code> for include files specified in <code>&lt;&gt;</code> directives
+and for files specified in <code>""</code> directives which do not exist locally. For example:
+
+
+<pre class="command_line"><kbd class="shell">cat g.c
+</kbd><samp>#include &lt;stdio.h&gt;
+
+int main(int argc, char *argv[]) {
+    printf("hello world\n");
+    exit(0);
+}
+</samp><kbd class="shell">./C_include.pl g.c
+</kbd><samp>/* Define ISO C stdio on top of C++ iostreams.
+   Copyright (C) 1991, 1994-2007, 2008, 2009 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307 USA.  */
+
+/*
+ *	ISO C99 Standard: 7.19 Input/output	&lt;stdio.h&gt;
+ */
+
+#ifndef _STDIO_H
+
+#if !defined __need_FILE &amp;&amp; !defined __need___FILE
+# define _STDIO_H	1
+/* Copyright (C) 1991-1993,1995-2006,2007,2009 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+...</samp></pre>
+<div class="answer">
+
+Perl sample solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+# Given C source files interpolate #include "FILE" and #include &lt;FILE&gt;
+# directives recursively.
+# The recursion in this script not terminate on stdio.h etc
+# because #ifdef directive are not handled
+
+@include_dirs = ('/usr/include/','/usr/local/include','/usr/include/x86_64-linux-gnu');
+
+sub include_file($@);
+
+sub include_file($@) {
+    my ($file,@prefixes) = @_;
+    foreach $prefix (@prefixes) {
+        # this function is recursive so a local filehandle is essential
+        my $path = "$prefix$file";
+        next if !-r $path;
+        open my $f, "&lt;$path" or die "$0: can not open $path: $!";
+        while ($line = &lt;$f&gt;) {
+            if ($line =~ /^#\s*include\s*"(.*?)"/) {
+                include_file($1, ('',@include_dirs));
+            } elsif ($line =~ /^#\s*include\s*&lt;(.*?)&gt;/) {
+                include_file($1, @include_dirs);
+            } else {
+                print $line;
+            }
+        }
+        close $f;
+        return;
+    }
+    die "$0: can not find: $file\n";
+}
+
+foreach $file (@ARGV) {
+    include_file($file, (''));
+}</pre>
+</div>
+</li><li>
+
+Write a Perl program, <code>times.pl</code> which prints a table of multiplications.
+<p>
+Your program will be given the dimension of the table and the width of
+the columns to be printed. For example:
+
+
+</p><pre class="command_line"><kbd class="shell">times.pl 4 5 3
+</kbd><samp>  1  1  2  3  4  5
+  2  2  4  6  8 10
+  3  3  6  9 12 15
+  4  4  8 12 16 20
+</samp></pre>
+<div class="answer">
+Sample Perl solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+die "Usage $0 &lt;n&gt; &lt;m&gt; &lt;column-width&gt;" if @ARGV != 3;
+$n = $ARGV[0];
+$m = $ARGV[1];
+$width = $ARGV[2];
+$format = "%${width}d";
+foreach $x (1..$n) {
+    printf $format, $x;
+    foreach $y (1..$m) {
+        printf "%${width}d", $x*$y;
+    }
+    print "\n";
+}
+</pre>
+
+Sample Python solution
+
+
+<pre class="program">#!/usr/bin/python
+import glob, sys, re
+
+if len(sys.argv) != 4:
+    sys.stdout.write("Usage: %s &lt;n&gt; &lt;m&gt; &lt;column-width&gt;\n\n" % sys.argv[0])
+    sys.exit(1)
+
+n = int(sys.argv[1])
+m = int(sys.argv[2])
+width = int(sys.argv[3])
+format = "%%%dd" % width
+
+for x in range(1, n + 1):
+    print(format % x)
+    for y in range(1, m + 1):
+        sys.stdout.write(' ' + (format % (x * y)))
+    print()
+
+</pre>
+</div>
+<p></p></li><li>
+<p>
+Write a Perl program which deletes blank lines from each
+of the files specified as arguments. For example, if run like this:
+
+</p><pre class="command_line"><kbd class="shell">deblank.pl file1 file2 file3</kbd>
+</pre>
+
+your program should delete any blank lines in <code>file1</code>,
+<code>file2</code> and <code>file3</code>.
+Note that this program <em>changes</em> the files, it doesn't
+just write the "de-blanked" versions to standard output.
+
+<div class="answer">
+
+Perl sample solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+# delete blank lines from specified files
+
+die "Usage: $0 &lt;files&gt;\n" if !@ARGV;
+
+foreach $file (@ARGV) {
+    open(IN, "$file") || die("Can not open $file: $!");
+    @lines = &lt;IN&gt;;  # reads entire file into array
+    close(IN);
+    open(OUT, "&gt;$file") || die("Can not open $file: $!");
+    foreach $line (@lines) {
+        print OUT $line if $line !~ /^\s*$/;
+    }
+    close(OUT);
+}
+</pre>
+
+Perl sample solution using -i switch
+
+
+<pre class="program">#!/usr/bin/perl -w -i
+while (&lt;&gt;) {
+    print if !/^\s*$/;
+}
+</pre>
+
+Perl sample solution using -i and -p switch
+
+
+<pre class="program">#!/usr/bin/perl -w -i -p
+s/^\s*$//
+</pre>
+
+Or from the command line:
+
+<pre class="command_line"><kbd class="shell">perl -ip -e 's/^\s*$//' file1 file2 file3</kbd>
+</pre>
+
+Python sample solution - based on Perl
+
+
+<pre class="program">#!/usr/bin/python
+# delete blank lines from specified files
+# simple code which could lose data, if a write error occurs
+import sys, re
+
+for filename in sys.argv[1:]:
+    with open(filename) as f:
+        lines = f.readlines()
+    with open(filename,'w') as f:
+        for line in lines:
+            if not re.match(r'^\s*$', line):
+                f.write(line)
+</pre>
+</div>
+<p></p></li><li>
+
+Write a Perl function <code>listToHTML()</code> that given a list of values
+returns a string
+of HTML code as an unordered list:
+
+<pre class="program">out = listToHTML('The', 'Quick', 'Brown', 'Fox');
+</pre>
+
+would result in <code>$out</code> having the value ...
+
+<pre class="program">&lt;ul&gt;
+&lt;li&gt;The
+&lt;li&gt;Quick
+&lt;li&gt;Brown
+&lt;li&gt;Fox
+&lt;/ul&gt;
+</pre>
+
+As part of an HTML page, this would display as:
+
+<ul>
+<li>The
+</li><li>Quick
+</li><li>Brown
+</li><li>Fox
+</li></ul>
+
+P.S. A Perl syntactic short cut can be used to construct the list above:
+
+<pre class="program">out = listToHTML(qw/The Quick Brown Fox/);
+</pre>
+<div class="answer">
+Sample solution for listToHTML
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+sub listToHTML(@) {
+    my (@list) = @_;
+    return "" if !@list;
+    return "&lt;ul&gt;\n&lt;li&gt;".join("\n&lt;li&gt;", @list)."\n&lt;/ul&gt;\n";
+}
+print listToHTML(@ARGV);
+</pre>
+</div>
+</li><li>
+
+Write a Perl function <code>hashToHTML()</code> that returns a string
+of HTML code that could be used to display a Perl associative array
+(hash) as an HTML table, e.g.
+
+<pre class="program"># the hash table ...
+colours = ("John"=&gt;"blue", "Anne"=&gt;"red", "Andrew"=&gt;"green");
+# and the function call ...
+out = hashToHTML(%colours);
+</pre>
+
+would result in <code>$out</code> having the value ...
+
+<pre class="program">&lt;table border="1" cellpadding="5"&gt;
+&lt;tr&gt;&lt;th&gt; Key &lt;/th&gt;&lt;th&gt; Value &lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt; Andrew &lt;/td&gt;&lt;td&gt; green &lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt; Anne &lt;/td&gt;&lt;td&gt; red &lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt; John &lt;/td&gt;&lt;td&gt; blue &lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+</pre>
+As part of an HTML page, this would display as:
+
+<table border="1" cellpadding="5">
+<tbody><tr><th> Key </th><th> Value </th></tr>
+<tr><td> Andrew </td><td> green </td></tr>
+<tr><td> Anne </td><td> red </td></tr>
+<tr><td> John </td><td> blue </td></tr>
+</tbody></table>
+
+Note that the hash should be displayed in ascending alphabetical order
+on key values.
+
+<div class="answer">
+This gives the function as well as some code to test it out:
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+sub hashToHTML {
+    my (%tab) = @_;
+    my $html = "";
+
+    $html = "&lt;table border=\"1\" cellpadding=\"5\"&gt;\n".
+        "&lt;tr&gt;&lt;th&gt; Key &lt;/th&gt;&lt;th&gt; Value &lt;/th&gt;&lt;/tr&gt;\n";
+
+    foreach $k (sort keys %tab) {
+        $html .= "&lt;tr&gt;&lt;td&gt; $k &lt;/td&gt;&lt;td&gt; $tab{$k} &lt;/td&gt;&lt;/tr&gt;\n";
+    }
+    $html .= "&lt;/table&gt;\n";
+    return $html;
+}
+
+%h = ("David"=&gt;"green", "Phil"=&gt;"blue", "Andrew"=&gt;"red", "John"=&gt;"blue");
+
+print hashToHTML(%h);
+exit;
+</pre>
+</div>
+</li><li>
+
+Write a perl program that will read in an HTML document and output a new HTML document that contains a table with two cells (in one row). In the left cell should be a copy of the complete original HTML document inside &lt;PRE&gt; tags so we can see the raw HTML. You will need to replace all "&lt;" characters with the sequence "&amp;lt;" and all "&gt;" characters with the sequence "&amp;gt;", otherwise the browser will think they are HTML tags (and we want to see the tags in the left cell). In the right cell just include the HTML body of the document, so we can see what it will look like when rendered by a browser.
+<!-- courtesy http://www.cs.rpi.edu/~hollingd/eiw.old/5-Perl/ex6.htm -->
+<div class="answer">
+Sample solution for show_html.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+# inspired by from www.cs.www.cs.rpi.edu/~hollingd/eiw.old/5-Perl/ex6.html
+
+my $html_source = join "", &lt;&gt;;
+my $modified_html = $html_source;
+$modified_html =~ s/&lt;\s*HEAD[^&gt;]*&gt;.*?&lt;\s*\/HEAD[^&gt;]*&gt;//si;
+$modified_html =~ s/&lt;\s*\/?\s*(BODY|HTML)[^&gt;]*&gt;//gsi;
+
+my ($title) = ($html_source =~ /.*&lt;\s*TITLE[^&gt;]*&gt;(.*?)&lt;\s*\/TITLE[^&gt;]*&gt;/si);
+$title = "No title" if !defined $title;
+
+$html_source =~ s/&lt;/\&amp;lt;/g;
+$html_source =~ s/&gt;/\&amp;gt;/g;
+
+print &lt;&lt;eof;
+&lt;HTML&gt;
+&lt;HEAD&gt;
+&lt;TITLE&gt;$title&lt;/TITLE&gt;
+&lt;/HEAD&gt;
+&lt;BODY&gt;
+&lt;H3 ALIGN=CENTER&gt;HTML-VIEW of $title&lt;/H3&gt;
+&lt;TABLE BORDER=1 BGCOLOR=WHEAT&gt;
+&lt;TR&gt;&lt;TD&gt;&lt;PRE&gt;&lt;FONT SIZE=SMALL&gt;$html_source&lt;/FONT&gt;&lt;/PRE&gt;&lt;/TD&gt;&lt;TD&gt;$modified_html&lt;/TD&gt;&lt;/TR&gt;
+&lt;/TABLE&gt;
+&lt;/BODY&gt;
+&lt;/HTML&gt;
+eof
+</pre>
+</div>
+</li><li>
+
+Write a Perl program that reads in data about student performance in a
+Prac Exam and computes the overall result for each student.
+The program takes a <em>single command line argument</em>, which is the name
+of a file containing space-separated text records of the form:
+
+<pre><i>studentID</i>  <i>exerciseID</i>  <i>testsPassed</i>  <i>numWarnings</i>
+</pre>
+
+There will be one line in the file for each exercise submitted by a student,
+so a given student may have one, two or three lines of data.
+<p>
+The output is ordered by student ID and contains a single line for
+each student, in the format:
+</p>
+<pre><i>studentID</i>  <i>totalMark</i>  <i>passOrFail</i>
+</pre>
+<p>
+The <i>totalMark</i> value is computed as follows:
+</p>
+<ul>
+<li> if an exercise passes all 5 tests, it is awarded a mark of 10 and is <em>correct</em>
+</li><li> if an exercise passes less than 5 tests, it is awarded a mark of <i>testsPassed/2</i> and is <em>incorrect</em>
+</li><li> if there are <em>any</em> warnings on an exercise, the mark is reduced by 2
+</li><li> the minimum mark for a given exercise is zero
+</li><li> the <i>totalMark</i> is the sum of the marks for the individual exercises
+</li></ul>
+
+The <i>totalMark</i> value should be display using the <code>printf</code>
+format <code>"%4.1f"</code>.
+
+A student is awarded a <code>PASS</code> if they have 2 or 3 <em>correct</em>
+exercises and is awarded a <code>FAIL</code> otherwise.
+Note that warnings do not cause an exercise to be treated as incorrect.
+<p>
+</p><table border="1" cellpadding="6">
+<tbody><tr><th>Sample Marks File</th><th>Corresponding Output</th></tr>
+<tr><td colspan="2"><center>Command line argument: <code>marks1</code></center></td></tr>
+<tr valign="top">
+<td>
+<pre>2121211 ex1 5 0
+2121211 ex2 5 0
+2121211 ex3 5 0
+2233455 ex1 5 0
+2233455 ex2 5 1
+2233455 ex3 0 1
+2277688 ex1 4 0
+2277688 ex2 3 0
+2277688 ex3 2 1
+2277689 ex1 5 0
+2277689 ex2 5 0
+2277689 ex3 1 1
+</pre>
+</td><td>
+<pre>2121211 30.0 PASS
+2233455 18.0 PASS
+2277688  3.5 FAIL
+2277689 20.0 PASS
+</pre>
+</td></tr></tbody></table>
+<div class="answer">
+Sample Perl solution
+
+
+<pre class="program">#!/usr/local/bin/perl
+#
+# Prac Exam Exercise
+# Author: John Shepherd (sample solution)
+#
+
+while (&lt;&gt;) {
+    chomp;
+    my ($sid,$ex,$tests,$warns) = split;
+    if ($tests == 5) {
+        $mark = 10;
+        $ncorrect{"$sid"}++;
+    }
+    else {
+        $mark = $tests/2.0;
+    }
+    $mark -= 2 if ($warns &gt; 0);
+    $mark = 0 if ($mark &lt; 0);
+    $total{$sid} += $mark;
+}
+
+foreach $sid (sort keys %total) {
+    if ($ncorrect{$sid} &gt;= 2) {
+        $passfail = "PASS";
+    } else {
+        $passfail = "FAIL";
+    }
+    printf "%s %4.1f %s\n", $sid, $total{$sid}, $passfail;
+}
+</pre>
+
+Sample Python solution
+
+
+<pre class="program">#!/usr/bin/python
+import fileinput, re, sys, collections
+ncorrect = collections.defaultdict(int)
+total = collections.defaultdict(float)
+for line in fileinput.input():
+    (sid,ex,tests,warns) = line.split()
+    if tests == '5':
+        mark = 10
+        ncorrect[sid] += 1
+    else:
+        mark = int(tests)/2.0
+    if int(warns) &gt; 0:
+        mark = max(0, mark - 2)
+    total[sid] += mark
+for sid in sorted(total.keys()):
+    if ncorrect[sid] &gt;= 2:
+        passfail = "PASS"
+    else:
+        passfail = "FAIL"
+    print("%s %4.1f %s" % (sid, total[sid], passfail))
+</pre>
+</div>
+<p></p></li><li>
+
+What does this Perl print and why?
+
+<pre class="program">@a = (1..5);
+@b = grep { $_ = $_ - 3; $_ &gt; 0} @a;
+print "@a\n";
+print "@b\n";
+</pre>
+<div class="answer">
+It prints:
+<p>
+</p><pre class="program">-2 -1 0 1 2
+1 2
+</pre>
+<p></p><p>
+The <code>grep</code> function aliases $_ to each list element in turn
+an executes the code in the block.  It returns a list ofthe element for which the
+last expressione evaluated is true.
+</p><p>
+<code>{ $_ = $_ - 3 }</code> subtracts 3 from each element in <code>@a</code>.
+The <code>$_ &gt; 0</code> expression selects positive elements.
+</p></div>
+</li><li>
+
+What does this Perl print?
+
+<pre class="program">@vec = map { $_ ** 2 } (1,2,3,4,5);
+print "@vec\n";
+</pre>
+<div class="answer">
+It prints:
+
+<pre class="program">1 4 9 16 25
+</pre>
+
+The <code>map</code> function applies the code in the block
+<code>{ $_ ** 2 }</code> to each element in the list, and
+returns a list containing the tranformed values.
+The <code>**</code> operator does exponentiation; and
+<code>$_</code> refers to the "current" element
+in the list.
+</div>
+</li></ol>
+<script src="./Week 08 Tutorial_files/2041.js.download"></script>
+</div>
+</div>
+
+
+
+<div id="extension-is-installed"></div></body></html>

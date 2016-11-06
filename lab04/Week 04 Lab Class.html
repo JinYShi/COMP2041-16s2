@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/answers.py?lab/week04.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Week 04 Lab Class</title>
+<link href="./Week 04 Lab Class_files/2041.css" rel="stylesheet">
+</head>
+<body data-shoptagr-mini="yes">
+<div class="container">
+<div id="heading"><a class="heading_link" target="_blank" id="left_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">COMP[29]041 16s2</a>
+Shell Scripts
+<a class="heading_link" target="_blank" id="right_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">Software Construction</a></div>
+<div class="tutlab lab">
+<h3>Aims</h3>
+This exercise aims to give you more practice with using the Unix shell
+for processing collections of files.
+<h3>Assessment</h3>
+<table border="0" cellpadding="3">
+<tbody><tr><td><b>Submission:</b></td><td><code>give cs2041 lab04 jpg2png.sh email_image.sh date_image.sh fix_id3_tags.sh  [create_music.sh]</code><br>
+</td></tr><tr><td><b>Deadline:</b></td><td>either during the lab, or Monday 22 August 11:59pm (midnight)</td></tr>
+<tr><td><b>Assessment:</b></td><td>
+Make sure that you are familiar with the
+<a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/assessment.html">lab assessment criteria</a>.
+</td></tr>
+</tbody></table>
+<h3>Exercise: Converting Images</h3>
+Write a shell script <code>jpg2png.sh</code> which converts all images in <a href="http://en.wikipedia.org/wiki/JPEG">JPEG</a> format
+in the current directory to <a href="http://en.wikipedia.org/wiki/Portable_Network_Graphics">PNG</a> format.
+<p>
+You can assume that JPEG files and only JPEG files have the suffix <code>jpg</code>.
+</p><p>
+If the conversion is succesful the JPEG file should be removed.
+</p><p>
+Your script should stop with an appropriate error message and exit status if the PNG file already exists.
+</p><p>
+</p><pre class="command_line"><kbd class="shell">wget http://www.cse.unsw.edu.au/~cs2041/lab/sh/images/images.zip</kbd>
+<kbd class="shell">unzip images.zip</kbd>
+Archive:  images.zip
+  inflating: Johannes Vermeer - The Girl With The Pearl Earring.jpg
+  inflating: nautilus.jpg
+  inflating: panic.jpg
+  inflating: penguins.jpg
+  inflating: shell.jpg
+  inflating: stingray.jpg
+  inflating: treefrog.jpg
+<kbd class="shell">./jpg2png.sh</kbd>
+<kbd class="shell">ls</kbd>
+Johannes Vermeer - The Girl With The Pearl Earring.png  panic.png
+email_image.sh                                          penguins.png
+images.zip                                              shell.png
+index.php                                               stingray.png
+jpg2png.sh                                              treefrog.png
+nautilus.png
+<kbd class="shell">cp -p /home/cs2041/public_html/lab/sh/images/penguins.jpg  .</kbd>
+<kbd class="shell">./jpg2png.sh</kbd>
+penguins.png already exists
+</pre>
+<p></p><p>
+</p><h4>Hints</h4>
+<p></p><p>
+You may find sed and back quotes useful.
+</p><p>
+The tool <code>convert</code> will convert between many image formats, for example:
+</p><p>
+</p><pre class="command_line"><kbd class="shell">convert penguins.jpg penguins.png</kbd>
+</pre>
+<div class="answer">
+Sample solution for jpg2png.sh
+
+
+<pre class="program">#!/bin/sh
+
+for jpg_file in *.jpg
+do
+    png_file=`echo $jpg_file|sed 's/jpg$/png/'`
+    if test -e "$png_file"
+    then
+        echo "$png_file" already exists
+        exit 1
+    fi
+    convert "$jpg_file" "$png_file" &amp;&amp; rm "$jpg_file"
+done</pre>
+</div>
+<h3>Exercise: Emailing Images</h3>
+Write a shell script <code>email_image.sh</code> which given a list of image
+files as arguments  displays them one-by-one.  After the user has viewed each image
+the script should prompt the user for an e-mail address.
+If the user does enter an email address, the script should prompt the user for a message to
+accompany the image and then send the image to e-mail address.
+to that address.
+<pre class="command_line"><kbd class="shell">./email_image.sh penguins.png treefrog.png </kbd>
+Address to e-mail this image to? <kbd>andrewt@cse.unsw.edu.au</kbd>
+Message to accompany image? <kbd>Penguins are cool.</kbd>
+penguins.png sent to andrewt@cse.unsw.edu.au
+Address to e-mail this image to? <kbd>andrewt@cse.unsw.edu.au</kbd>
+Message to accompany image? <kbd>This is a White-lipped Tree Frog</kbd>
+treefrog.png sent to andrewt@cse.unsw.edu.au
+</pre>
+<p></p><p>
+</p><h4>Hints</h4>
+<p></p><p>
+The program <code>display</code> can be used to view image files
+</p><p>
+The program  <code>mutt</code> can be used to send mail from the command line including attachments, for example:
+</p><p>
+</p><pre class="command_line"><kbd class="shell">echo 'Penguins are cool.'|mutt -s 'penguins!' -a penguins.png -e set copy=no -- nobody@nowhere.com</kbd>
+</pre>
+<div class="answer">
+Sample solution for email_image.sh
+
+
+<pre class="program">#!/bin/sh
+
+for png_file in "$@"
+do
+    display "$png_file"
+    echo -n "Address to e-mail this image to? "
+    read address
+    if test -n "$address"
+    then
+        echo -n "Message to accompany image? "
+        read message
+        echo "$message"| mutt -s 'image' -a "$png_file" -e set copy=no -- "$address"
+        echo "$png_file sent to $address"
+    else
+        echo "No email sent"
+    fi
+done
+</pre>
+
+Python solution
+
+
+<pre class="program">#!/usr/bin/python
+
+import smtplib, subprocess, sys
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+from_address = "andrewt@unsw.edu.au"
+for png_file in sys.argv[1:]:
+    subprocess.check_output(['echo', 'display', png_file])
+    sys.stdout.write("Address to e-mail this image to? ")
+    sys.stdout.flush()
+    to_address = sys.stdin.readline().strip()
+    if to_address:
+        sys.stdout.write("Message to accompany image? ")
+        sys.stdout.flush()
+        message = sys.stdin.readline().strip()
+        msg = MIMEMultipart(message)
+        msg['Subject'] = png_file
+        msg['From'] = from_address
+        msg['To'] = to_address
+        with open(png_file) as f:
+            attachment = MIMEText(f.read())
+            attachment.add_header('Content-Disposition', 'attachment', filename=png_file)
+            msg.attach(attachment)
+        s = smtplib.SMTP('smtp.cse.unsw.edu.au')
+        s.sendmail(from_address, [to_address], msg.as_string())
+        s.quit()
+    else:
+        print("No email sent")
+</pre>
+</div>
+<h3>Exercise: Annotating Images</h3>
+Write a shell script <code>date_image.sh</code> which, given a list of image
+files as arguments, changes each file so it has a label added to the image
+indicating the time it was taken.
+You can assume the last-modification time of the image file
+is the time it was taken.
+<p></p><p>
+So for example if we these commands were run:
+</p><p>
+</p><pre class="command_line"><kbd class="shell">cp -p /home/cs2041/public_html/lab/sh/images/penguins.jpg  .</kbd>
+<kbd class="shell">ls -l penguins.jpg </kbd>
+-rw-r--r-- 1 andrewt andrewt 58092 Mar 16 16:08 penguins.jpg
+<kbd class="shell">./date_image.sh penguins.jpg</kbd>
+<kbd class="shell">display  penguins.jpg </kbd>
+</pre>
+<p></p><p>
+Then <code>penguins.jpg</code> should have been be modified to look like this:
+</p><p>
+<img alt="http://en.wikipedia.org/wiki/File:Emperor_penguins.jpg" src="./Week 04 Lab Class_files/labelled_penguins.jpg">
+</p><h4>Hints</h4>
+<p></p><p>
+The program convert can be used to label an image like this:
+</p><p>
+</p><pre class="command_line"><kbd class="shell"> convert -gravity south -pointsize 36 -draw "text 0,10 'Andrew rocks'" penguins.jpg temporary_file.jpg</kbd>
+</pre>
+<p></p><p>
+<b>Hint:</b><code>sed</code> and/or <code>cut</code> may be useful to extract the date&amp;time from ls's output.
+</p><p>
+<b>Hint:</b><code>convert</code> produce confusing messages if you don't get its option syntax exactly right
+
+</p><div class="answer">
+Sample solution for date_image.sh
+
+
+<pre class="program">#!/bin/sh
+
+for image_file in "$@"
+do
+    last_modify_time=`ls -l "$image_file"|cut -d\  -f5-|sed 's/^ *//'|cut -d\  -f2-4`
+    temporary_file="$image_file.tmp.$$"
+    if test -e "$temporary_file"
+    then
+        echo "$temporary_file" already exists
+        exit 1
+    fi
+    convert -gravity south -pointsize 36 -annotate 0 "text 0,10 '$last_modify_time'" $image_file $temporary_file &amp;&amp;
+    touch -r $image_file $temporary_file &amp;&amp;  # preserve modification time (challenge question)
+    mv $temporary_file $image_file
+done</pre>
+</div>
+<h3>Challenge Question: preserving file modification times</h3>
+
+Modify <code>date_image.sh</code> so it doesn't affect the
+image file's last-modification time. For example:
+<p></p><p>
+</p><pre class="command_line"><kbd class="shell">cp -p /home/cs2041/public_html/lab/sh/images/penguins.jpg  .</kbd>
+<kbd class="shell">ls -l penguins.jpg </kbd>
+-rw-r--r-- 1 andrewt andrewt 58092 Mar 16 16:08 penguins.jpg
+<kbd class="shell">./date_image.sh penguins.jpg</kbd>
+<kbd class="shell">ls -l penguins.jpg </kbd>
+-rw-r--r-- 1 andrewt andrewt 58092 Mar 16 16:08 penguins.jpg
+</pre>
+<p></p>
+<h3>Exercise: Organizing Music</h3>
+
+Andrew's needs help fixing the <a href="https://en.wikipedia.org/wiki/ID3">ID3</a> tags in the <a href="https://en.wikipedia.org/wiki/MP3">MP3</a> files in his music collection.
+<p>
+You will write a shell script <code>fix_id3_tags.sh</code> which set appropriate ID3 tags for Andrew's music collection.
+</p><p>
+Your script will determine the appropriate ID3 tags from the directory names and file names of the music collection.
+</p><p>
+You assume the names follows a standard format.  You can determine this
+format by <a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/sh/music/music.zip">downloading</a> Andrew's music collection.
+</p><p>
+</p><pre class="command_line"><kbd class="shell">wget http://www.cse.unsw.edu.au/~cs2041/lab/sh/music/music.zip</kbd>
+<i>...</i>
+<kbd class="shell">unzip music.zip</kbd>
+Archive:  music.zip
+   creating: music/
+   creating: music/Triple J Hottest 100, 2006/
+  inflating: music/Triple J Hottest 100, 2006/2 - Black Fingernails, Red Wine - Eskimo Joe.mp3
+  inflating: music/Triple J Hottest 100, 2006/6 - Crazy - Gnarls Barkley.mp3
+  inflating: music/Triple J Hottest 100, 2006/5 - I Don't Feel Like Dancin' - Scissor Sisters.mp3
+<i>...</i>
+</pre>
+<p></p><p>
+The command <code>id3</code> can be used list the value of ID3 tags in an MP3 file, for example:
+
+</p><pre class="command_line"><kbd class="shell">id3 -l 'music/Triple J Hottest 100, 2013/1 - Riptide - Vance Joy.mp3'</kbd>
+music/Triple J Hottest 100, 2013/1 - Riptide - Vance Joy.mp3:
+Title  : Andrew Rocks                    Artist: Andrew
+Album  : Best of Andrew                  Year: 2038, Genre: Unknown (255)
+Comment:                                 Track: 42
+</pre>
+
+As you can see the ID3 tags of this music file have been accidentally over-written. The ID3 tags  should be:
+
+<pre class="command_line"><kbd class="shell">id3 -l 'music/Triple J Hottest 100, 2013/1 - Riptide - Vance Joy.mp3'</kbd>
+music/Triple J Hottest 100, 2013/1 - Riptide - Vance Joy.mp3:
+Title  : Riptide                         Artist: Vance Joy
+Album  : Triple J Hottest 100, 2013      Year: 2013, Genre: Unknown (255)
+Comment:                                 Track: 1
+</pre>
+
+Fortunately all the information needed to fix the ID3 tags is available in
+the name of the file and the name of the directory it is in.
+<p></p><p>
+You will write a shell script <code>fix_id3_tags.sh</code> which takes the name of 1 or more directories
+in Andrew's music collection as arguments and fixes the ID# tags of the all MP3 files in that directory.
+For example:
+
+</p><pre class="command_line"><kbd class="shell">fix_id3_tags.sh 'music/Triple J Hottest 100, 2015'</kbd>
+<kbd class="shell">id3 -l 'music/Triple J Hottest 100, 2015/4 - The Less I Know the Better - Tame Impala.mp3'</kbd>
+music/Triple J Hottest 100, 2015/4 - The Less I Know the Better - Tame Impala.mp3:
+Title  : The Less I Know the Better      Artist: Tame Impala
+Album  : Triple J Hottest 100, 2015      Year: 2015, Genre: Unknown (255)
+Comment:                                 Track: 4
+<kbd class="shell">fix_id3_tags.sh music/*</kbd>
+<kbd class="shell">id3 -l 'music/Triple J Hottest 100, 1995/10 - Greg! The Stop Sign!! - TISM.mp3'</kbd>
+music/Triple J Hottest 100, 1995/10 - Greg! The Stop Sign!! - TISM.mp3:
+Title  : Greg! The Stop Sign!!           Artist: TISM
+Album  : Triple J Hottest 100, 1995      Year: 1995, Genre: Unknown (255)
+Comment:                                 Track: 10
+<kbd class="shell">id3 -l 'music/Triple J Hottest 100, 1999/1 - These Days - Powderfinger.mp3'</kbd>
+music/Triple J Hottest 100, 1999/1 - These Days - Powderfinger.mp3:
+Title  : These Days                      Artist: Powderfinger
+Album  : Triple J Hottest 100, 1999      Year: 1999, Genre: Unknown (255)
+Comment:                                 Track: 1
+<kbd class="shell">id3 -l 'music/Triple J Hottest 100, 2012/2 - Little Talks - Of Monsters and Men.mp3'</kbd>
+music/Triple J Hottest 100, 2012/2 - Little Talks - Of Monsters and Men.mp3:
+Title  : Little Talks                    Artist: Of Monsters and Men
+Album  : Triple J Hottest 100, 2012      Year: 2012, Genre: Unknown (255)
+Comment:                                 Track: 2
+</pre>
+
+Your script should not change the <i>Genre</i> or <i>Comment</i> fields.
+<p></p><p>
+Your script should determine <i>Title</i>, <i>Artist</i> <i>Track</i> <i>Album</i> &amp; <i>Year</i> from the directory &amp; filename.
+
+</p><h4>Hints</h4>
+<pre class="command_line"><kbd class="shell">man id3</kbd>
+<i>...</i>
+</pre>
+<code>cut</code> almost works for extracting  <i>Title</i> and <i>Album</i>  from the filename.
+<p></p><p>
+Handling the few MP3 files correctly where using <code>cut</code> doesn't work will be considered a <b>challenge exercise</b>.
+</p><p>
+It can be difficult debugging your script on Andrew's music collection.
+In cases like these it usually worth creating a smaller data set
+for initial debugging.
+Such a tiny data set is available in  <a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/sh/music/tiny_music.zip">tiny_music.zip</a> if you want to use it
+for debugging.  This dataset is used in the first autotests.
+
+</p><pre class="command_line"><kbd class="shell">wget http://www.cse.unsw.edu.au/~cs2041/lab/sh/music/tiny_music.zip</kbd>
+<kbd class="shell">unzip tiny_music.zip</kbd>
+Archive:  tiny_music.zip
+   creating: tiny_music/
+   creating: tiny_music/Album1, 2015/
+  inflating: tiny_music/Album1, 2015/2 - Little Talks - Of Monsters and Men.mp3
+  inflating: tiny_music/Album1, 2015/1 - Riptide - Vance Joy.mp3
+   creating: tiny_music/Album2, 2016/
+  inflating: tiny_music/Album2, 2016/2 - Royals - Lorde.mp3
+  inflating: tiny_music/Album2, 2016/1 - Hoops - The Rubens.mp3
+<kbd class="shell">id3 -l tiny_music/*/*.mp3</kbd>
+tiny_music/Album1, 2015/1 - Riptide - Vance Joy.mp3:
+Title  : Andrew Rocks                    Artist: Andrew
+Album  : Best of Andrew                  Year: 2038, Genre: Unknown (255)
+Comment:                                 Track: 42
+tiny_music/Album1, 2015/2 - Little Talks - Of Monsters and Men.mp3:
+Title  : Andrew Rocks                    Artist: Andrew
+Album  : Best of Andrew                  Year: 2038, Genre: Unknown (255)
+Comment:                                 Track: 42
+tiny_music/Album2, 2016/1 - Hoops - The Rubens.mp3:
+Title  : Andrew Rocks                    Artist: Andrew
+Album  : Best of Andrew                  Year: 2038, Genre: Unknown (255)
+Comment:                                 Track: 42
+tiny_music/Album2, 2016/2 - Royals - Lorde.mp3:
+Title  : Andrew Rocks                    Artist: Andrew
+Album  : Best of Andrew                  Year: 2038, Genre: Unknown (255)
+Comment:                                 Track: 42
+<kbd class="shell">./fix_id3_tags.sh tiny_music/*</kbd>
+<kbd class="shell">id3 -l tiny_music/*/*.mp3</kbd>
+tiny_music/Album1, 2015/1 - Riptide - Vance Joy.mp3:
+Title  : Riptide                         Artist: Vance Joy
+Album  : Album1, 2015                    Year: 2015, Genre: Unknown (255)
+Comment:                                 Track: 1
+tiny_music/Album1, 2015/2 - Little Talks - Of Monsters and Men.mp3:
+Title  : Little Talks                    Artist: Of Monsters and Men
+Album  : Album1, 2015                    Year: 2015, Genre: Unknown (255)
+Comment:                                 Track: 2
+tiny_music/Album2, 2016/1 - Hoops - The Rubens.mp3:
+Title  : Hoops                           Artist: The Rubens
+Album  : Album2, 2016                    Year: 2016, Genre: Unknown (255)
+Comment:                                 Track: 1
+tiny_music/Album2, 2016/2 - Royals - Lorde.mp3:
+Title  : Royals                          Artist: Lorde
+Album  : Album2, 2016                    Year: 2016, Genre: Unknown (255)
+Comment:                                 Track: 2
+</pre>
+<div class="answer">
+Sample solution for fix_id3_tags.sh
+
+
+<pre class="program">#!/bin/sh
+
+for album_pathname in "$@"
+do
+    album=`basename "$album_pathname"`
+    year=`echo "$album"|sed 's/.* //'`
+
+    for mp3_pathname in "$album_pathname"/*.mp3
+    do
+        mp3_filename=`basename "$mp3_pathname" .mp3`
+        # assume ' - ' doesn't occur in artist or album
+        track=`echo "$mp3_filename"|sed 's/ - .*//'`
+        title=`echo "$mp3_filename"|sed 's/^[0-9]* - //;s/ - .*//'`
+        artist=`echo "$mp3_filename"|sed 's/.* - //'`
+        id3 -t "$title" -T "$track" -a "$artist" -A "$album" -y "$year" "$mp3_pathname" &gt;/dev/null
+    done
+done
+</pre>
+</div>
+<p></p>
+
+You can run some tests on your script like this:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab04 fix_id3_tags.sh</kbd>
+</pre>
+
+
+You can also specify that only a single test be run:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab04 tiny_album1</kbd>
+</pre>
+
+Also do your own testing!
+
+
+
+<h3>Challenge Exercise: Creating Music</h3>
+
+The test data for the previous question is not really Andrew's music collection.
+All the mp3 files contain identical contents.
+The directories and filenames  were created from the source of this  <a href="https://en.wikipedia.org/wiki/Triple_J_Hottest_100">web page</a>.
+
+Write a shell script <code>create_music.sh</code> which uses the above webpage to create exactly the same directories and files as
+in the test data set supplied above.
+
+Your script should take 2 arguments: the name of an MP3 file to use as the contents of the MP3 files you create and
+the directory in which to create the test data.
+For example:
+
+<pre class="command_line"><kbd class="shell">wget http://www.cse.unsw.edu.au/~cs2041/lab/sh/music/music.zip</kbd>
+<i>...</i>
+<kbd class="shell">unzip music.zip</kbd>
+<kbd class="shell">wget http://www.cse.unsw.edu.au/~cs2041/lab/sh/music/sample.mp3</kbd>
+<kbd class="shell">./create_music.sh sample.mp3 created_music</kbd>
+<kbd class="shell">ls created_music</kbd>
+Triple J Hottest 100, 1993  Triple J Hottest 100, 1998  Triple J Hottest 100, 2003  Triple J Hottest 100, 2008  Triple J Hottest 100, 2013
+Triple J Hottest 100, 1994  Triple J Hottest 100, 1999  Triple J Hottest 100, 2004  Triple J Hottest 100, 2009  Triple J Hottest 100, 2014
+Triple J Hottest 100, 1995  Triple J Hottest 100, 2000  Triple J Hottest 100, 2005  Triple J Hottest 100, 2010  Triple J Hottest 100, 2015
+Triple J Hottest 100, 1996  Triple J Hottest 100, 2001  Triple J Hottest 100, 2006  Triple J Hottest 100, 2011
+Triple J Hottest 100, 1997  Triple J Hottest 100, 2002  Triple J Hottest 100, 2007  Triple J Hottest 100, 2012
+<kbd class="shell">ls 'created_music/Triple J Hottest 100, 2012'</kbd>
+1 - Thrift Shop - Macklemore and Ryan Lewis featuring Wanz.mp3  5 - I Will Wait - Mumford &amp; Sons.mp3
+10 - My Gun - The Rubens.mp3                                    6 - Get Free - Major Lazer featuring Amber Coffman.mp3
+2 - Little Talks - Of Monsters and Men.mp3                      7 - Elephant - Tame Impala.mp3
+3 - Breezeblocks - Alt-J.mp3                                    8 - Lost - Frank Ocean.mp3
+4 - Holdin' On - Flume.mp3                                      9 - Feels Like We Only Go Backwards - Tame Impala.mp3
+<kbd class="shell">diff -r music created_music/</kbd>
+<kbd class="shell"></kbd>
+</pre>
+<h4>Hints</h4>
+<pre class="command_line"><kbd class="shell">wget -q -O- 'https://en.wikipedia.org/wiki/Triple_J_Hottest_100?action=raw'</kbd>
+<i>...</i>
+</pre>
+<div class="answer">
+Sample solution for create_music.sh
+
+
+<pre class="program">#!/bin/sh
+
+mp3_file="$1"
+base_dir="$2"
+
+wget -q -O- 'https://en.wikipedia.org/wiki/Triple_J_Hottest_100?action=raw'|
+while read line
+do
+    # look for line which is start of Hottest 100 list for a year
+
+    case "$line" in
+    *'[[Triple J Hottest 100, '[0-9][0-9][0-9][0-9]'|'[0-9][0-9][0-9][0-9]*) ;;
+    *) continue;;
+    esac
+
+    # create a directory for a Hottest 100
+    album=`echo "$line"|sed 's/.*\[\[//;s/|.*//'`
+    year=`echo "$album"|sed 's/.*\ //'`
+    dir="$base_dir/Triple J Hottest 100, $year"
+    mkdir -p -m 755 "$dir"
+
+    # read top 10 songs for year
+    track=1
+    while read line &amp;&amp; test $track -le 10
+    do
+        case "$line" in
+        '#'*) ;;
+        *) continue;;
+        esac
+
+        # remove links to wikipedia pages
+        line=`echo "$line"|sed 's/[^[]*|//g'`
+
+        # change slashes to hyphens - because can't have / in a filename
+        line=`echo "$line"|sed 's/\//-/g'`
+
+        # remove some formating characters
+        line=`echo "$line"|tr -d '[]"#'`
+
+        #break line in two at en dash byte codes
+        artist=`echo "$line"|sed 's/\xe2\x80\x93.*//'`
+        title=`echo "$line"|sed 's/.*\xe2\x80\x93//'`
+
+        #trim leading spaces
+        artist=`echo "$artist"|sed 's/^ *//'`
+        title=`echo "$title"|sed 's/^ *//'`
+
+        #trim trailing spaces
+        artist=`echo "$artist"|sed 's/ *$//'`
+        title=`echo "$title"|sed 's/ *$//'`
+
+        file="$dir/$track - $title - $artist.mp3"
+        cp -p "$mp3_file" "$file"
+        track=$((track + 1))
+    done
+done</pre>
+</div>
+<!--
+
+You can run a test on your script like this:
+
+<pre class="command_line">
+<kbd class="shell">~cs2041/bin/autotest lab04 create_music.sh</kbd>
+</pre>
+
+Also do your own testing!
+-->
+<h3>Finalising</h3>
+<p>
+You must show your solutions to your tutor and be able to explain
+how they work.
+Once your tutor has discussed your answers with you, you should
+submit them using
+</p><pre class="command_line"><kbd class="shell">give cs2041 lab04 jpg2png.sh email_image.sh date_image.sh fix_id3_tags.sh  [create_music.sh]</kbd>
+</pre>
+Only submit <code>create_music.sh</code> if you attempt the challenge exercise.
+Whether you discuss your solutions
+with your tutor this week or next week, you must submit them before
+the above deadline.
+<script src="./Week 04 Lab Class_files/2041.js.download"></script>
+<p></p></div>
+</div>
+
+
+
+<div id="extension-is-installed"></div></body></html>

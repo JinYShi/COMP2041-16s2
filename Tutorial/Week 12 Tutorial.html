@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/answers.py?tut/week12.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Week 12 Tutorial</title>
+<link href="./Week 12 Tutorial_files/2041.css" rel="stylesheet">
+</head>
+<body data-shoptagr-mini="yes">
+<div class="container">
+<div id="heading"><a class="heading_link" target="_blank" id="left_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">COMP[29]041 16s2</a>
+Need dynamic web content - you want Perl
+<a class="heading_link" target="_blank" id="right_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">Software Construction</a></div>
+<div class="tutlab tut">
+<ol>
+<li>
+</li><li>
+What is  Unicode
+<div class="written answer">
+A standard for representing all the world's written languages and other symbols - it has 100,000+ characters,
+<p>
+ASCII represents 128 characters including the English alphabet. 
+</p></div>
+</li><li>
+What is UTF-8
+<div class="written answer">
+An encoding for Unicode which uses 1-4 bytes to represnt characters.
+<p>
+It is backward compatible with ASCII - the 128 ASCII characters have the same value in UTF-8
+</p></div>
+</li><li>
+Do I need to I know about UTF-8 for the assignment.
+
+<div class="written answer">
+Yes and no.
+<p>
+The test data set are encoded in UTF-8 but only a small fraction 
+of the posts/replies/comments contain non-ASCII so you can do a lot of the assignment
+Asuuming the data is ASCII.
+</p><p>
+Most the world's web pages use UTF-8 and for example 
+users of a social media website with non-ASCII names would be (rghtly) upset if their name are shown correctly!
+</p><p>
+So if you get past teh first couple of subet you may have to do a little research on handling unicode.
+</p></div>
+</li><li>
+Write a Perl program script <code>distance_from_unsw.pl</code> which lists the latitude, longitude and
+suburb (if provided) of all matelook users in a dataset it is given as argument.
+<p>
+The users must be listed in increasing order of distance from UNSW.
+</p><p>
+For example:
+
+
+</p><pre class="command_line"><kbd class="shell">./distance_from_unsw.pl dataset-small
+</kbd><samp>z3413158 lives at -33.9229 151.2303 in University Of New South Wales
+z3466413 lives at -33.9217 151.2247 in University Of New South Wales
+z5076002 lives at -33.9103 151.2323 in University Of New South Wales
+z5040176 lives at -33.9111 151.2342 in University Of New South Wales
+z5059413 lives at -33.9049 151.2433 in Randwick
+z5014861 lives at -33.9489 151.2105 in Banksmeadow
+z5099187 lives at -33.9838 151.2374 in Little Bay
+z3493921 lives at -33.8062 151.2003 in Willoughby
+z5063045 lives at -33.9688 151.0567 in Peakhurst
+z3462191 lives at -33.7393 150.9988 in Castle Hill
+</samp></pre>
+
+Assume UNSW's (latitiude, longitude) is (-33.9172238,151.2302268).
+<p></p><p>
+Don't print  users who don't provide their latitude/longitude.
+</p><p>
+You can assume if a user provides either latitude or longitude they provide both.
+
+</p><div class="answer">
+Sample solution for distance_from_unsw.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+$dataset_dir = $ARGV[0] or die;
+
+$unsw_latitude = -33.9172238;
+$unsw_longitude = 151.2302268;
+
+foreach $user_directory (glob "$dataset_dir/*") {
+	open F, "&lt;$user_directory/user.txt" or next;
+	my $username = $user_directory;
+	$username =~ s/.*\///;
+	my ($line, $latitude, $longitude);
+	while ($line = &lt;F&gt;) {
+		if ($line =~ /^home_latitude=(\S+)/) {
+			$latitude{$username} = $1;
+		} elsif ($line =~ /^home_longitude=(\S+)/) {
+			$longitude{$username} = $1;
+		} elsif ($line =~ /^home_suburb=(.*)/) {
+			$suburb{$username} = $1;
+		}
+	}
+	close F;
+}
+
+sub distance_from_unsw {
+	my ($username) = @_;
+	my ($latitude, $longitude) = ($latitude{$username}, $longitude{$username});
+	return sqrt(($latitude - $unsw_latitude) ** 2 + ($longitude - $unsw_longitude) ** 2)
+}
+
+@usernames = keys %latitude;
+@sorted_usernames = sort {distance_from_unsw($a) &lt;=&gt; distance_from_unsw($b)} @usernames;
+
+foreach $username (@sorted_usernames) {
+	printf "$username lives at $latitude{$username} $longitude{$username}";
+	print " in $suburb{$username}" if $suburb{$username};
+	print "\n";
+}
+</pre>
+</div>
+<p></p></li><li>
+
+Translate  distance_from_unsw.pl to Python.
+
+
+<div class="answer">
+Sample solution for distance_from_unsw.py
+
+
+<pre class="program">#!/usr/bin/python
+
+import glob, math, os, re, sys
+dataset_dir = sys.argv[1]
+
+unsw_latitude = -33.9172238
+unsw_longitude = 151.2302268
+
+latitude = {}
+longitude = {}
+suburb = {}
+for user_directory in glob.glob(os.path.join(dataset_dir, "*")):
+    username = os.path.basename(user_directory)
+    with open(os.path.join(user_directory, "user.txt")) as f:
+        for line in f:
+            m = re.match(r'(.*?)=(.*)', line)
+            if not m:
+                continue
+            if m.group(1) == 'home_latitude':
+                latitude[username] = float(m.group(2))
+            elif m.group(1) == 'home_longitude':
+                longitude[username] = float(m.group(2))
+            elif m.group(1) == 'home_suburb':
+                suburb[username] = m.group(2)
+
+def distance_from_unsw(username):
+    (lat, int) = (latitude[username], longitude[username])
+    return math.sqrt((lat - unsw_latitude) ** 2 + (int - unsw_longitude) ** 2)
+
+usernames = list(latitude.keys())
+sorted_usernames = sorted(usernames, key=distance_from_unsw)
+
+for username in sorted_usernames:
+    sys.stdout.write("%s lives at %s, %s" % (username, latitude[username], longitude[username]))
+    if username in suburb:
+        sys.stdout.write(" in %s" % suburb[username])
+    sys.stdout.write('\n')
+</pre>
+</div>
+</li><li>
+
+Write a CGI script which allow users to change what is stored in a file.
+<p>
+Here is an example implementation:
+
+
+
+</p><div class="cgi_display">
+<div class="cgi_display_title">
+<a target="_blank" href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/tut/perlcgi/editfile.cgi">editfile.cgi</a>
+</div>
+<div class="cgi_output_panel">
+<iframe class="cgi_output_display" src="./Week 12 Tutorial_files/editfile.html" onload="show_html_source(this)">
+</iframe>
+</div>
+<div class="html_source_panel">
+<div class="html_source_display">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;A Simple Example&lt;/title&gt;
+&lt;meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h2&gt;File contents are:&lt;/h2&gt;&lt;form method="post" action="/~cs2041cgi/16s2/tut/perlcgi/editfile.cgi" enctype="multipart/form-data"&gt;
+&lt;textarea name="contents" rows="10" cols="60"&gt;dasdaa&lt;/textarea&gt;&lt;p&gt;&lt;input type="submit" name="Save" value="Save"&gt;&lt;/p&gt;&lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</div>
+</div>
+</div>
+<div class="answer">
+Sample solution for editfile.cgi
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+use CGI qw/:all/;
+use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
+
+# Simple CGI script written by andrewt@cse.unsw.edu.au
+# Allow users to change a file
+
+print header, start_html('A Simple Example');
+warningsToBrowser(1);
+
+if (param('Save') &amp;&amp; defined param('contents')) {
+    open FILE, "&gt;example_13.txt" or die "Can not open example_13.txt: $!";
+    print FILE param('contents');
+    close FILE;
+    print h2('Saved'),end_html;
+    exit 0;
+}
+
+if (!defined param('contents') &amp;&amp; open FILE, "&lt;example_13.txt") {
+	# Note there is a large risk of security holes if you display user-supplied HTML
+	# The substitutions below remove some of the risks
+	my $contents = join "", &lt;FILE&gt;;
+	$contents =~ s/&amp;/&amp;amp;/g;
+	$contents =~ s/&lt;/&amp;lt;/g;
+	$contents =~ s/&gt;/&amp;gt;/g;
+    param('contents', $contents);
+}
+
+print   h2('File contents are:'),
+        start_form,
+        textarea(-name=&gt;'contents', -rows=&gt;10,-cols=&gt;60),
+        p, submit('Save'),
+        end_form,
+        end_html;
+</pre>
+</div>
+<p></p></li><li>
+
+Write a CGI script to play the <a href="http://en.wikipedia.org/wiki/Bulls_and_cows">Bulls and Cows</a> guessing game.
+<p>
+Here is an example implementation:
+
+
+
+</p><div class="cgi_display">
+<div class="cgi_display_title">
+<a target="_blank" href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/tut/perlcgi/bullscows.cgi">bullscows.cgi</a>
+</div>
+<div class="cgi_output_panel">
+<iframe class="cgi_output_display" src="./Week 12 Tutorial_files/bullscows.html" onload="show_html_source(this)">
+</iframe>
+</div>
+<div class="html_source_panel">
+<div class="html_source_display">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Bulls'n'Cows Game&lt;/title&gt;
+&lt;meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;center&gt;
+&lt;h1&gt;Bulls'n'Cows Guessing Game&lt;/h1&gt;Welcome to the Bulls and Cows guessing game. &lt;p&gt;
+There are four colours "hidden" under the squares. &lt;/p&gt;&lt;p&gt;
+&lt;/p&gt;&lt;table border="1" cellpadding="10"&gt;
+&lt;tbody&gt;&lt;tr&gt;
+  &lt;td&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; ? &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;/td&gt;
+  &lt;td&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; ? &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;/td&gt;
+  &lt;td&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; ? &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;/td&gt;
+  &lt;td&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; ? &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt; &lt;p&gt;
+In each turn you can guess colours for as many squares as you like. &lt;br&gt;
+I will then tell you how many "bulls" and "cows" you scored. &lt;br&gt;
+A "bull" means that you guessed the correct colour in the correct square. &lt;br&gt;
+A "cow" means that you guessed the correct colour but in the wrong square. &lt;br&gt;
+Each guess will be counted only once, and bulls are counted before cows. &lt;/p&gt;&lt;p&gt;
+The aim of the game is for you to work out the colours &lt;br&gt;
+in the least number of guesses.
+&lt;/p&gt;&lt;form method="post" action="/~cs2041cgi/16s2/tut/perlcgi/bullscows.cgi" enctype="multipart/form-data"&gt;
+&lt;input type="hidden" name="State" value="Guessing"&gt;&lt;input type="hidden" name="Guesses" value=""&gt;&lt;input type="hidden" name="Answer" value="gggg"&gt;&lt;input type="submit" name="Start the game" value="Start the game"&gt;&lt;/form&gt;&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</div>
+</div>
+</div>
+<div class="answer">
+Sample solution
+
+
+<pre class="program">#!/usr//bin/perl
+#
+# Play the Bulls and Cows game
+#
+# This script has three states:
+# - "" (initial state before we start playing the game)
+# - Guessing (state for making guess/processing previous guess)
+# - Won (state when the player guesses correctly)
+#
+# States are implemented via the State data item
+#
+# Other data items that are carried from state to state:
+# - Answer (what we're trying to guess)
+# - Guesses (comma-separated list of guesses made so far)
+# - Box1,Box2,Box3,Box4 (most recent colours guessed for boxes)
+#
+# All data items are initially null ("")
+#
+
+use CGI qw/:all/;
+
+# Information for the current state
+
+$state   = param('State');
+$guesses = param('Guesses');
+$answer  = param('Answer');
+
+# Constants (colour list and welcome message)
+
+%colours = ("r"=&gt;"Red","y"=&gt;"Yellow","g"=&gt;"Green","b"=&gt;"Blue");
+
+$welcome = &lt;&lt;WELCOME
+Welcome to the Bulls and Cows guessing game. &lt;p&gt;
+There are four colours "hidden" under the squares. &lt;p&gt;
+&lt;table border=1 cellpadding=10&gt;
+&lt;tr&gt;
+  &lt;td&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; ? &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;/td&gt;
+  &lt;td&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; ? &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;/td&gt;
+  &lt;td&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; ? &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;/td&gt;
+  &lt;td&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; ? &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt; &lt;p&gt;
+In each turn you can guess colours for as many squares as you like. &lt;br&gt;
+I will then tell you how many "bulls" and "cows" you scored. &lt;br&gt;
+A "bull" means that you guessed the correct colour in the correct square. &lt;br&gt;
+A "cow" means that you guessed the correct colour but in the wrong square. &lt;br&gt;
+Each guess will be counted only once, and bulls are counted before cows. &lt;p&gt;
+The aim of the game is for you to work out the colours &lt;br&gt;
+in the least number of guesses.
+WELCOME
+;
+
+# Start off each page with a standard header
+
+print(
+    header,
+    start_html(-title=&gt;'Bulls\'n\'Cows Game'),
+    "&lt;center&gt;\n",
+    h1("Bulls\'n\'Cows Guessing Game")
+);
+
+if ($state eq "")
+# Initial state: print welcome/instruction message
+{
+    # Generate a random sequence of four colours
+    @cols = keys %colours;
+    foreach $i (1..4) {
+        $c = $cols[int(rand($#cols+1))];
+        $answer .= $c;
+    }
+
+    # Print message, set initial state and display button to start game
+    print(
+        $welcome,
+        start_form,
+        "&lt;input type=hidden name='State' value='Guessing'&gt;",
+        "&lt;input type=hidden name='Guesses' value=''&gt;",
+        "&lt;input type=hidden name='Answer' value='$answer'&gt;",
+        submit("Start the game"),
+        end_form
+    );
+}
+elsif ($state eq "Guessing")
+# Check previous guess (if any)
+# If won, then print a message and click to scoreboard page
+# If not won, print the guessing table, plus previous guesses
+{
+    # Process previous guess
+
+    $guess = param('Box1').param('Box2').param('Box3').param('Box4');
+    ($bulls, $cows) = &amp;bullcow($guess, $answer);
+    $guesses = "$guess,$guesses";
+    $guesses =~ s/,$//;
+
+    # We won! So set up for winning state
+
+    if ($bulls == 4)
+    {
+        @g = split(/,/,$guesses);
+        $ng = $#g+1;
+        print(
+            "Congratulations! You guessed it.",
+            p,
+            "It took you $ng guesses.",
+            p,
+            start_form,
+            "&lt;input type=hidden name='State' value='Won'&gt;",
+            "&lt;input type=hidden name='Score' value='$ng'&gt;",
+            "Enter your name:",
+            "&lt;input type=text name='Player'&gt;",
+            p,
+            submit("Click for ScoreBoard"),
+            end_form,
+            end_html
+        );
+        exit 0;
+    }
+
+    # Set up table containing pull-down colour menus
+    #  for collecting the next guess
+
+    print(
+        start_form,
+        "&lt;input type=hidden name='State' value='Guessing'&gt;",
+        "&lt;input type=hidden name='Guesses' value='$guesses'&gt;",
+        "&lt;input type=hidden name='Answer' value='$answer'&gt;",
+        "&lt;table border=1 cellpadding=5&gt;&lt;tr&gt;"
+    );
+    foreach $i (1..4) {
+        print "&lt;td&gt;&lt;select name='Box$i' default='?'&gt;\n";
+        print "&lt;option value='?'&gt;?\n";
+        foreach $c (keys %colours) {
+            print "&lt;option value='$c'&gt;$colours{$c}\n";
+        }
+        print "&lt;/select&gt;&lt;/td&gt;\n";
+    }
+    print(
+        "&lt;/tr&gt;&lt;/table&gt;\n",
+        p,
+        submit("Submit guess"),
+        end_form,
+        p
+    );
+
+    # Iterate over previous guesses, displaying
+    #  each guess along with the score it obtained
+
+    print h3("Previous Guesses");
+    foreach $guess (split(/,/,$guesses)) {
+        print "&lt;p&gt;&lt;table border=1 cellpadding=5&gt;&lt;tr&gt;";
+        foreach $c (split(//, $guess)) {
+            if ($c eq "?") {
+                print "&lt;td&gt; &amp;nbsp; ? &amp;nbsp; &amp;nbsp; &lt;/td&gt;";
+            }
+            else {
+                print(
+                    "&lt;td bgcolor='$colours{$c}'&gt;",
+                    "&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;",
+                    "&lt;/td&gt;"
+                );
+            }
+        }
+        ($bulls, $cows) = &amp;bullcow($guess, $answer);
+        print "&lt;td&gt;$bulls Bulls, $cows Cows&lt;/td&gt;";
+        print "&lt;/tr&gt;&lt;/table&gt;\n";
+    }
+}
+elsif ($state eq "Won")
+{
+    # Update the scoreboard
+
+    $score = param('Score');
+    $score =~ s/[^\d]//g;             # remove all but expected characters
+    $score = substr $score, 0, 4;    # limit score to 4 characters
+    $player = param('Player');
+    $player =~ s/[^\w\s-_]//g;        # remove all but expected characters
+    $player = substr $player, 0, 256; # limit player to 256 characters
+    if (!open(SCORES, "&gt;&gt;ScoreBoard")) {
+        print h3(font({-color=&gt;'red'},"Can't write Scoreboard"));
+    }
+    else {
+        print SCORES "$score;$player;".localtime()."\n";
+        close(SCORES);
+    }
+
+    # Fetch the scoreboard information
+
+    if (!open(SCORES, "&lt;ScoreBoard")) {
+        print(
+            h3(font({-color=&gt;'red'},"Can't read Scoreboard")),
+            end_html
+        );
+        exit 0;
+    }
+    $i = 0;
+    while ($line = &lt;SCORES&gt;) {
+        $lines[$i++] = $line;
+    }
+    close(SCORES);
+
+    # Display the scoreboard
+
+    print h3("Best Scores");
+    print(
+        "&lt;table border=1&gt;\n",
+        "&lt;tr&gt;&lt;th&gt;Score&lt;/th&gt;&lt;th&gt;Player&lt;/th&gt;&lt;th&gt;Date&lt;/th&gt;&lt;/tr&gt;\n"
+    );
+    foreach $line (sort @lines) {
+        @bits = split(/;/,$line);
+        print "&lt;tr&gt;&lt;td&gt;$bits[0]&lt;/td&gt;&lt;td&gt;$bits[1]&lt;/td&gt;&lt;td&gt;$bits[2]&lt;/td&gt;&lt;/tr&gt;\n";
+    }
+    print "&lt;/table&gt;\n";
+
+    # Print button for starting a new game
+
+    print(
+        start_form,
+        "&lt;input type=hidden name='State' value=''&gt;",
+        submit("Play another game?"),
+        end_form,
+    );
+}
+
+print "&lt;/center&gt;",end_html;
+
+# BullCow subroutine:
+#   Takes two strings (each of four chars) and computes the
+#   number of direct (Bull) matches and indirect (Cow) matches
+
+sub bullcow()
+{
+    my @guess  = split(//,$_[0]);
+    my @answer = split(//,$_[1]);
+    my $bulls = 0;
+    my $cows  = 0;
+
+    # Count bulls
+
+    for $i (0..3) {
+        if ($guess[$i] eq $answer[$i]) {
+            $bulls++;
+            $guess[$i] = "?";
+            $answer[$i] = "#";
+        }
+    }
+
+    # Count cows
+
+    foreach $i (0..3) {
+        foreach $j (0..3) {
+            if ($guess[$i] eq $answer[$j]) {
+                $cows++;
+                $guess[$i] = "?";
+                $answer[$j] = "#";
+            }
+        }
+    }
+
+    return ($bulls,$cows);
+}
+</pre>
+</div>
+<p></p></li><li>
+
+Write Perl CGI scripts to perform the following two tasks:
+<p>
+(1) Produce an HTML form that allows a user to choose
+their favourite colour by clicking on radio buttons in a colour table.
+Generate the colour table from the following list of colour names
+
+</p><pre class="program">    @colours = ("red", "orange", "yellow",
+         "green", "blue", "indigo", "violet");
+</pre>
+
+Assume that these are all valid names that can be used in e.g. the HTML/CSS
+attribute <code>style: "background-color: <i>ColourName</i>"</code>.
+<p></p><p>
+The form should look like:
+
+</p><center>
+</center><form action="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/answers.py?tut/week12.html">
+<table border="1" cellpadding="10">
+<tbody><tr><td style="background-color: red"><input type="radio" name="FavouriteColour" value="red"></td>
+</tr><tr><td style="background-color: orange"><input type="radio" name="FavouriteColour" value="orange"></td>
+</tr><tr><td style="background-color: yellow"><input type="radio" name="FavouriteColour" value="yellow"></td>
+</tr><tr><td style="background-color: green"><input type="radio" name="FavouriteColour" value="green"></td>
+</tr><tr><td style="background-color: blue"><input type="radio" name="FavouriteColour" value="blue"></td>
+</tr><tr><td style="background-color: indigo"><input type="radio" name="FavouriteColour" value="indigo"></td>
+</tr><tr><td style="background-color: violet"><input type="radio" name="FavouriteColour" value="violet"></td>
+</tr></tbody></table>
+<p><input type="submit" name="I&#39;ve chosen one" value="I&#39;ve chosen one">
+</p></form>
+
+
+(This may not display well when printed).
+<p></p><p>
+(2) Process the colour selection by printing a
+centered heading with the message:
+</p><center>
+<h3>Your favourite colour is <i>Colour</i></h3>
+</center>
+with the word <b><i>Colour</i></b> replaced by the appropriate colour
+name <em>and</em> with the text of that word in the appropriate colour.
+If the user selects no colour, the script should display:
+
+<center>
+<h3>You have no favourite colour</h3>
+</center>
+<div class="answer">
+<pre class="program answer">#!/usr/bin/perl
+use CGI ':all';
+@colours = ("red", "orange", "yellow", "green", "blue", "indigo", "violet");
+print(
+   header(),
+   start_html('Colour Chooser'),
+   h3("Choose One Colour"),
+   start_form(-action=&gt;'<i>URL to refer to processing script</i>'),
+   "&lt;center&gt;&lt;table border=1 cellpadding=10&gt;\n"
+);
+foreach $c (@colours) {
+    print(
+       "&lt;td style=\"background-color: $c\"&gt;",
+       "&lt;input type=radio name='FavouriteColour' value='$c'&gt;",
+       "&lt;/td&gt;\n"
+    );
+}
+print(
+   "&lt;/table&gt;\n",
+   p,
+   submit("I've chosen one"),
+   "&lt;/center&gt;\n",
+   end_form,
+   end_html
+);
+</pre>
+
+CGI.pm to process favourite colour selection:
+
+<pre class="program answer">#!/usr/bin/perl
+use CGI ':all';
+print(
+   header(),
+   start_html('Chosen Colour'),
+);
+$favColour = param('FavouriteColour');
+if (!$favColour) {
+    print(
+       h3("You seem to have no favourite colour")
+    );
+}
+else {
+    print(
+       h3("Your favourite colour is",
+        "&lt;span style=\"background-color: $favColour\"&gt;$favColour&lt;/span&gt;"
+       )
+    );
+}
+print(end_html);
+</pre>
+</div>
+<p></p></li><li>
+
+Combine the two scripts from the previous question into a single script.
+(Hint: you can check for the whether it's the form case or the processing
+case using the <code>param()</code> function with no arguments).
+
+<div class="answer">
+Combined CGI.pm script:
+
+<pre class="program answer">#!/usr/bin/perl
+use CGI ':all';
+@colours = ("red", "orange", "yellow", "green", "blue", "indigo", "violet");
+if (!param()) # no parameters =&gt; data collection case
+{
+    print(
+       header(),
+       start_html('Colour Chooser'),
+       h3("Choose One Colour"),
+       start_form,
+       "&lt;center&gt;&lt;table border=1 cellpadding=10&gt;\\n"
+    );
+    foreach $c (@colours) {
+        print(
+           "&lt;td style=\"background-color: $c\"&gt;",
+           "&lt;input type=radio name='FavouriteColour' value='$c'&gt;",
+           "&lt;/td&gt;\\n"
+        );
+    }
+    print(
+       "&lt;/table&gt;\\n",
+       p,
+       submit("I've chosen one"),
+       "&lt;/center&gt;\\n",
+       end_form,
+       end_html
+    );
+}
+else             # some parameters =&gt; data processing case
+{
+    print(
+       header(),
+       start_html('Chosen Colour'),
+    );
+    $favColour = param('FavouriteColour');
+    if (!$favColour) {
+        print(
+           h3("You have have no favourite colour")
+        );
+    }
+    else {
+        print(
+           h3("Your favourite colour is ",
+             "&lt;span style=\"background-color: $favColour\"&gt;$favColour&lt;/span&gt;"
+           )
+        );
+    }
+    print(end_html);
+}
+</pre>
+</div>
+</li><li>
+Modify the script from the previous question to use a checkbox group so
+that users can select more than one colour.
+<p>
+The form should look like:
+</p><form action="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/answers.py?tut/week12.html">
+<center><table border="1" cellpadding="10"><tbody><tr>
+<td style="background-color: red"><input type="checkbox" name="FavouriteColours" value="red"></td>
+<td style="background-color: orange"><input type="checkbox" name="FavouriteColours" value="orange"></td>
+<td style="background-color: yellow"><input type="checkbox" name="FavouriteColours" value="yellow"></td>
+<td style="background-color: green"><input type="checkbox" name="FavouriteColours" value="green"></td>
+<td style="background-color: blue"><input type="checkbox" name="FavouriteColours" value="blue"></td>
+<td style="background-color: indigo"><input type="checkbox" name="FavouriteColours" value="indigo"></td>
+<td style="background-color: violet"><input type="checkbox" name="FavouriteColours" value="violet"></td>
+</tr></tbody></table>
+</center><p><input type="submit" name="I&#39;ve chosen" value="I&#39;ve chosen">
+</p></form>
+The processing code should then print one of the following messages:
+<center>
+<h3>You have no favourite colour</h3>
+<h3>Your favourite colour is <i>Colour</i></h3>
+<h3>Your favourite colours are <i>Colour<sub>1</sub></i>,
+<i>Colour<sub>2</sub></i>, ...</h3>
+</center>
+<div class="answer">
+<pre class="program answer">#!/usr/bin/perl
+use CGI ':all';
+@colours = ("red", "orange", "yellow", "green", "blue", "indigo", "violet");
+if (!param()) # data collection case
+{
+    print(
+       header(),
+       start_html('Colour Chooser'),
+       h3("Choose Colours"),
+       start_form,
+       "&lt;center&gt;&lt;table border=1 cellpadding=10&gt;\\n"
+    );
+    foreach $c (@colours) {
+        print(
+           "&lt;td style=\"background-color: $c\"&gt;",
+           "&lt;input type=checkbox name='FavouriteColours' value='$c'&gt;",
+           "&lt;/td&gt;\\n"
+        );
+    }
+    print(
+       "&lt;/table&gt;\\n",
+       p,
+       submit("I've chosen"),
+       "&lt;/center&gt;\\n",
+       end_form,
+       end_html
+    );
+}
+else             # data processing case
+{
+    print(
+       header(),
+       start_html('Chosen Colours'),
+    );
+    @favColours = param('FavouriteColours');
+    if (@favColours == 0) {
+        print(
+           h3("You have have no favourite colour")
+        );
+    }
+    elsif (@favColours == 1)
+    {
+        print(
+           h3("Your favourite colour is",
+             "&lt;span style=\"background-color: $favColours[0]\"&gt;$favColours[0]&lt;/span&gt;"
+           )
+        );
+    }
+    else {
+        foreach $c (@favColours) {
+            $colourList .= "&lt;span style=\"background-color: $c\"&gt;$c&lt;/span&gt;, ";
+        }
+        $colourList =~ s/, $//;  # remove trailing ", "
+        print(
+           h3("Your favourite colours are",
+            $colourList
+           )
+        );
+    }
+    print(end_html);
+}
+</pre>
+</div>
+<p></p></li></ol>
+<script src="./Week 12 Tutorial_files/2041.js.download"></script>
+</div>
+</div>
+
+
+
+<div id="extension-is-installed"></div></body></html>

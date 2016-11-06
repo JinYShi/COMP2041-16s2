@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/answers.py?lab/week10.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Week 10 Lab Class</title>
+<link href="./Week 10 Lab Class_files/2041.css" rel="stylesheet">
+</head>
+<body data-shoptagr-mini="yes">
+<div class="container">
+<div id="heading"><a class="heading_link" target="_blank" id="left_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">COMP[29]041 16s2</a>
+Perl is perfect for  dynamic web content
+<a class="heading_link" target="_blank" id="right_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">Software Construction</a></div>
+<div class="tutlab lab">
+<h3>Aims</h3>
+Generating dynamic web content using Perl.
+<h3>Assessment</h3>
+<table border="0" cellpadding="3">
+<tbody><tr><td><b>Submission:</b></td><td><code>give cs2041 lab10 creditcard.pl creditcard.cgi testing_plan.txt [quine.pl quinepy.pl quine.pypl]</code></td></tr>
+<tr><td><b>Deadline:</b></td><td>either during the lab, or Monday 10 October 11:59pm (midnight)</td></tr>
+<tr><td><b>Assessment:</b></td><td>
+Make sure that you are familiar with the
+<a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/assessment.html">lab assessment criteria</a>.
+</td></tr>
+</tbody></table>
+<style>
+.cgi_output_panel {height : 32em;}
+.html_source_panel {height : 32em;}
+</style>
+<h3>Validating a Credit Card Number in a Perl Application</h3>
+
+In the tutorial you discussed this Python code which implements the
+<a href="https://en.wikipedia.org/wiki/Luhn_algorithm">Luhn formula</a>
+which credit card numbers must satisfy.
+
+
+<pre class="program">#!/usr/bin/python
+# written by andrewt@cse.unsw.edu.au as a COMP2041 programming example
+# validate a credit card number by calculating its
+# checksum using Luhn's formula (https://en.wikipedia.org/wiki/Luhn_algorithm)
+
+import re, sys
+
+def luhn_checksum(number):
+    checksum = 0
+    digits = reversed(number)
+    for (index, digit) in enumerate(digits):
+        multiplier = 1 + index % 2
+        d = int(digit) * multiplier
+        if d &gt; 9:
+            d -= 9
+        checksum += d
+    return checksum
+
+def validate(credit_card):
+    number = re.sub(r'\D', '', credit_card)
+    if len(number) != 16:
+        return credit_card + " is invalid - does not contain exactly 16 digits"
+    elif luhn_checksum(number) % 10 == 0:
+        return credit_card + " is valid"
+    else:
+        return credit_card + " is invalid"
+
+if __name__ == "__main__":
+    for arg in sys.argv[1:]:
+        print(validate(arg))
+</pre>
+
+Write a Perl script <code>creditcard.pl</code> which performs the same task.
+For example:
+
+
+<pre class="command_line"><kbd class="shell">creditcard.pl 0000000000000000 9999999999999999
+</kbd><samp>0000000000000000 is valid
+9999999999999999 is invalid
+</samp><kbd class="shell">creditcard.pl 2389423423423467 9182387723427777 9182380923427773 4564456445644564
+</kbd><samp>2389423423423467 is valid
+9182387723427777 is invalid
+9182380923427773 is invalid
+4564456445644564 is valid
+</samp><kbd class="shell">creditcard.pl 42 ................
+</kbd><samp>42 is invalid - does not contain exactly 16 digits
+................ is invalid - does not contain exactly 16 digits
+</samp><kbd class="shell">creditcard.pl 4564-7953-6021-9047 1234-5678-9012-3456
+</kbd><samp>4564-7953-6021-9047 is valid
+1234-5678-9012-3456 is invalid
+</samp></pre>
+<h4>Hints</h4>
+
+Split <code>split //, $string</code> returns a list of the characters in a string.
+<p>
+The builtin Perl function reverse returns a list in reversed order.
+</p><p>
+Keep the same functions as the Python.
+</p><p>
+</p><pre class="command_line"><kbd class="shell">cd ~/public_html/lab10</kbd>
+<kbd class="shell">vi creditcard.pl</kbd>
+....
+</pre>
+<p></p><p>
+When you make progress on <code>creditcard.pl</code> don't forget to push it to gitlab.cse.unsw.edu.au using the usual commands.
+
+</p><pre class="command_line"><kbd class="shell">git add creditcard.pl</kbd>
+<kbd class="shell">git commit -m 'checksum calculated correctly'</kbd>
+<kbd class="shell">git push</kbd>
+</pre>
+<div class="answer">
+Sample solution for <code>creditcard.pl</code>
+<pre class="program">#!/usr/bin/perl -w
+# written by andrewt@cse.unsw.edu.au as a COMP2041 programming example
+# validate a credit card number by calculating its
+# checksum using Luhn's formula (https://en.wikipedia.org/wiki/Luhn_algorithm)
+
+sub luhn_checksum {
+    my ($number) = @_;
+    my $checksum = 0;
+    my @digits = reverse(split //, $number);
+    foreach $index (0..$#digits) {
+        my $digit = $digits[$index];
+        my $multiplier = 1 + $index % 2;
+        my $check_digit = int($digit) * $multiplier;
+        if ($check_digit &gt; 9) {
+            $check_digit -= 9;
+        }
+        $checksum += $check_digit;
+    }
+    return $checksum;
+}
+
+sub validate {
+    my ($credit_card) = @_;
+    my $number = $credit_card;
+    $number =~ s/\D//g;
+    if (length $number != 16) {
+        return  "invalid - does not contain exactly 16 digits";
+    } elsif (luhn_checksum($number) % 10 == 0) {
+        return "valid";
+    } else {
+        return "invalid";
+    }
+}
+
+foreach $credit_card (@ARGV) {
+    print "$credit_card is ", validate($credit_card), "\n";
+}
+</pre>
+</div>
+<h3>Validating a Credit Card Number in a Perl CGI Script</h3>
+
+Write a Perl CGI script <code>creditcard.cgi</code> which embedded your code
+to validate a credit card number in a CGI script.
+<p></p><p>
+Match EXACTLY the behaviour of this example implementation:
+
+
+
+</p><div class="cgi_display">
+<div class="cgi_display_title">
+<a target="_blank" href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/cgi/creditcard/creditcard.cgi">creditcard.cgi</a>
+</div>
+<div class="cgi_output_panel">
+<iframe class="cgi_output_display" src="./Week 10 Lab Class_files/creditcard.html" onload="show_html_source(this)">
+</iframe>
+</div>
+<div class="html_source_panel">
+<div class="html_source_display">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Credit Card Validation&lt;/title&gt;
+&lt;meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;h2&gt;Credit Card Validation&lt;/h2&gt;
+This page checks whether a potential credit card number satisfies the Luhn Formula.
+&lt;p&gt;
+&lt;/p&gt;&lt;form&gt;
+Enter credit card number:
+&lt;input type="text" name="credit_card" value=""&gt;
+&lt;input type="submit" name="submit" value="Validate"&gt;
+&lt;input type="reset" name="Reset" value="Reset"&gt;
+&lt;input type="submit" name="close" value="Close"&gt;
+&lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</div>
+</div>
+</div>
+<h3>Hints</h3>
+
+Copy your code for <code>creditcard.pl</code> to  <code>creditcard.cgi</code>.
+<p></p><p>
+CSE's web server is configured to treat files sending with this suffix as cgi scripts
+and will execute them when they are requested.
+
+</p><pre class="command_line"><kbd class="shell">cp creditcard.pl  creditcard.cgi</kbd>
+<kbd class="shell">chmod 755 creditcard.cgi</kbd>
+<kbd class="shell">firefox http://cgi.cse.unsw.edu.au/~<i>z5555555</i>/lab10/creditcard.cgi &amp;</kbd>
+</pre>
+<p></p><p>
+Remember if you are not working in a CSE lab run firefox (or another web browser) on your local machine.
+</p><p>
+For example if you are working at home on a laptop and using ssh to connect to CSE,
+run the web browser on your laptop and supply the URL <code>http://cgi.cse.unsw.edu.au/~<i>z5555555</i>/lab09/browser.cgi</code>.
+</p><p>
+Simply  renaming it doesn't change <code>credit.pl</code>
+from a perl program into a  useful CGI script. It also needs
+to be modified to collect the credit card as a parameter
+and to produce HTML rather than plain text.
+</p><p>
+Let's start by doing a quick hack to get something appearing in your
+Web browser, just to make sure that you've got the script set up right.
+</p><p>
+Add this to the top of <code>creditcard.cgi</code>:
+
+</p><pre class="program">use CGI qw/:all/;
+use CGI::Carp qw/fatalsToBrowser warningsToBrowser/;
+
+print header, start_html("Credit Card Validation"), "\n";
+warningsToBrowser(1);
+$credit_card = param("credit_card");
+if (defined $credit_card) {
+    print validate($credit_card);
+}
+print end_html;
+exit 0;
+</pre>
+<p></p><p>
+Note this code assumes you have a Perl <i>validate</i> function equivalent the one in the above Python.
+</p><p>
+Run the CGI script from the command line to make sure it produces appropriate output:
+
+</p><pre class="command_line"><kbd class="shell">./creditcard.cgi</kbd>
+Content-Type: text/html; charset=ISO-8859-1
+
+&lt;!DOCTYPE html
+<i>...</i>
+</pre>
+
+Now try running your code as your CGI script, you can supply the credit card number as a query string
+by using a URL like this
+<pre>http://cgi.cse.unsw.edu.au/~<i>z5555555</i>/lab10/creditcard.cgi?credit_card=4564-7953-6021-9047
+</pre>
+
+When that works you now have to implement the full logic of the CGI script
+so it matches the reference implementation.
+<p></p><p>
+There are four kinds of pages to be delivered
+by your script (although they have common elements):
+</p><ol>
+<li>A basic "Welcome" page with a brief message,
+a prompt next to a text box to accept a [hypothetical] credit card number,
+and three buttons, labelled "Validate", "Reset" and "Close".
+The text box is initially empty.
+</li><li>
+A successful report page, which looks the same as the basic page
+but has a message indicating what the input was and that it
+was valid (assuming it passes the validation tests).
+The entry box is cleared ready for a new number,
+and the prompt is changed to "Another card number:" or similar.
+</li><li>
+An error report page, which looks the same as the basic
+page but has an error message (wrong number of digits
+and invalid number are the error conditions detected).
+In this case the previous (erroneous) input remains in
+the text field, and the prompt is changed to "Try again:".
+</li><li>
+A final "Goodbye" page,
+which contains only a finalisation message,
+and is presented in response to pressing the Close button.
+</li></ol>
+<h4>What do I do about Internal Server Error?</h4>
+
+If your script is producing a 500 error from the webserver you can obtain
+some debugging info by creating a <code>.htaccess</code> file with these contents:
+<p></p><p>
+</p><pre class="command_line">&lt;Files "creditcard.cgi"&gt;
+SetHandler application/x-setuid-cgid
+&lt;/Files&gt;
+</pre>
+<p></p><p>
+See <a href="http://taggi.cse.unsw.edu.au/FAQ/CGI_scripts/">here</a> for more info.
+
+</p><h3>Cross-site Scripting</h3>
+
+Try pasting this HTML into the credit card field of your CGI script and validating it
+
+<pre class="program">&lt;img src="http://imgs.xkcd.com/comics/exploits_of_a_mom.png"&gt;
+</pre>
+
+If your CGI script displays an image your script allows cross-site-scripting (XSS).
+This is a serious security vulnerability, even if this particular script is unimportant.
+For example, it may allow a malicious attacker to steal user's cookies for your site.
+<p></p><p>
+You should never output HTML supplied by a user without sanitizing it.
+</p><p>
+A similar risk applies to field values (even if hidden!) - try entering a value containing a double-quote(") and see
+what your script does, For example this string:
+
+</p><pre class="program">"&gt; &lt;img src="http://imgs.xkcd.com/comics/exploits_of_a_mom.png"&gt;
+</pre>
+<h3>Systematic Testing</h3>
+
+Create a text file <code>testing_plan.txt</code> containg a list of tests
+you've done to compare the reference implementation
+<p></p><p>
+Make sure your test plan explores all  user pathways.
+</p><p>
+Remember that any button can be pushed, and any text typed into
+a text field: your script must cover all possibilities.
+</p><p>
+</p><ul>
+<li> test name
+</li><li> value in the text field
+</li><li> button pushed
+</li><li> expected response
+</li><li> actual response (if different)
+</li></ul>
+<div class="answer">
+Sample solution for <code>creditcard.cgi</code>
+<pre class="program">#!/usr/bin/perl -w
+# written by andrewt@cse.unsw.edu.au as a COMP2041 programming example
+# validate a credit card number by calculating its
+# checksum using Luhn's formula (https://en.wikipedia.org/wiki/Luhn_algorithm)
+
+use CGI qw/:all/;
+use CGI::Carp qw/fatalsToBrowser warningsToBrowser/;
+
+if (@ARGV) {
+    # if we have arguments we've been run from command-line, not webserver
+    foreach $arg (@ARGV) {
+        print validate($arg), "\n";
+    }
+} else {
+    print header, start_html("Credit Card Validation"), "\n";
+    warningsToBrowser(1);
+    print_page();
+    print end_html;
+}
+exit 0;
+
+sub print_page {
+    print "&lt;h2&gt;Credit Card Validation&lt;/h2&gt;\n";
+    if (param('close')) {
+        print "Thank you for using the Credit Card Validator.\n";
+    } else {
+        print "This page checks whether a potential credit card number satisfies the Luhn Formula.\n";
+        print "&lt;p&gt;\n";
+        print "&lt;form&gt;\n";
+        my $credit_card = param('credit_card');
+        my $last_credit_card = "";
+        if (!defined $credit_card) {
+            print "Enter credit card number:\n";
+        } else {
+            my $validation = validate($credit_card);
+            my $message = "$credit_card is $validation";
+            # sanitize credit-card by removing &lt; characters, disabling any HTML tag
+            $message =~ s/&lt;/&amp;lt;/g;
+            if ($validation eq "valid") {
+                print "$message\n";
+                print "&lt;p&gt;\nAnother card number:\n";
+            } else {
+                print "&lt;b&gt;&lt;span style=\"color: red\"&gt;$message&lt;/span&gt;&lt;/b&gt;";
+                print "\n&lt;p&gt;\nTry again:\n";
+            	$last_credit_card = $credit_card;
+ 		        # remove any " characters from credit_card
+            	$last_credit_card =~ s/"/&amp;#34/g;
+            }
+        } 
+        print &lt;&lt;eof
+&lt;input type="text" name="credit_card" value="$last_credit_card"&gt;
+&lt;input type="submit" name="submit" value="Validate"&gt;
+&lt;input type="reset"  name="Reset" value="Reset"&gt;
+&lt;input type="submit" name="close" value="Close"&gt;
+&lt;/form&gt;
+eof
+    }
+}
+
+sub luhn_checksum {
+    my ($number) = @_;
+    my $checksum = 0;
+    my @digits = reverse(split //, $number);
+    foreach $index (0..$#digits) {
+        my $digit = $digits[$index];
+        my $multiplier = 1 + $index % 2;
+        my $check_digit = int($digit) * $multiplier;
+        if ($check_digit &gt; 9) {
+            $check_digit -= 9;
+        }
+        $checksum += $check_digit;
+    }
+    return $checksum;
+}
+
+sub validate {
+    my ($credit_card) = @_;
+    my $number = $credit_card;
+    $number =~ s/\D//g;
+    if (length $number != 16) {
+        return  "invalid - does not contain exactly 16 digits";
+    } elsif (luhn_checksum($number) % 10 == 0) {
+        return "valid";
+    } else {
+        return "invalid";
+    }
+}    
+
+</pre>
+
+Sample solution for <code>creditcard.cgi</code> using <i>cgi.pm</i> shortcuts.
+
+
+<pre class="program">#!/usr/bin/perl -w
+# written by andrewt@cse.unsw.edu.au as a COMP2041 programming example
+# validatr a credit card number by calculating its
+# checksum using Luhn's formula (https://en.wikipedia.org/wiki/Luhn_algorithm)
+
+use CGI qw/:all -debug/;
+use CGI::Carp qw/fatalsToBrowser warningsToBrowser/;
+
+if (@ARGV) {
+	# if we have arguments we'be been run from command-line, not webserver
+	foreach $arg (@ARGV) {
+		print validate($arg), "\n";
+	}
+} else {
+	print header, start_html("Credit Card Validation"), "\n";
+	warningsToBrowser(1);
+	print_page();
+	print end_html;
+}
+exit 0;
+
+sub print_page {
+	print h2("Credit Card Validation"), "\n";
+	if (param('close')) {
+		print p("Thank you for using the Credit Card Validator"), "\n";
+	} else {
+		print p("This page checks whether a potential credit card number satisfies the Luhn Formula."), "\n";
+		print start_form;
+		$credit_card = param('credit_card');
+		if (defined $credit_card) {
+			$credit_card =~ s/\D//g;
+		    $message = validate($credit_card);
+		    if ($message !~ /is valid/) {
+		        print p(b(span({-style=&gt;'Color: red;'}, $message)));
+		        print "Try again:\n";
+		    } else {
+		        print p($message);
+		        print "Another card number:\n";
+		        param("card", "");
+		    }
+		} else {
+			print "Enter credit card number:\n"
+		}
+		print textfield("credit_card"), "\n";
+		print submit("submit", "Validate"), "\n";
+		print reset("Reset"), "\n";
+		print submit("close", "Close"), "\n";
+		print end_form;
+	} 
+}
+
+sub luhn_checksum {
+	my ($number) = @_;
+    $checksum = 0;
+    @digits = reverse(split //, $number);
+    foreach $index (0..$#digits) {
+    	$digit = $digits[$index];
+    	$multiplier = 1 + $index % 2;
+        $check_digit = int($digit) * $multiplier;
+        if ($check_digit &gt; 9) {
+            $check_digit -= 9;
+        }
+        $checksum += $check_digit;
+    }
+    return $checksum;
+}
+
+sub validate {
+	my ($credit_card) = @_;
+	my $number = $credit_card;
+	$number =~ s/\D//g;
+    if (length $number != 16) {
+        return  "$credit_card is invalid  - does not contain exactly 16 digits";
+    } elsif (luhn_checksum($number) % 10 == 0) {
+        return "$credit_card is valid";
+    } else {
+        return "$credit_card is invalid";
+	}
+}    
+
+</pre>
+</div>
+<h3>Challenge Exercise: A Perl program that Outputs Itself</h3>
+Write a (non-empty) Perl program <code>quine.pl</code> which takes no input or arguments
+and when run outputs itself (its own source code).
+<p></p><p>
+For example:
+</p><p>
+</p><pre class="command_line"><kbd class="shell">perl quine.pl &gt;output</kbd>
+<kbd class="shell">diff output quine.pl</kbd>
+<kbd class="shell">&lt;quine.pl perl|perl|perl|perl &gt;output</kbd>
+<kbd class="shell">diff output quine.pl</kbd>
+<kbd class="shell"></kbd></pre>
+<p></p><p>
+You are not permitted to use the DATA file stream, access the source file,
+or use any  Perl builtin or module which lets a Perl program access its source.
+</p><p>
+Don't look for other people solutions.
+</p><p>
+See if you can invent  your own - there are many possible approaches.
+</p><p>
+Tutors will be generous for original but not-quite working attempts.
+Tutors won't give marks to non-original solutions.
+
+</p><div class="answer">
+Sample solution
+
+
+<pre class="program">@a = ('"@","a = ("','chr(39),$_,chr(39),"," foreach @a','");\n"','"print $_;\n" foreach @a');
+print "@","a = (";
+print chr(39),$_,chr(39),"," foreach @a;
+print ");\n";
+print "print $_;\n" foreach @a;
+</pre>
+
+Another Sample solution
+
+
+<pre class="program">$a='print chr(36),"a=",chr(39),$a,chr(39),";",";$a"';print chr(36),"a=",chr(39),$a,chr(39),";$a"
+</pre>
+
+Sample solution using eval (by V Vinay)
+
+
+<pre class="program">$a=q(print"\$a=q($a);eval \$a");eval $a</pre>
+
+Cryptic solution (by shinichiro hamaji )
+
+
+<pre class="program">($;=&lt;&lt;''
+#&amp;-!!*!%&gt;{(\$;=&lt;&lt;''
+$;
+)=~('
+_ ^-^,'^'"`[;[?@(\$;^\$^)})')+
+
+)=~('
+_ ^-^,'^'"`[;[?@($;^$^)})')
+</pre>
+</div>
+<h3>Challenge Exercise: A Perl program that Outputs a Python program that Outputs the Perl Program</h3>
+
+More difficult: write a (non-empty) Perl program <code>quinepy.pl</code> which when run outputs
+a Python program which when run outputs the Perl program. For example:
+
+<pre class="command_line"><kbd class="shell">perl quinepy.pl|python &gt;output</kbd>
+<kbd class="shell">diff output quinepy.pl</kbd>
+<kbd class="shell">&lt;quinepy.pl perl|python|perl|python|perl|python &gt;output</kbd>
+<kbd class="shell">diff output quinepy.pl</kbd>
+<kbd class="shell"></kbd>
+</pre>
+<div class="answer">
+Sample solution
+
+
+<pre class="program">@python = ('print "".join(["@python = ("]+map(lambda s:chr(39)+s+chr(39)+",", python)+[");"])','print "".join(["@perl = ("]+map(lambda s:chr(39)+s+chr(39)+",", perl)+[");"])','for s in perl: print s',);
+@perl = ('print "$_ = [", map({chr(39).$_.chr(39).","} @$_), "]".chr(10) foreach qw/python perl/;','print map {"$_;".chr(10)} @python;',);
+print "$_ = [", map({chr(39).$_.chr(39).","} @$_), "]".chr(10) foreach qw/python perl/;
+print map {"$_;".chr(10)} @python;
+</pre>
+</div>
+<h3>Challenge Exercise: A Perl &amp; Python program that Outputs itlsef</h3>
+
+Even more difficult:  write a (non-empty) program <code>quine.pypl</code> which is both
+valid Perl &amp; Python and when run with either outputs itself. For example:
+
+<pre class="command_line"><kbd class="shell">perl quine.pypl &gt;output</kbd>
+<kbd class="shell">diff output quine.pypl</kbd>
+<kbd class="shell">python quine.pypl &gt;output</kbd>
+<kbd class="shell">diff output quine.pypl</kbd>
+<kbd class="shell">&lt;quine.pypl perl|python|python|perl|perl|python &gt;output</kbd>
+<kbd class="shell">diff output quine.pypl</kbd>
+<kbd class="shell"></kbd></pre>
+<div class="answer">
+Sample solution
+
+
+<pre class="program">0 and length &lt;&lt;2;
+"""
+2
+@a = ('0 and length &lt;&lt;2;','!!!','2','print map {$a=$_;$b=chr(33);$a=~s/$b/"/g;$a.chr(10)} @a[0..2];','print "@","a = (", map({chr(39).$_.chr(39).","} @a), ");".chr(10);','print map {$a=$_;$b=chr(33);$a=~s/$b/"/g;$a.chr(10)}  @a[3..9];','print "a = [", join(", ",map({chr(39).$_.chr(39)} @a)), "]".chr(10);','print map {$a=$_;$b=chr(33);$a=~s/$b/"/g;$a.chr(10)}  @a[10..$#a];','$_ = &lt;&lt;"#";','# !!!','for s in a[0:3]: print s.replace(chr(33), chr(34))','print "".join(["@a = ("]+map(lambda s:chr(39)+s+chr(39)+",", a)+[");"]);','for s in a[3:10]: print s.replace(chr(33), chr(34))','print "a =", a','for s in a[10:]: print s.replace(chr(33), chr(34))','#','# !!!',);
+print map {$a=$_;$b=chr(33);$a=~s/$b/"/g;$a.chr(10)} @a[0..2];
+print "@","a = (", map({chr(39).$_.chr(39).","} @a), ");".chr(10);
+print map {$a=$_;$b=chr(33);$a=~s/$b/"/g;$a.chr(10)}  @a[3..9];
+print "a = [", join(", ",map({chr(39).$_.chr(39)} @a)), "]".chr(10);
+print map {$a=$_;$b=chr(33);$a=~s/$b/"/g;$a.chr(10)}  @a[10..$#a];
+$_ = &lt;&lt;"#";
+# """
+a = ['0 and length &lt;&lt;2;', '!!!', '2', 'print map {$a=$_;$b=chr(33);$a=~s/$b/"/g;$a.chr(10)} @a[0..2];', 'print "@","a = (", map({chr(39).$_.chr(39).","} @a), ");".chr(10);', 'print map {$a=$_;$b=chr(33);$a=~s/$b/"/g;$a.chr(10)}  @a[3..9];', 'print "a = [", join(", ",map({chr(39).$_.chr(39)} @a)), "]".chr(10);', 'print map {$a=$_;$b=chr(33);$a=~s/$b/"/g;$a.chr(10)}  @a[10..$#a];', '$_ = &lt;&lt;"#";', '# !!!', 'for s in a[0:3]: print s.replace(chr(33), chr(34))', 'print "".join(["@a = ("]+map(lambda s:chr(39)+s+chr(39)+",", a)+[");"]);', 'for s in a[3:10]: print s.replace(chr(33), chr(34))', 'print "a =", a', 'for s in a[10:]: print s.replace(chr(33), chr(34))', '#', '# !!!']
+for s in a[0:3]: print s.replace(chr(33), chr(34))
+print "".join(["@a = ("]+map(lambda s:chr(39)+s+chr(39)+",", a)+[");"]);
+for s in a[3:10]: print s.replace(chr(33), chr(34))
+print "a =", a
+for s in a[10:]: print s.replace(chr(33), chr(34))
+#
+# """
+</pre>
+</div>
+<h3>Finalising</h3>
+You must show your solutions to your tutor and be able to explain
+how they work.
+Once your tutor has discussed your answers with you, you should
+submit them using:
+<pre class="command_line"><kbd class="shell">give cs2041 lab10 creditcard.pl creditcard.cgi testing_plan.txt [quine.pl quinepy.pl quine.pypl]</kbd>
+</pre>
+Whether you discuss your solutions
+with your tutor this week or next week, you must submit them before
+the above deadline.
+<script src="./Week 10 Lab Class_files/2041.js.download"></script>
+<p></p></div>
+</div>
+
+
+
+<div id="extension-is-installed"></div></body></html>

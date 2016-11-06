@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/answers.py?lab/week06.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Week 06 Lab Class</title>
+<link href="./Week 06 Lab Class_files/2041.css" rel="stylesheet">
+</head>
+<body data-shoptagr-mini="yes">
+<div class="container">
+<div id="heading"><a class="heading_link" target="_blank" id="left_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">COMP[29]041 16s2</a>
+More Perl
+<a class="heading_link" target="_blank" id="right_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">Software Construction</a></div>
+<div class="tutlab lab">
+<h3>Aims</h3>
+Get used to more Perl features.
+<h3>Assessment</h3>
+<table border="0" cellpadding="3">
+<tbody><tr><td><b>Submission:</b></td><td><code>give cs2041 lab06 whale.pl all_whales.pl prereq.pl [recursive_prereq.pl digits.py echon.py simple_tail.py whale.py all_whales.py]</code></td>
+</tr><tr><td><b>Deadline:</b></td><td>either during the lab, or Monday 5 September 11:59pm (midnight)</td></tr>
+<tr><td><b>Assessment:</b></td><td>
+Make sure that you are familiar with the
+<a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/assessment.html">lab assessment criteria</a>.
+</td></tr>
+</tbody></table>
+<p>
+</p><h3>Background</h3>
+<p></p><p>
+We have covered only a small amount of Perl in lectures. In fact, to
+cover the whole language in detail would take a whole semester, so
+we're going to rely on you finding out about the language yourself
+in tutes, labs and assignments. A good place to start is
+the Perl documentation &amp; tutorial links on the class home page
+For example you might find these useful:
+</p>
+<ul>
+<li> <a target="doc" href="http://search.cpan.org/dist/perl/pod/perlsyn.pod">Perl language syntax</a>
+</li><li> <a target="doc" href="http://search.cpan.org/dist/perl/pod/perlsub.pod">Perl functions</a>
+</li><li> <a target="doc" href="http://search.cpan.org/dist/perl/pod/perlop.pod">Perl operators</a>
+</li></ul>
+<h3>Input Data</h3>
+
+A biologist needs your help counting migrating whales.
+As pods of migrating whales as they
+swim past the biologist's boat, the biologist types the number and species of whales in the pod
+<p>
+Here is an example of the input the biologist will provide
+</p><p>
+</p><pre class="command_line"><kbd>15 humpback
+2 orca
+2 sperm whale
+19 beluga
+2 humpback
+2 sperm whale
+4 orca
+4 pygmy right whale
+7 humpback
+1 orca</kbd>
+</pre>
+<h3>Counting One Whale Species</h3>
+
+Write a Perl script <code>whale.pl</code> which given a whale name as a command line argument,
+reads whale observations in the above format until the end-of-input is reached and then prints the
+number of pods of the specified whale and the total numbers of whales in those pods.
+For example:
+
+
+<pre class="command_line"><kbd class="shell">./whale.pl 'sperm whale'
+</kbd><kbd>15 humpback
+2 orca
+2 sperm whale
+19 beluga
+2 humpback
+2 sperm whale
+4 orca
+4 pygmy right whale
+7 humpback
+1 orca
+<span class="eof"></span></kbd>
+<samp>sperm whale observations: 2 pods, 4 individuals
+</samp></pre>
+<pre class="command_line"><kbd class="shell">./whale.pl "cuvier's beaked whale"
+</kbd><kbd>3 orca
+673 beluga
+2 sperm whale
+123 pilot whale
+2 cuvier's beaked whale
+19 beluga
+2 north atlantic right whale
+2 humpback
+5 cuvier's beaked whale
+2 sperm whale
+1 north atlantic right whale
+1119 beluga
+7 orca
+4 pygmy right whale
+7 humpback
+1 false orca
+3 beluga
+4 pilot whale
+1 orca
+<span class="eof"></span></kbd>
+<samp>cuvier's beaked whale observations: 2 pods, 7 individuals
+</samp></pre>
+
+As usual use <code>autotest</code> to assist in testing your code and
+push your work to <code>gitlab.cse.unsw.edu.au</code> every time you make
+some progress with it.
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab06 whale.pl</kbd>
+...
+<kbd class="shell">git add whale.pl </kbd>
+<kbd class="shell">git commit -a -m "whales are cool just like Andrew"</kbd>
+...
+<kbd class="shell">git push</kbd>
+...
+</pre>
+<div class="answer">
+
+Sample Perl solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+die "Usage: $0 &lt;whale species&gt;\n" if @ARGV != 1;
+$target_species = $ARGV[0];
+
+$n_pods = 0;
+$n_individuals = 0;
+while ($line = &lt;STDIN&gt;) {
+    if ($line =~ /(\d+)\s*(.+)$/) {
+        $count = $1;
+        $species = $2;
+        if ($species eq $target_species) {
+            $n_pods++;
+            $n_individuals += $count;
+        }
+    }
+}
+print "$target_species observations: $n_pods pods, $n_individuals individuals\n";</pre>
+
+Sample Python solution
+
+
+<pre class="program">#!/usr/bin/python
+
+import re, sys
+
+if len(sys.argv) != 2:
+    sys.stderr.write("Usage: %s &lt;whale species&gt;\n" % sys.argv[0])
+    sys.exit(1)
+target_species = sys.argv[1]
+
+n_pods = 0
+n_individuals = 0
+for line in sys.stdin:
+    m = re.search(r'(\d+)\s*(.+)$', line)
+    if m:
+        count = m.group(1)
+        species = m.group(2)
+        if species == target_species:
+            n_pods += 1
+            n_individuals += int(count)
+print("%s observations: %d pods, %d individuals" % (target_species, n_pods, n_individuals))</pre>
+</div>
+<h3>Counting All Whale Species</h3>
+
+Write a Perl scripts <code>all_whales.pl</code> that
+reads whale obsevatiions in the above format until the end-of-input is reached and
+for all species of whale observed prints the
+number of pods of the specified whale and the total numbers of whales in those pods.
+For example:
+
+
+
+<pre class="command_line"><kbd class="shell">./all_whales.pl
+</kbd><kbd>15 humpback
+2 orcas
+2 sperm whales
+19 belugas
+2 humpbacks
+2 sperm  whales
+4 Orcas
+4  pygmy right whale
+7 humpbacks
+1 orca
+3 ORCAS
+673 belugas
+2 sperm whales
+123 pilot whale
+2 cuvier's beaked whales
+19 beluga
+2 north atlantic right whale
+2 humpbacks
+5 cuvier's BEAKED whale
+2 Sperm Whales
+1 north atlantic right whales
+1119              belugas
+7 orcas
+4 pygmy right whales
+7 humpbacks
+1 False Orca
+3 belugas
+4 pilot whaleS
+1 orca
+<span class="eof"></span></kbd>
+<samp>beluga observations: 5 pods, 1833 individuals
+cuvier's beaked whale observations: 2 pods, 7 individuals
+false orca observations: 1 pods, 1 individuals
+humpback observations: 5 pods, 33 individuals
+north atlantic right whale observations: 2 pods, 3 individuals
+orca observations: 6 pods, 18 individuals
+pilot whale observations: 2 pods, 127 individuals
+pygmy right whale observations: 2 pods, 8 individuals
+sperm whale observations: 4 pods, 8 individuals
+</samp></pre>
+<p></p><p>
+The whales should be listed in alphabetical order.
+</p><p>
+All whale names should be converted to lower case.
+</p><p>
+All whale names should be converted from plural to singular - assume this can be done safely by deleting a trailing 's' if it is present.
+</p><p>
+Any extra white space should be ignored.
+</p><p>
+You can make no assumptions about possible whale names.
+</p><p>
+No mention of particular whale names can appear in your program.
+</p><p>
+As usual:
+</p><pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab06 all_whales.pl</kbd>
+...
+<kbd class="shell">git add all_whales.pl </kbd>
+<kbd class="shell">git commit -a -m "whales &amp; perl what could be better"</kbd>
+</pre>
+<div class="answer">
+
+Sample Perl solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+while ($line = &lt;STDIN&gt;) {
+    $line = lc $line;     # convert line to lower case
+    $line =~ s/\s+$//;    # remove trailing white space
+    $line =~ s/s?$//;     # change to singular
+    $line =~ s/\s+/ /g;   # convert sequential white-space charcaters to a single space
+
+    if ($line =~ /(\d+)\s*(.+)\s*$/) {
+        $count = $1;
+        $species = $2;
+        $n_pods{$species}++;
+        $n_individuals{$species} += $count;
+    } else {
+        print "Sorry couldn't parse: $line\n";
+    }
+}
+
+foreach $species (sort keys %n_pods) {
+    print "$species observations: $n_pods{$species} pods, $n_individuals{$species} individuals\n";
+}</pre>
+
+Sample Python solution
+
+
+<pre class="program">#!/usr/bin/python
+
+import re, sys
+
+n_pods = {}
+n_individuals = {}
+for line in sys.stdin:
+    line = line.lower()              # convert line to lower case
+    line = line.strip()              # remove surrounding white space
+    line = re.sub(r's?$', '', line)  # change to singular
+    line = re.sub(r'\s+', ' ', line) # convert sequential white-space charcaters to a single space
+    m = re.search(r'(\d+)\s*(.*)$', line)
+    if m:
+        count = int(m.group(1))
+        species = m.group(2)
+        if species in n_pods:
+            n_pods[species] += 1
+            n_individuals[species] += count
+        else:
+            n_pods[species] = 1
+            n_individuals[species] = count
+    else:
+        print("Sorry couldn't parse: %s" % line)
+
+for species in sorted(n_pods):
+    print("%s observations: %d pods, %d individuals" % (species, n_pods[species], n_individuals[species]))
+</pre>
+</div>
+<h3>Prerequisites</h3>
+
+
+Write a Perl script which prints courses which can be used to meet prerequisite
+requirements for a UNSW course. For example:
+<p></p><p>
+</p><pre class="command_line"><kbd class="shell">./prereq.pl COMP2041</kbd>
+COMP1917
+COMP1921
+<kbd class="shell">./prereq.pl COMP9041</kbd>
+COMP9021
+<kbd class="shell">./prereq.pl COMP9242</kbd>
+COMP3231
+COMP3891
+COMP9201
+COMP9283
+<kbd class="shell">./prereq.pl HESC3641</kbd>
+HESC2501
+</pre>
+
+Your script must download the UNSW handbook web pages and extract the information from them when it is run.
+<p></p><p>
+You should print the courses in alphabetic order.
+
+</p><h6>Hints</h6>
+
+The UNSW handbook uses separate web pages for  undergraduate and postgraduate handbook and you may need
+to extract prerequisites from either or both.
+<p></p><p>
+A simple way (but not the best way) to access a web page from Perl is like this:
+
+</p><pre class="command_line">$url = "http://www.handbook.unsw.edu.au/postgraduate/courses/2015/COMP9041.html";
+open F, "wget -q -O- $url|" or die;
+while ($line = &lt;F&gt;) {
+    print $line;
+}
+</pre>
+
+You'll have to make some assumptions about the handbook pages.
+<p></p><p>
+It easy in Perl to skip lines until you find one specifying prerequisites.
+</p><p>
+It easy in Perl to remove part of a line.
+</p><p>
+It easy in Perl to remove HTML tags.
+
+</p><pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab06 prereq.pl</kbd>
+...
+<kbd class="shell">git add prereq.pl </kbd>
+<kbd class="shell">git commit -a -m "web scraping isn't as cool as whales"</kbd>
+</pre>
+<div class="answer">
+Sample solution for prereq.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+$year = 2016;
+$url_base = "http://www.handbook.unsw.edu.au/";
+$url_ugrad = "$url_base/undergraduate/courses/$year";
+$url_pgrad = "$url_base/postgraduate/courses/$year";
+
+foreach $course (@ARGV) {
+    open F, "wget -q -O- $url_ugrad/$course.html $url_pgrad/$course.html|" or die;
+    while ($line = &lt;F&gt;) {
+        # look for pre-requisite line handling varying format used  in handbook pages
+        if ($line =~ /pre.?(requisite)?(.?:|\s+[A-Z]{4}\d{4})/i) {
+            $line = uc $line;
+            $line =~ s/&lt;[^&gt;]*&gt;/ /g;
+            $line =~ s/EXCLU.*/ /i;
+            my @courses = $line =~ /([A-Z]{4}\d{4})/g;
+            push @prereqs, @courses;
+        }
+    }
+}
+foreach $course (sort @prereqs) {
+    print "$course\n";
+}
+</pre>
+
+Sample Python solution for prereq.pl
+
+
+<pre class="program">#!/usr/bin/python
+import sys, subprocess, re
+
+year = 2016
+url_base = "http://www.handbook.unsw.edu.au"
+
+prereqs = []
+for course in sys.argv:
+    ugrad_url = "%s/undergraduate/courses/%d/%s.html" % (url_base, year, course)
+    pgrad_url = "%s/postgraduate/courses/%d/%s.html" % (url_base, year, course)
+
+    # there are python libraries which provide a  better way to fetch web pages
+    # subprocess.check_output is also usually better, but here we may get a non-zero exit
+    # if either pgrad or ugrad page doesn't exist
+    webpage = subprocess.Popen(["wget","-q","-O-", ugrad_url, pgrad_url], stdout=subprocess.PIPE).communicate()[0]
+    webpage = webpage.decode("utf-8") # guess the encoding
+    for line in webpage.split('\n'):
+        # look for pre-requisite line handling varying format used  in handbook pages
+        if re.search(r'pre.?(requisite)?(.?:|\s+[A-Z]{4}\d{4})', line, re.I):
+            line = line.upper()
+            line = re.sub(r'&lt;[^&gt;]*&gt;', '', line)
+            line = re.sub(r'EXCLU.*', '', line)
+            for word in re.findall(r'[A-Z]{4}\d{4}', line):
+                prereqs.append(word)
+
+for course in sorted(prereqs):
+    print(course)
+</pre>
+</div>
+<h3>Challenge Question</h3>
+Add a -r (for recursive ) flag to <code>prereq.pl</code> so it also also  lists all courses which can be used
+to meet a prequisite requirement of any course can be used to meet prerequisite
+requirements  and so on.
+<p></p><p>
+Call your new program <code>recursive_prereq.pl</code> so
+</p><p>
+For example:
+</p><p>
+</p><pre class="command_line"><kbd class="shell">./recursive_prereq.pl -r COMP9243</kbd>
+COMP1911
+COMP1917
+COMP1921
+COMP1927
+COMP2121
+COMP3231
+COMP3331
+COMP3891
+COMP3931
+COMP9021
+COMP9024
+COMP9032
+COMP9201
+COMP9283
+COMP9331
+ELEC1111
+ELEC1112
+ELEC2141
+ELEC2142
+MTRN2500
+MTRN3500
+TELE3018
+</pre>
+<p></p><p>
+You may find courses listed as prerequisites which are no longer offered and
+are not in the current handbook - you should include them but you
+don't need to find their prerequisites (don't look up old handbooks).
+</p><p>
+Beware infinite loops!
+
+</p><div class="answer">
+Sample solution for recursive_prereq.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+$debug = 0;
+$recursive = 0;
+$year = 1900 + (localtime(time))[5];
+$url_base = "http://www.handbook.unsw.edu.au/";
+$url_ugrad = "$url_base/undergraduate/courses/$year";
+$url_pgrad = "$url_base/postgraduate/courses/$year";
+
+sub prereq {
+    my ($course) = @_;
+    my $f;
+    print STDERR "prereq($course) $url_ugrad/$course.html $url_pgrad/$course.html\n" if $debug;
+    open F, "wget -q -O- $url_ugrad/$course.html $url_pgrad/$course.html|" or die;
+    my (@prereqs, $line);
+    while ($line = &lt;F&gt;) {
+        # look for pre-requisite line (note format used varies in handbook pages)
+        next if $line !~ /pre.?(requisite)?(.?:|\s+[A-Z]{4}\d{4})/i;
+        $line = uc $line;
+        $line =~ s/&lt;[^&gt;]*&gt;/ /g;
+        $line =~ s/EXCLU.*/ /i;
+        my @courses = $line =~ /([A-Z]{4}\d{4})/g;
+        push @prereqs, @courses;
+    }
+    print STDERR "prereq($course) -&gt; @prereqs\n" if $debug;
+    foreach my $course (@prereqs) {
+        prereq($course) if !$prereqs{$course}++ &amp;&amp; $recursive;
+    }
+}
+
+foreach $arg (@ARGV) {
+    if ($arg eq "-r") {
+        $recursive = 1;
+        next;
+    } else {
+        prereq($arg);
+    }
+}
+print "$_\n" foreach sort keys %prereqs;
+</pre>
+
+Sample Python solution for recursive_prereq.pl
+
+
+<pre class="program">#!/usr/bin/python
+
+import sys, time, subprocess, re
+
+year = time.localtime().tm_year
+url_base = "http://www.handbook.unsw.edu.au"
+debug = 0
+
+def prereq(course):
+    if debug: print("prereq(%s)" % course)
+    ugrad_url = "%s/undergraduate/courses/%d/%s.html" % (url_base, year, course)
+    pgrad_url = "%s/postgraduate/courses/%d/%s.html" % (url_base, year, course)
+
+    # there are python libraries which provide a  better way to fetch web pages
+    # subprocess.check_output is also usually better, but here we may get a non-zero exit
+    # if either pgrad or ugrad page doesn't exist
+    webpage = subprocess.Popen(["wget","-q","-O-", ugrad_url, pgrad_url], stdout=subprocess.PIPE).communicate()[0]
+    webpage = webpage.decode("utf-8") # assume hansdbook uses 'utf-8'
+    listed_prereqs = []
+    for line in webpage.split('\n'):
+        # look for pre-requisite line handling varying format used  in handbook pages
+        if re.search(r'pre.?(requisite)?(.?:|\s+[A-Z]{4}\d{4})', line, re.I):
+            line = line.upper()
+            line = re.sub(r'&lt;[^&gt;]*&gt;', '', line)
+            line = re.sub(r'EXCLU.*', '', line)
+            for word in re.findall(r'[A-Z]{4}\d{4}', line):
+                listed_prereqs.append(word)
+    for course in listed_prereqs:
+        if course not in prereqs:
+            prereqs[course] = 1
+            if recursive:
+                prereq(course)
+
+if __name__== "__main__":
+    recursive = 0
+    prereqs = {}
+    for arg in sys.argv[1:]:
+        if arg == "-r":
+            recursive = 1
+        else:
+            prereq(arg)
+    for course in sorted(prereqs.keys()):
+        print(course)
+</pre>
+</div>
+<h4>Python challenge questions</h4>
+
+Students coping well with Perl are encouraged to try picking up some Python as well.
+<p></p><p>
+The brief introduction to Python in lectures will come later.
+</p><p>
+The <a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/code/python/code_examples.html">example Python scripts</a> and links
+to external Python resources should help - but you may need more info - Google is your friend.
+
+</p><h3>Challenge Exercise: Mapping Digits in Python</h3>
+
+
+Write a Python script <code>digits.py</code> that reads from standard input and writes to standard output
+mapping all digit characters whose values are
+less than 5 into the character '<code>&lt;</code>' and all digit characters
+whose values are greater than 5 into the character '<code>&gt;</code>'.
+The digit character '5' should be left unchanged.
+<p></p><p>
+</p><center>
+<table border="1" cellpadding="6">
+<tbody><tr><th>Sample Input Data</th><th>Corresponding Output</th></tr>
+<tr valign="top"><td>
+<pre>1 234 5 678 9
+</pre>
+</td><td>
+<pre>&lt; &lt;&lt;&lt; 5 &gt;&gt;&gt; &gt;
+</pre>
+</td></tr><tr valign="top"><td>
+<pre>I can think of 100's
+of other things I'd rather
+be doing than these 3 questions
+</pre>
+</td><td>
+<pre>I can think of &lt;&lt;&lt;'s
+of other things I'd rather
+be doing than these &lt; questions
+</pre>
+</td></tr>
+<tr valign="top"><td>
+<pre>A line with lots of numbers:
+123456789123456789123456789
+A line with all zeroes
+000000000000000000000000000
+A line with blanks at the end
+1 2 3
+</pre>
+</td><td>
+<pre>A line with lots of numbers:
+&lt;&lt;&lt;&lt;5&gt;&gt;&gt;&gt;&lt;&lt;&lt;&lt;5&gt;&gt;&gt;&gt;&lt;&lt;&lt;&lt;5&gt;&gt;&gt;&gt;
+A line with all zeroes
+&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+A line with blanks at the end
+&lt; &lt; &lt;
+</pre>
+</td></tr>
+<tr valign="top"><td>
+<pre>Input with absolutely 0 digits in it
+Well ... apart from that one ...
+</pre>
+</td><td>
+<pre>Input with absolutely &lt; digits in it
+Well ... apart from that one ...
+</pre>
+</td></tr>
+<tr valign="top"><td>
+<pre>1 2 4 8 16 32 64 128 256 512 1024
+2048 4096 8192 16384 32768 65536
+</pre>
+</td><td>
+<pre>&lt; &lt; &lt; &gt; &lt;&gt; &lt;&lt; &gt;&lt; &lt;&lt;&gt; &lt;5&gt; 5&lt;&lt; &lt;&lt;&lt;&lt;
+&lt;&lt;&lt;&gt; &lt;&lt;&gt;&gt; &gt;&lt;&gt;&lt; &lt;&gt;&lt;&gt;&lt; &lt;&lt;&gt;&gt;&gt; &gt;55&lt;&gt;
+</pre>
+</td></tr>
+</tbody></table>
+</center>
+
+As usual:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab06 digits.py</kbd>
+...
+<kbd class="shell">git add digits.py</kbd>
+<kbd class="shell">git commit -a -m "my first python program"</kbd>
+</pre>
+<div class="answer">
+Sample solution
+
+
+<pre class="program">#!/usr/bin/python
+
+import sys, re
+
+for line in sys.stdin:
+    line = re.sub(r'[0-4]', '&lt;', line)
+    line = re.sub(r'[6-9]', '&gt;', line)
+    sys.stdout.write(line)
+# Note above line can also be (Python 3 only):
+#   print(line, end='')
+</pre>
+</div>
+<div class="answer">
+Sample solution using tr-like approach
+
+
+<pre class="program">#!/usr/bin/python
+
+import sys, re
+
+for line in sys.stdin:
+    line = re.sub(r'[0-4]', '&lt;', line)
+    line = re.sub(r'[6-9]', '&gt;', line)
+    sys.stdout.write(line)
+# Note above line can also be (Python 3 only):
+#   print(line, end='')
+</pre>
+</div>
+<h3>Challenge Exercise:  Repeated Echo in Python</h3>
+
+
+Write a Perl script <code>echon.py</code> which given exactly two arguments, an integer <i>n</i>
+and a string, prints the string <i>n</i> times. For example:
+
+
+<pre class="command_line"><kbd class="shell">./echon.py 5 hello
+</kbd><samp>hello
+hello
+hello
+hello
+hello
+</samp></pre>
+<pre class="command_line"><kbd class="shell">./echon.py 0 nothing
+</kbd><samp></samp></pre>
+<pre class="command_line"><kbd class="shell">./echon.py 1 goodbye
+</kbd><samp>goodbye
+</samp></pre>
+
+Your script should print an error message if it is not given
+appropriate arguments. For example:
+
+
+<pre class="command_line"><kbd class="shell">./echon.py
+</kbd><samp>Usage: ./echon.py &lt;number of lines&gt; &lt;string&gt;
+</samp></pre>
+<pre class="command_line"><kbd class="shell">./echon.py 1 2 3
+</kbd><samp>Usage: ./echon.py &lt;number of lines&gt; &lt;string&gt;
+</samp></pre>
+<pre class="command_line"><kbd class="shell">./echon.py Andrew Rocks
+</kbd><samp>./echon.py: argument 1 must be a non-negative integer
+</samp></pre>
+
+As usual:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab06 echon.py</kbd>
+...
+<kbd class="shell">git echon.py </kbd>
+<kbd class="shell">git commit -a -m "this is a bad commit message"</kbd>
+</pre>
+<div class="answer">
+Sample solution #0 for echon.py
+
+
+<b>ERROR MISSING FILE: "echonv0.py"</b>
+
+
+Sample solution #1 for echon.py
+
+
+<pre class="program">#!/usr/bin/python
+
+import re, sys
+
+if len(sys.argv) != 3:
+    sys.stderr.write("Usage: %s &lt;number of lines&gt; &lt;string&gt;\n" % sys.argv[0])
+# Above line can also be in Python3
+#   print("Usage: %s &lt;number of lines&gt; &lt;string&gt;" % sys.argv[0], file=sys.stderr)
+    sys.exit(1)
+
+if not re.match(r'^\d+$', sys.argv[1]):
+    sys.stderr.write("%s: argument 1 must be a non-negative integer\n" % sys.argv[0])
+    sys.exit(1)
+
+for i in range(int(sys.argv[1])):
+    print(sys.argv[2])
+</pre>
+
+Sample solution #2 for echon.py
+
+
+<pre class="program">#!/usr/bin/python
+
+import sys
+
+if len(sys.argv) != 3:
+    sys.stderr.write("Usage: %s &lt;number of lines&gt; &lt;string&gt;\n" % sys.argv[0])
+    sys.exit(1)
+
+# check argument is a positive int  (not required by exercise)
+try:
+    n = int(sys.argv[1])
+except ValueError:
+    n = -1
+if n &lt; 0:
+    sys.stderr.write("%s: argument 1 must be a non-negative integer\n" % sys.argv[0])
+    sys.exit(1)
+
+sys.stdout.write((sys.argv[2] + "\n") * n)
+</pre>
+</div>
+<h3>Challenge Exercise:  Tail in Python</h3>
+
+
+Write a Python script <code>simple_tail.py</code> to implement the Unix <code>tail</code> command.
+It does not need to implement any command line options.
+It will be always be given one or more files on the command line.
+It does not have to read from stdin or handle errors.
+<p></p><p>
+To assist with testing your solution, there are three small data
+files: <a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/data1.txt">data1.txt</a>, <a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/data2.txt">data2.txt</a>, and
+<a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/data3.txt">data3.txt</a>.  Copy these files to your current directory.
+
+</p><pre class="command_line"><kbd class="shell">cp /home/cs2041/public_html/lab/python/simple_tail/t?.txt .</kbd>
+</pre>
+<pre class="command_line"><kbd class="shell">simple_tail.py t1.txt t2.txt t3.txt
+</kbd><samp>Data 1 ... Line 2
+Data 1 ... Line 3
+Data 1 ... Line 4
+Data 1 ... Line 5
+Data 1 ... Line 6
+Data 1 ... Line 7
+Data 1 ... Line 8
+Data 1 ... Line 9
+Data 1 ... Line 10
+Data 1 ... Last line
+A one line file.
+has 
+exactly
+twelve
+lines
+with
+one
+word
+on
+each
+line
+</samp></pre>
+
+As usual:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab06 simple_tail.py</kbd>
+...
+<kbd class="shell">git add simple_tail.py</kbd>
+<kbd class="shell">git commit -a -m "my third python program"</kbd>
+</pre>
+<div class="answer">
+<div class="program_description">
+Sample solution
+</div>
+<pre class="program">#!/usr/bin/python
+
+import sys,os
+
+# inefficient for large files but simple
+for filename in sys.argv[1:]:
+    lines = open(filename).readlines()
+    tail = lines[-10:]
+    for line in tail:
+        sys.stdout.write(line)
+# Above line can also be in Python3:
+#       print(line, end='')
+</pre>
+
+More concise solution
+
+
+<pre class="program">#!/usr/bin/python
+
+import sys,os
+
+# inefficient for large files but simple
+for filename in sys.argv[1:]:
+    sys.stdout.write("".join(open(filename).readlines()[-10:]))
+</pre>
+</div>
+<h3>Challenge Exercise:  Whales in Python</h3>
+
+Implement Python scripts <code>whale.py</code> and <code>all_whales.py</code> which count whales as described in the first two lab questions.
+
+As usual:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab06 whale.py</kbd>
+...
+<kbd class="shell">~cs2041/bin/autotest lab06 all_whales.py</kbd>
+...
+<kbd class="shell">git add whale.py all_whales.py</kbd>
+<kbd class="shell">git commit -a -m "Python &amp; whales!!!"</kbd>
+</pre>
+<div class="answer">
+Sample solution for  whale.py
+
+
+<pre class="program">#!/usr/bin/python
+
+import re, sys
+
+if len(sys.argv) != 2:
+    sys.stderr.write("Usage: %s &lt;whale species&gt;\n" % sys.argv[0])
+    sys.exit(1)
+target_species = sys.argv[1]
+
+n_pods = 0
+n_individuals = 0
+for line in sys.stdin:
+    m = re.search(r'(\d+)\s*(.+)$', line)
+    if m:
+        count = m.group(1)
+        species = m.group(2)
+        if species == target_species:
+            n_pods += 1
+            n_individuals += int(count)
+print("%s observations: %d pods, %d individuals" % (target_species, n_pods, n_individuals))</pre>
+
+Sample solution for all_whales.py
+
+
+<pre class="program">#!/usr/bin/python
+
+import re, sys
+
+n_pods = {}
+n_individuals = {}
+for line in sys.stdin:
+    line = line.lower()              # convert line to lower case
+    line = line.strip()              # remove surrounding white space
+    line = re.sub(r's?$', '', line)  # change to singular
+    line = re.sub(r'\s+', ' ', line) # convert sequential white-space charcaters to a single space
+    m = re.search(r'(\d+)\s*(.*)$', line)
+    if m:
+        count = int(m.group(1))
+        species = m.group(2)
+        if species in n_pods:
+            n_pods[species] += 1
+            n_individuals[species] += count
+        else:
+            n_pods[species] = 1
+            n_individuals[species] = count
+    else:
+        print("Sorry couldn't parse: %s" % line)
+
+for species in sorted(n_pods):
+    print("%s observations: %d pods, %d individuals" % (species, n_pods[species], n_individuals[species]))
+</pre>
+</div>
+<h3>Testing</h3>
+
+Do your own testing in addition to the autotests.
+<p></p><p>
+BTW you can run all the autotests for the lab:
+</p><pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab06</kbd>
+</pre>
+
+Or just one autotest:
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab06 whale_1</kbd>
+</pre>
+<h3>Finalising</h3>
+
+You must show your solutions to your tutor and be able to explain
+how they work.
+Once your tutor has discussed your answers with you, you should
+submit them using:
+
+<pre class="command_line"><kbd class="shell">give cs2041 lab06 whale.pl all_whales.pl prereq.pl [recursive_prereq.pl digits.py echon.py simple_tail.py whale.py all_whales.py]</kbd>
+</pre>
+
+Whether you discuss your solutions
+with your tutor this week or next week, you must submit them before
+the above deadline.
+<script src="./Week 06 Lab Class_files/2041.js.download"></script>
+<p></p></div>
+</div>
+
+
+
+<div id="extension-is-installed"></div></body></html>

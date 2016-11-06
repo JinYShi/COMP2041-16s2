@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/answers.py?lab/week07.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Week 07 Lab Class</title>
+<link href="./Week 07 Lab Class_files/2041.css" rel="stylesheet">
+</head>
+<body data-shoptagr-mini="yes">
+<div class="container">
+<div id="heading"><a class="heading_link" target="_blank" id="left_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">COMP[29]041 16s2</a>
+We love Perl
+<a class="heading_link" target="_blank" id="right_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">Software Construction</a></div>
+<div class="tutlab lab">
+<h3>Aims</h3>
+This week you get to see how wonderful Perl can be for some tasks.
+<h3>Assessment</h3>
+<table border="0" cellpadding="3">
+<tbody><tr><td><b>Submission:</b></td><td><code>give cs2041 lab07 total_words.pl count_word.pl frequency.pl log_probability.pl identify_poet.pl [total_words.py count_word.py frequency.py log_probability.py identify_poet.py]]</code></td></tr>
+<tr><td><b>Deadline:</b></td><td>either during the lab,  or Monday 12 September 11:59pm (midnight)</td></tr>
+<tr><td><b>Assessment:</b></td><td>
+Make sure that you are familiar with the
+<a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/assessment.html">lab assessment criteria</a>.
+</td></tr>
+</tbody></table>
+<p>
+We have covered only a small amount of Perl in lectures. In fact, to
+cover the whole language in detail would take a whole semester, so
+we're going to rely on you finding out about the language yourself
+in tutes, labs and assignments. A good place to start is
+the Perl documentation &amp; tutorial links on the class home page
+For example you might find these useful:
+</p>
+<ul>
+<li> <a target="doc" href="http://search.cpan.org/dist/perl/pod/perlsyn.pod">Perl language syntax</a>
+</li><li> <a target="doc" href="http://search.cpan.org/dist/perl/pod/perlsub.pod">Perl functions</a>
+</li><li> <a target="doc" href="http://search.cpan.org/dist/perl/pod/perlop.pod">Perl operators</a>
+</li></ul>
+<h3>Introduction</h3>
+In this lab exercise you will implement a <a href="http://en.wikipedia.org/wiki/Naive_Bayes_classifier#Document_Classification">Naive Bayes Document classifier</a> in Perl.
+Naive Bayes Document classifiers are used widely for applications such as spam filtering and
+language recognition.
+<p>
+You will use the approach to discover the author of a piece of poetry.
+</p><p>
+The directory <a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/perl/poets/poems">/home/cs2041/public_html/lab/perl/poets/poems/</a>
+contains text files containing poems written by 10 famous poets:
+</p><ul>
+<li><a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/perl/poets/poems/Elizabeth_Barrett_Browning.txt">Elizabeth Barrett Browning</a>
+</li><li><a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/perl/poets/poems/Emily_Dickinson.txt">Emily Dickinson</a>
+</li><li><a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/perl/poets/poems/John_Keats.txt">John Keats</a>
+</li><li><a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/perl/poets/poems/Percy_Bysshe_Shelley.txt">Percy Bysshe Shelley</a>
+</li><li><a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/perl/poets/poems/Robert_Frost.txt">Robert Frost</a>
+</li><li><a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/perl/poets/poems/Samuel_Taylor_Coleridge.txt">Samuel Taylor Coleridge</a>
+</li><li><a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/perl/poets/poems/Walt_Whitman.txt">Walt Whitman</a>
+</li><li><a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/perl/poets/poems/William_Blake.txt">William Blake</a>
+</li><li><a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/perl/poets/poems/William_Butler_Yeats.txt">William Butler Yeats</a>
+</li><li><a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/perl/poets/poems/William_Wordsworth.txt">William Wordsworth</a>
+</li></ul>
+<p></p><p>
+Your program will be given a poem and should determine which of these 10
+famous poets is most likely to have written this poem.
+You program will based this on the probability that a particular poet
+will use a given word.  This can be estimated from the frequency which
+the poet uses the word in the poems you are given.
+<!--
+<p>
+When you set up the git repository as described above  sub-directory called <b>poets</b> should have
+been created inside <b>lab07</b> containing the above files
+-->
+
+
+You should link the directory <code>/home/cs2041/public_html/lab/perl/poets/poems/</code>
+into your <code>lab07</code> directory. So to get started do something like this.
+
+</p><pre class="command_line"><kbd class="shell">ln -s ~cs2041/public_html/lab/perl/poets/poems</kbd>
+<kbd class="shell">ln -s ~cs2041/public_html/lab/perl/poets/poem?.txt</kbd>
+</pre>
+
+The <code>ln -s</code> command creates a symbolic link which saves disk space.
+If you are working on your own machine you may prefer
+to copy the files across and add them to your repo:
+
+<pre class="command_line"><kbd class="shell">cp -r ~cs2041/public_html/lab/perl/poets/poems .</kbd>
+<kbd class="shell">cp ~cs2041/public_html/lab/perl/poets/poem?.txt .</kbd>
+<kbd class="shell">git add poems poem?.txt</kbd>
+</pre>
+<!--
+<p>
+Three poems of unknown authorship
+<a href="poem1.txt">poem1.txt</a>
+<a href="poem2.txt">poem2.txt</a>
+<a href="poem3.txt">poem3.txt</a>
+should also have been placed in <b>lab07</b>.
+-->
+<p></p>
+<h3>Exercise: Total Words</h3>
+Write a Perl script <code>total_words.pl</code> which counts the total number of words
+found on in its input (<code>STDIN</code>).
+<p>
+For the purposes of this program and the following programs we will define a word to
+be maximal non-empty contiguous sequences of alphabetic characters (<code>[a-zA-Z]</code>).
+</p><p>
+Any characters other than <code>[a-zA-Z]</code> separate words.
+</p><p>
+So for example the phrase "<code>The soul's desire</code>" contains 4 words: <code>("The", "soul", "s", "desire")</code>
+</p><p>
+For example:
+
+
+</p><pre class="command_line"><kbd class="shell">./total_words.pl &lt;poems/Walt_Whitman.txt
+</kbd><samp>116941 words
+</samp><kbd class="shell">./total_words.pl &lt;poems/Emily_Dickinson.txt
+</kbd><samp>112882 words
+</samp><kbd class="shell">./total_words.pl &lt;poems/Robert_Frost.txt
+</kbd><samp>21698 words
+</samp></pre>
+<b>Hint</b>: if your word counts are out a little you might be counting empty strings (split can return these).
+
+<div class="answer">
+Straight-forward solution using split for total_words.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+$count = 0;
+while ($line = &lt;STDIN&gt;) {
+    my @words = split /[^a-zA-Z]+/, $line;
+    foreach $word (@words) {
+        $count++ if $word ne '';
+    }
+}
+print "$count words\n"</pre>
+
+More concise solution for total_words.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+$count = 0;
+while (&lt;STDIN&gt;) {
+    foreach (/[a-z]+/ig) {
+        $count++;
+    }
+}
+print "$count words\n"</pre>
+</div>
+
+
+
+
+As usual:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab07 total_words.pl</kbd>
+<kbd class="shell">git add total_words.pl</kbd>
+<kbd class="shell">git commit -a -m "total_words.pl passes dryrun tests!"</kbd>
+</pre>
+<h3>Exercise: Count Word</h3>
+
+Write a Perl script <code>count_word.pl</code> which counts the number of times
+a specified word is found on in its input (<code>STDIN</code>).
+<p></p><p>
+A word is as defined for the previous exercise.
+</p><p>
+The word you should count will be specified as a command line argument.
+</p><p>
+You program should ignore the case of words.
+</p><p>
+For example:
+
+
+</p><pre class="command_line"><kbd class="shell">./count_word.pl snow &lt;poems/Elizabeth_Barrett_Browning.txt
+</kbd><samp>snow occurred 11 times
+</samp><kbd class="shell">./count_word.pl path &lt;poems/Robert_Frost.txt
+</kbd><samp>path occurred 3 times
+</samp><kbd class="shell">./count_word.pl urn &lt;poems/John_Keats.txt
+</kbd><samp>urn occurred 7 times
+</samp><kbd class="shell">./count_word.pl England &lt;poems/William_Blake.txt
+</kbd><samp>england occurred 34 times
+</samp></pre>
+<b>Hint</b>: modify the code from the last exercise.
+<p></p><p>
+<b>Hint</b>: the Perl function <code>uc</code> &amp; <code>lc</code> convert strings tolower &amp; uppercase respectively.
+</p><p>
+</p><div class="answer">
+Sample solution for count_word.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+die "Usage: $0 &lt;word&gt;\n" if @ARGV != 1;
+$specified_word = lc $ARGV[0];
+$count = 0;
+while ($line = &lt;STDIN&gt;) {
+    $line = lc $line;
+    my @words = split /[^a-z]+/i, $line;
+    foreach $word (@words) {
+        $count++ if $word eq $specified_word;
+    }
+}
+print "$specified_word occurred $count times\n"</pre>
+</div>
+
+
+
+As usual:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab07 count_word.pl</kbd>
+<kbd class="shell">git add count_word.pl</kbd>
+<kbd class="shell">git commit -a -m "count_word.pl inital version - not working"</kbd>
+</pre>
+<h3>Exercise: Word Frequency</h3>
+
+Write a Perl script <code>frequency.pl</code>
+which prints the frequency with each poet uses a  word specified as argument.
+So if Robert Frost uses the word <i>"snow"</i> 30 times in the 21699 words of his poetry you
+are given, then its frequency is <code>30/21699 = 0.001382552</code>. For example:
+
+
+
+<pre class="command_line"><kbd class="shell">./frequency.pl snow
+</kbd><samp>  11/ 50080 = 0.000219649 Elizabeth Barrett Browning
+  56/112882 = 0.000496093 Emily Dickinson
+  11/ 62844 = 0.000175037 John Keats
+  24/ 53400 = 0.000449438 Percy Bysshe Shelley
+  30/ 21698 = 0.001382616 Robert Frost
+  19/ 38123 = 0.000498387 Samuel Taylor Coleridge
+  14/116941 = 0.000119718 Walt Whitman
+  18/ 40751 = 0.000441707 William Blake
+  22/121198 = 0.000181521 William Butler Yeats
+  25/117162 = 0.000213380 William Wordsworth
+</samp></pre>
+
+So of these poets Robert Frost uses the word <i>"snow"</i> most frequently.
+If you choose a word a randomly from Robert Frost the probability it will be "snow"
+is just over in 1 in a thousand (0.1%).
+<p></p><p>
+Make sure your Perl script produces exactly the output above (the printf format is <code>"%4d/%6d = %.9f %s\n"</code>).
+Note you should ignore case (change A-Z to a-z).
+You should treat as a word any sequence of alphabetic characters.
+You should treat non-alphabetic characters (characters other than a-z) as spaces.
+</p><p>
+<b>Hint</b>: use a hash table of hash tables indexed by poet and word to store the word counts.
+</p><p>
+<b>Hint</b>: this loop executes once for each <code>.txt</code> file in the directory <code>poems</code>.
+</p><pre class="program">    foreach $file (glob "poems/*.txt") {
+        print "$file\n";
+    }
+</pre>
+<p></p><p>
+<b>Hint</b>: reuse code from the last exercise.
+
+</p><div class="answer">
+
+Sample solution for frequency.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+foreach $file (glob "poems/*") {
+    my $poet = $file;
+    $poet =~ s/.*\///;
+    $poet =~ s/\.txt$//;
+    $poet =~ s/_/ /g;
+    open F, "&lt;$file" or die;
+    while ($line = &lt;F&gt;) {
+        $line = lc $line;
+        foreach $word ($line =~ /[a-z]+/g) {
+            $frequency{$poet}{$word}++;
+            $n_words{$poet}++;
+        }
+    }
+}
+
+foreach $word (@ARGV) {
+    $word = lc $word;
+    foreach $poet (sort keys %frequency) {
+        my $f = $frequency{$poet}{$word}||0;
+        my $n = $n_words{$poet};
+        printf "%4d/%6d = %.9f %s\n", $f, $n, $f/$n, $poet;
+    }
+}</pre>
+</div>
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab07 frequency.pl</kbd>
+<kbd class="shell">git add frequency.pl</kbd>
+<kbd class="shell">git commit -a -m "what's your frequency Kenneth?"</kbd>
+</pre>
+<h3>Exercise: Word Log Probability</h3>
+
+Now suppose we have the phrase <i>"Truth is beauty."</i> if John Keats uses the
+word <i>"truth"</i> with frequency 0.000333885 and the
+word "<i>is"</i> with frequency 0.004944671,  the word <i>"beauty"</i> with frequency 0.000747265.
+We can estimate the probability of Keats writing the phrase <i>"Truth is beauty."</i>
+as:
+
+<pre class="program">0.000333885 * 0.004944671 * 0.000747265 == 1.23369825533711e-09
+</pre>
+
+We could similarly estimate probabilities for each of the other 9 poets, and
+then determine which of the 10 poets is most likely to write <i>"Truth is beauty."</i> (it's Blake).
+<p></p><p>
+A sidenote: we are actually making a large simplifying assumption in calculating this probability. Its
+often  called the <a href="http://en.wikipedia.org/wiki/Bag_of_words_model"><i>bag of words model</i></a>.
+</p><p>
+Multiplying probabilities like this quickly leads to very small numbers and may result in
+arithmetic underflow of our floating point representation.
+A common solution to this underflow is instead to  work with the <i>log</i> of the numbers.
+</p><p>
+So instead we will calculate the the log of the probability of the phrase.
+You this by adding the log of the probablities of each word. For example,
+you calculate the log-probability of Keats like this:
+
+</p><pre class="program">log(0.000333885) + log(0.004944671) + log(0.000747265)  == -20.5132494670232 == log(1.23369825533711e-09)
+</pre>
+
+Log-probabilities can be used directly to determine the most likely poet, as the poet
+with the highest log-probability will also have the highest probability.
+<p></p><p>
+Another problem is that we might be given a word that a poet has not used in the poems we
+have.  For example:
+
+
+</p><pre class="command_line"><kbd class="shell">./frequency.pl mortality
+</kbd><samp>   0/ 50080 = 0.000000000 Elizabeth Barrett Browning
+   4/112882 = 0.000035435 Emily Dickinson
+   5/ 62844 = 0.000079562 John Keats
+   5/ 53400 = 0.000093633 Percy Bysshe Shelley
+   0/ 21698 = 0.000000000 Robert Frost
+   0/ 38123 = 0.000000000 Samuel Taylor Coleridge
+   1/116941 = 0.000008551 Walt Whitman
+   0/ 40751 = 0.000000000 William Blake
+   0/121198 = 0.000000000 William Butler Yeats
+   7/117162 = 0.000059746 William Wordsworth
+</samp></pre>
+
+It's not useful to assume there is zero probability that the poet would use the word,
+even though they haven't used it previously.
+You should avoid this when estimating probabilities by adding 1 to the count of occurrences
+of each word. So for example we'd estimate the probability of Robert Frost using the word
+<i>mortality</i> as (0+1)/21699 and the probability of John Keats using the word
+<i>mortality</i> as (5+1)/62896.
+This is a simple version of <a href="http://en.wikipedia.org/wiki/Additive_smoothing">Additive smoothing</a>.
+<p></p><p>
+Write a perl script <code>log_probability.pl</code> which given an argument prints the estimate
+log of the probability that a poet would use this word. For example:
+
+
+</p><pre class="command_line"><kbd class="shell">./log_probability.pl mortality
+</kbd><samp>log((0+1)/ 50080) = -10.8214 Elizabeth Barrett Browning
+log((4+1)/112882) = -10.0247 Emily Dickinson
+log((5+1)/ 62844) =  -9.2567 John Keats
+log((5+1)/ 53400) =  -9.0938 Percy Bysshe Shelley
+log((0+1)/ 21698) =  -9.9850 Robert Frost
+log((0+1)/ 38123) = -10.5486 Samuel Taylor Coleridge
+log((1+1)/116941) = -10.9763 Walt Whitman
+log((0+1)/ 40751) = -10.6152 William Blake
+log((0+1)/121198) = -11.7052 William Butler Yeats
+log((7+1)/117162) =  -9.5919 William Wordsworth
+</samp></pre>
+
+You will only need to copy your <code>frequency.pl</code> and make a small modification.
+Make sure your output matches the above exactly (the printf format is <code>"log((%d+1)/%6d) = %8.4f %s\n"</code>)
+
+<div class="answer">
+Sample solution for log_probability.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+foreach $file (glob "poems/*") {
+    my $poet = $file;
+    $poet =~ s/.*\///;
+    $poet =~ s/\.txt$//;
+    $poet =~ s/_/ /g;
+    open F, "&lt;$file" or die;
+    while ($line = &lt;F&gt;) {
+        $line = lc $line;
+        foreach $word ($line =~ /[a-z]+/g) {
+            $frequency{$poet}{$word}++;
+            $n_words{$poet}++;
+        }
+    }
+}
+
+foreach $word (@ARGV) {
+    $word = lc $word;
+    foreach $poet (sort keys %frequency) {
+        my $f = $frequency{$poet}{$word}||0;
+        my $n = $n_words{$poet};
+        printf "log((%d+1)/%6d) = %8.4f %s\n", $f, $n, log(($f+1)/$n), $poet;
+    }
+}</pre>
+</div>
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab07 log_probability.pl</kbd>
+<kbd class="shell">git add log_probability.pl</kbd>
+<kbd class="shell">git commit -a -m "logs are useful"</kbd>
+</pre>
+<h3>Exercise: Identifying the Poet</h3>
+
+Write a Perl script <code>identify_poet.pl</code> that given 1 or more files, each containing a poem, prints the most likely poet for each poem.
+<p></p><p>
+In other words, for each file given as argument you should go through all (10) poets calculating
+the log-probability that the poet wrote that poem by summing the
+log-probability of that poet using each word in the file.
+You should print the poet with the highest log-probability.
+</p><p>
+The files <a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/perl/poets/poem1.txt">poem1.txt</a>, <a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/perl/poets/poem2.txt">poem2.txt</a> and  <a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/perl/poets/poem3.txt">poem3.txt</a>
+contain famous poems by Keats, Shelley and Frost, which are not included in their poems in the poets directory.
+</p><p>
+Your program should produce exactly this output:
+
+
+</p><pre class="command_line"><kbd class="shell">./identify_poet.pl poem?.txt
+</kbd><samp>poem1.txt most resembles the work of John Keats (log-probability=-2720.9)
+poem2.txt most resembles the work of Percy Bysshe Shelley (log-probability=-777.0)
+poem3.txt most resembles the work of Robert Frost (log-probability=-720.2)
+</samp></pre>
+<p></p><p>
+You may find it helpful to add a '-d' flag which provides debugging information (this is optional),
+for example:
+
+
+</p><pre class="command_line"><kbd class="shell">./identify_poet.pl -d poem2.txt
+</kbd><samp>poem2.txt: log_probability of -777.0 for Percy Bysshe Shelley
+poem2.txt: log_probability of -789.0 for Robert Frost
+poem2.txt: log_probability of -796.3 for Samuel Taylor Coleridge
+poem2.txt: log_probability of -803.7 for William Wordsworth
+poem2.txt: log_probability of -804.9 for John Keats
+poem2.txt: log_probability of -805.4 for William Blake
+poem2.txt: log_probability of -805.4 for Elizabeth Barrett Browning
+poem2.txt: log_probability of -808.2 for William Butler Yeats
+poem2.txt: log_probability of -818.1 for Walt Whitman
+poem2.txt: log_probability of -832.0 for Emily Dickinson
+poem2.txt most resembles the work of Percy Bysshe Shelley (log-probability=-777.0)
+</samp></pre>
+<b>Hints:</b> you may like to create simpler input to use in debugging, for example:
+
+<pre class="command_line"><kbd class="shell">echo Andrew Rocks &gt;andrew_rocks.txt</kbd>
+</pre>
+<pre class="command_line"><kbd class="shell">./log_probability.pl Andrew
+</kbd><samp>log((0+1)/ 50080) = -10.8214 Elizabeth Barrett Browning
+log((0+1)/112882) = -11.6341 Emily Dickinson
+log((0+1)/ 62844) = -11.0484 John Keats
+log((0+1)/ 53400) = -10.8856 Percy Bysshe Shelley
+log((0+1)/ 21698) =  -9.9850 Robert Frost
+log((0+1)/ 38123) = -10.5486 Samuel Taylor Coleridge
+log((0+1)/116941) = -11.6694 Walt Whitman
+log((0+1)/ 40751) = -10.6152 William Blake
+log((0+1)/121198) = -11.7052 William Butler Yeats
+log((10+1)/117162) =  -9.2734 William Wordsworth
+</samp><kbd class="shell">./log_probability.pl Rocks
+</kbd><samp>log((0+1)/ 50080) = -10.8214 Elizabeth Barrett Browning
+log((0+1)/112882) = -11.6341 Emily Dickinson
+log((10+1)/ 62844) =  -8.6505 John Keats
+log((20+1)/ 53400) =  -7.8410 Percy Bysshe Shelley
+log((3+1)/ 21698) =  -8.5987 Robert Frost
+log((4+1)/ 38123) =  -8.9391 Samuel Taylor Coleridge
+log((19+1)/116941) =  -8.6737 Walt Whitman
+log((8+1)/ 40751) =  -8.4180 William Blake
+log((8+1)/121198) =  -9.5080 William Butler Yeats
+log((49+1)/117162) =  -7.7593 William Wordsworth
+</samp><kbd class="shell">./identify_poet.pl -d andrew_rocks.txt
+</kbd><samp>andrew_rocks.txt: log_probability of -17.0 for William Wordsworth
+andrew_rocks.txt: log_probability of -18.6 for Robert Frost
+andrew_rocks.txt: log_probability of -18.7 for Percy Bysshe Shelley
+andrew_rocks.txt: log_probability of -19.0 for William Blake
+andrew_rocks.txt: log_probability of -19.5 for Samuel Taylor Coleridge
+andrew_rocks.txt: log_probability of -19.7 for John Keats
+andrew_rocks.txt: log_probability of -20.3 for Walt Whitman
+andrew_rocks.txt: log_probability of -21.2 for William Butler Yeats
+andrew_rocks.txt: log_probability of -21.6 for Elizabeth Barrett Browning
+andrew_rocks.txt: log_probability of -23.3 for Emily Dickinson
+andrew_rocks.txt most resembles the work of William Wordsworth (log-probability=-17.0)
+</samp></pre>
+<div class="answer">
+Sample solution for identify_poet.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+$debug = 0;
+foreach $file (glob "poems/*") {
+    my $poet = $file;
+    $poet =~ s/.*\///;
+    $poet =~ s/\.txt$//;
+    $poet =~ s/_/ /g;
+    open F, "&lt;$file" or die;
+    while (&lt;F&gt;) {
+        tr/A-Z/a-z/;
+        foreach (/[a-z]+/g) {
+            $frequency{$poet}{$_}++;
+            $n_words{$poet}++;
+        }
+    }
+}
+@poets = keys %frequency;
+foreach $file (@ARGV) {
+    my %log_probability;
+    if ($file eq '-d') {
+        $debug = 1;
+        next;
+    }
+    open F, "&lt;$file" or die "can not open $file: $!";
+    while (&lt;F&gt;) {
+        tr/A-Z/a-z/;
+        foreach $word (/[a-z]+/g) {
+            foreach $poet (@poets) {
+                $log_probability{$poet} += log((($frequency{$poet}{$word}||0) + 1)/$n_words{$poet});
+            }
+        }
+    }
+    @sorted_poets = sort {$log_probability{$b} &lt;=&gt; $log_probability{$a}} @poets;
+    if ($debug) {
+        foreach $poet (@sorted_poets) {
+            printf "%s: log_probability of %.1f for %s\n", $file, $log_probability{$poet}, $poet;
+        }
+    }
+    printf "%s most resembles the work of %s (log-probability=%.1f)\n", $file, $sorted_poets[0], $log_probability{$sorted_poets[0]};
+}
+</pre>
+</div>
+<p></p>
+
+As usual:
+
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab07 identify_poet.pl</kbd>
+<kbd class="shell">git add identify_poet.pl</kbd>
+<kbd class="shell">git commit -a -m "logs are useful"</kbd>
+</pre>
+<h3>Challenge Exercise: Poetic Python</h3>
+
+Implement the above exercises in Python.
+<p>
+The <a href="http://cgi.cse.unsw.edu.au/~cs2041/code/python/code_examples.html">example Python scripts</a> and links
+to external Python resources should help - but you will need more info - Google is your friend.
+</p><p>
+<b>Hints</b> for <code>total_words.py</code> &amp;  <code>count_word.py</code>:
+</p><p>
+This loop executes for each line of stdin:
+
+</p><pre class="program">import sys
+for line in sys.stdin:
+    print line
+</pre>
+
+The function <code>re.split</code> or the function <code>re.findall</code> could be used to separate words.
+<p></p><p>
+<b>Hints</b> for <code>frequency.py</code>, <code>log_probability.py</code> &amp; <code>identify_poet.py</code>:
+</p><p>
+Beware Python dicts need a slightly different approach to Perrl hashes, and also
+Perl &amp; Python division have different semantics.
+</p><p>
+This loop executes once for each <code>.txt</code> file in the directory <code>poets</code>.
+
+</p><pre class="program">import glob
+for file in glob.glob("poems/*.txt"):
+    print file
+</pre>
+<p></p><p>
+You might find <code>math.log</code>, <code>sorted</code>, <code>re.sub</code> and  <code>collections.defaultdict</code> useful.
+
+</p><div class="answer">
+Solution for total_words.py using re.split
+
+
+<pre class="program">#!/usr/bin/python
+
+import re, sys
+
+count = 0
+for line in sys.stdin:
+    words = re.split(r'[^a-zA-Z]+', line)
+    for word in words:
+        if word:
+            count += 1
+
+print("%d words" % count)
+</pre>
+
+Solution for total_words.py using re.findall
+
+
+<pre class="program">#!/usr/bin/python
+
+import re, sys
+
+count = 0
+for line in sys.stdin:
+    for word in re.findall(r'[a-z]+', line, re.I):
+        count += 1
+
+print("%d words" % count)
+</pre>
+
+More Pythonic solution for total_words.py using re.findall
+
+
+<pre class="program">#!/usr/bin/python
+
+import sys, re
+
+lines = "".join(l for l in sys.stdin).lower()
+words = re.findall(r'[a-z]+', lines, flags=re.I)
+print("%d words" % len(words))
+</pre>
+
+Sample solution for count_word.py
+
+
+<pre class="program">#!/usr/bin/python
+
+import re, sys
+
+if len(sys.argv) != 2:
+    sys.stderr.write("Usage %s: &lt;word&gt;\n" % sys.argv[0])
+    sys.exit(1)
+
+specified_word = sys.argv[1].lower()
+
+count = 0
+for line in sys.stdin:
+    line = line.lower()
+    words = re.split(r'[^a-z]+', line)
+    for word in words:
+        if word == specified_word:
+            count += 1
+
+print("%s occurred %d times" % (specified_word, count))
+</pre>
+
+More Pythonic solution for count_word.py using re.findall
+
+
+<pre class="program">#!/usr/bin/python
+
+import sys, re
+
+word = sys.argv[1].lower()
+lines = "".join(l for l in sys.stdin).lower()
+words = re.findall(r'[a-z]+', lines, flags=re.I)
+print("%s occurred %d times" % (word, words.count(word)))
+</pre>
+
+Sample solution for frequency.py
+
+
+<pre class="program">#!/usr/bin/python
+import sys, glob, re, collections
+
+frequency = {}
+n_words = collections.defaultdict(int)
+for file in glob.glob("poems/*"):
+    poet = re.sub(r'.*/', '', file)
+    poet = re.sub(r'.txt$', '', poet)
+    poet = re.sub(r'_', ' ', poet)
+    frequency[poet] = collections.defaultdict(int)
+    for line in open(file):
+        line = line.lower()
+        for word in re.findall(r'[a-z]+', line, re.I):
+            frequency[poet][word] += 1
+            n_words[poet] += 1
+
+for word in sys.argv[1:]:
+    word = word.lower()
+    for poet in sorted(frequency.keys()):
+        f = frequency[poet][word]
+        n = n_words[poet]
+        print("%4d/%6d = %.9f %s" % (f, n, f/float(n), poet))
+</pre>
+
+More Pythonic solution for frequency.py
+
+
+<pre class="program">#!/usr/bin/python
+
+import sys, glob, re, collections, os
+
+frequency = {}
+n_words = collections.Counter()
+for f in glob.glob("poems/*.txt"):
+    # remove directory, extension, and fix the underscores
+    poet = os.path.splitext(os.path.basename(f))[0].replace('_', ' ')
+    lines = open(f).read().lower()
+    words = re.findall(r'[a-z]+', lines, flags=re.I)
+    frequency[poet] = collections.Counter(words)
+    n_words[poet] = len(words)
+
+for word in sys.argv[1:]:
+    for poet in sorted(frequency):
+        f = frequency[poet][word.lower()]
+        n = n_words[poet]
+        print("%4d/%6d = %.9f %s" % (f, n, float(f) / n, poet))
+</pre>
+
+Sample solution for log_probability.py
+
+
+<pre class="program">#!/usr/bin/python
+import sys, glob, re, collections, math
+
+frequency = {}
+n_words = collections.defaultdict(int)
+for file in glob.glob("poems/*"):
+    poet = re.sub(r'.*/', '', file)
+    poet = re.sub(r'.txt$', '', poet)
+    poet = re.sub(r'_', ' ', poet)
+    frequency[poet] = collections.defaultdict(int)
+    for line in open(file):
+        line = line.lower()
+        for word in re.findall(r'[a-z]+', line, re.I):
+            frequency[poet][word] += 1
+            n_words[poet] += 1
+
+for word in sys.argv[1:]:
+    word = word.lower()
+    for poet in sorted(frequency.keys()):
+        f = frequency[poet][word]
+        n = n_words[poet]
+        print("log((%d+1)/%6d) = %8.4f %s" % (f, n, math.log((f+1)/float(n)), poet))
+</pre>
+
+More Pythonic solution for log_probability.py
+
+
+<pre class="program">#!/usr/bin/python
+
+import sys, glob, re, collections, os, math
+
+frequency = {}
+n_words = {}
+for f in glob.glob("poems/*.txt"):
+    # remove directory, extension, and fix the underscores
+    poet = os.path.splitext(os.path.basename(f))[0].replace('_', ' ')
+    lines = open(f).read().lower()
+    words = re.findall(r'[a-z]+', lines, flags=re.I)
+    frequency[poet] = collections.Counter(words)
+    n_words[poet] = len(words)
+
+for word in sys.argv[1:]:
+    for poet in sorted(frequency):
+        f = frequency[poet][word.lower()]
+        n = n_words[poet]
+        print("log((%d+1)/%6d) = %8.4f %s" % (f, n, math.log(float(f + 1) / n), poet))
+</pre>
+
+Sample solution for identify_poet.py
+
+
+<pre class="program">#!/usr/bin/python
+import sys, glob, re, collections, math
+
+frequency = {}
+n_words = collections.defaultdict(int)
+for file in glob.glob("poems/*"):
+    poet = re.sub(r'.*/', '', file)
+    poet = re.sub(r'.txt$', '', poet)
+    poet = re.sub(r'_', ' ', poet)
+    frequency[poet] = collections.defaultdict(int)
+    for line in open(file):
+        line = line.lower()
+        for word in re.findall(r'[a-z]+', line, re.I):
+            frequency[poet][word] += 1
+            n_words[poet] += 1
+
+poets = list(frequency.keys())
+debug = 0
+for file in sys.argv[1:]:
+    if file == '-d':
+        debug = 1
+        continue
+    log_probability = collections.defaultdict(float)
+    for line in open(file):
+        line = line.lower()
+        for word in re.findall(r'[a-z]+', line, re.I):
+            for poet in poets:
+                log_probability[poet] += math.log(((frequency[poet][word] + 1)/float(n_words[poet])))
+    sorted_poets = sorted(poets, key=lambda p: -log_probability[p])
+    if debug:
+        for poet in sorted_poets:
+            print("%s: log_probability of %.1f for %s" % (file, log_probability[poet], poet))
+    print("%s most resembles the work of %s (log-probability=%.1f)" % (file, sorted_poets[0], log_probability[sorted_poets[0]]))
+</pre>
+
+More Pythonic solution for identify_poet.py
+
+
+<pre class="program">#!/usr/bin/python
+
+import sys, glob, re, collections, os, math
+
+frequency = {}
+for f in glob.glob("poems/*.txt"):
+    lines = open(f).read().lower()
+    author = os.path.splitext(os.path.basename(f))[0].replace('_', ' ')
+    words = re.findall(r'[a-z]+', lines, flags=re.S | re.M | re.I)
+    count = collections.Counter(words)
+    # we need to use a default value to capture at creation time, not runtime
+    # the following line just says the dictionary defaults to log(1/|words|)
+    frequency[author] = collections.defaultdict(lambda x=math.log(float(1) / len(words)): x)
+    for word, occurances in count.items():
+        frequency[author][word] = math.log(float((occurances + 1)) / len(words))
+
+for f in sys.argv[1:]:
+    lines = open(f).read().lower()
+    words = re.findall(r'[a-z]+', lines, flags=re.I)
+    prob = {}
+    for author, freq in frequency.items():
+        prob[author] = sum(freq[word] for word in words)
+    likely = max(prob, key=prob.get) # this is how you sort hashes by value in python
+    print("%s most resembles the work of %s (log-probability=%.1f)" % (f, likely, prob[likely]))
+</pre>
+</div>
+
+
+
+As usual:
+
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab07 total_words.py</kbd>
+<kbd class="shell">~cs2041/bin/autotest lab07 count_word.py</kbd>
+<kbd class="shell">~cs2041/bin/autotest lab07 frequency.py</kbd>
+<kbd class="shell">~cs2041/bin/autotest lab07 log_probability.py</kbd>
+<kbd class="shell">~cs2041/bin/autotest lab07 identify_poet.py</kbd>
+<kbd class="shell">git add total_words.py count_word.py frequency.py log_probability.py identify_poet.py</kbd>
+<kbd class="shell">git commit -a -m "python is poetic"</kbd>
+</pre>
+<h3>Testing</h3>
+
+Rember to do your own testing as well as the autotest tests are available for this lab.
+<p></p><p>
+To run all tests:
+</p><pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab07</kbd>
+</pre>
+You can run a single test if you also pass the test label as the second argument to autotest.
+For example, to run just test <code>total_words_5</code> type:
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab07 total_words_5</kbd>
+</pre>
+
+You can also tell autotest to the code you have commited to gitlab
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab07 -gitlab</kbd>
+</pre>
+
+or a particular gitlab commit
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab07 9bfa2c5a</kbd>
+</pre>
+<h3>Finalising</h3>
+You must show your solutions to your tutor and be able to explain
+how they work.
+Once your tutor has discussed your answers with you, you should
+submit them using:
+<pre class="command_line"><kbd class="shell">give cs2041 lab07 total_words.pl count_word.pl frequency.pl log_probability.pl identify_poet.pl [total_words.py count_word.py frequency.py log_probability.py identify_poet.py]</kbd>
+</pre>
+Whether you discuss your solutions
+with your tutor this week or next week, you must submit them before
+the above deadline.
+
+<h3>Gitlab - More Information</h3>
+
+I expect most students will just work in their CSE account and push work to gitlab.cse.unsw.edu.au
+from there, but you can try setting up a git repository on your home machine
+and pushing work to gitlab.cse.unsw.edu.au from there.
+<p></p><p>
+If you do so you'll want to
+use git's pull command to update the repository in your CSE account.
+</p><p>
+</p><pre class="command_line"><kbd class="shell">git pull</kbd>
+Unpacking objects: 100% (3/3), done.
+From gitlab@gitlab.cse.unsw.EDU.AU/z5555555/16s2-comp2041-labs
+   226cddf..e64fee9  master     -&gt; origin/master
+Updating 226cddf..e64fee9
+Fast-forward
+ total_words.pl |    1 +
+ 1 file changed, 1 insertion(+)
+</pre>
+<p></p><p>
+If ssh access doesn't work, you can also use https to access gitlab
+using a URL equivalent to <code>https://gitlab.cse.unsw.edu.au/z<i>5555555</i>/16s2-comp2041-labs.git</code> (replace 5555555 with your student number) and use your z-id &amp; zPass.
+</p><p>
+</p><pre class="command_line"><kbd class="shell">git remote set-url origin https://gitlab.cse.unsw.edu.au/z<i>5555555</i>/16s2-comp2041-labs.git</kbd>
+<kbd class="shell">git push</kbd>
+Username for 'https://gitlab.cse.unsw.EDU.AU': <kbd>z5555555</kbd>
+Password for 'https://z5555555@gitlab.cse.unsw.EDU.AU': <kbd><i>zPass</i></kbd>
+</pre>
+<script src="./Week 07 Lab Class_files/2041.js.download"></script>
+<p></p></div>
+</div>
+
+
+
+<div id="extension-is-installed"></div></body></html>

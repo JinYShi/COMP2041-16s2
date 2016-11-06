@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/answers.py?tut/week13.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Week 13 Tutorial</title>
+<link href="./Week 13 Tutorial_files/2041.css" rel="stylesheet">
+</head>
+<body data-shoptagr-mini="yes">
+<div class="container">
+<div id="heading"><a class="heading_link" target="_blank" id="left_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">COMP[29]041 16s2</a>
+Practice Implementation Exam Questions
+<a class="heading_link" target="_blank" id="right_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">Software Construction</a></div>
+<div class="tutlab tut">
+<ol>
+<li><p>
+In the context of computing, a <i>shell</i> is
+</p><ol type="a">
+<li> <p> part of the Unix operating system </p>
+</li><li> <p> a program that arranges the execution of other programs </p>
+</li><li> <p> a component of a window manager such as <code>fvwm</code> </p>
+</li><li> <p> an object-oriented wrapper for a procedural program </p>
+</li></ol>
+<div class="answer">
+<ol type="a">
+<li><p>
+Incorrect ... the shell runs as a normal process under Unix; it is not part of the O/S
+</p>
+</li><li><p>
+Correct.
+</p>
+</li><li><p>
+Incorrect ... the shell is completely separate from any window manager;
+you can run a shell without having any window manager running.
+</p>
+</li><li> <p>
+Incorrect ... meaningless answer; certainly not shell-related
+</p>
+</li></ol>
+</div>
+<p></p></li><li><p>
+A shell script can be executed by placing it in a file
+called e.g. <code>script</code> and then
+</p><ol type="a">
+<li> <p> executing the command <code>run script</code> </p>
+</li><li> <p> clicking on an icon for that script in a window manager </p>
+</li><li> <p> executing the command <code>sh script</code> </p>
+</li><li> <p> making the file readable and then simply typing its name </p>
+</li></ol>
+<div class="answer">
+<ol type="a">
+<li>
+<p>
+Incorrect ... on any Unix system I've ever seen <code>run</code> gives
+a <code>Command not found</code> error message. I guess it's remotely
+possible that some Unix system somewhere has a command called
+<code>run</code>. The chances of it doing what's described above is
+even more remote.
+</p>
+</li><li>
+<p>
+Incorrect ... I haven't seen any window managers where shell
+scripts automatically get turned into icons
+</p>
+</li><li>
+<p>
+Correct ... guaranteed to work on any Unix system I've seen.
+</p>
+</li><li>
+<p>
+Incorrect ... you'd need to make it executable as well.
+</p>
+</li></ol>
+</div>
+<p></p></li><li><p>
+Which one of the following regular expressions would match a
+non-empty string consisting only of the letters <code>x</code>,
+<code>y</code> and <code>z</code>, in any order?
+</p><ol type="a">
+<li> <p> <code>[xyz]+</code> </p>
+</li><li> <p> <code>x+y+z+</code> </p>
+</li><li> <p> <code>(xyz)*</code> </p>
+</li><li> <p> <code>x*y*z*</code> </p>
+</li></ol>
+<div class="answer">
+<ol type="a">
+<li> <p>
+Correct
+</p>
+</li><li> <p>
+Incorrect ... this matches strings like <code>xxx...yyy...zzz...</code>
+</p>
+</li><li> <p>
+Incorrect ... this matches strings like <code>xyzxyzxyz...</code>
+</p>
+</li><li> <p>
+Incorrect ... this matches strings like <code>xxx...yyy...zzz...</code>
+</p>
+</li></ol>
+<p>
+The difference between (b) and (d) is that (b) requires there to be
+at least one of each <code>x</code>, <code>y</code> and <code>z</code>.
+</p>
+</div>
+<p></p></li><li><p>
+Which one of the following commands would extract the student id
+field from a file in the following format:
+</p><pre class="command_line">COMP3311;2122987;David Smith;95
+COMP3231;2233445;John Smith;51
+COMP3311;2233445;John Smith;76
+</pre>
+<ol type="a">
+<li> <p> <code>cut -f 2</code> </p>
+</li><li> <p> <code>cut -d; -f 2</code> </p>
+</li><li> <p> <code>sed -e 's/.*;//'</code> </p>
+</li><li> <p> None of the above. </p>
+</li></ol>
+<div class="answer">
+<ol type="a">
+<li> <p>
+Incorrect ... this gives the entire data file; the default field-separator
+is tab, and since the lines contain no tabs, they are treated as a single
+large field; if an invalid field number is specified, <code>cut</code> simply
+prints the first
+</p>
+</li><li> <p>
+Incorrect ... this runs two separate commands <code>cut -d</code> followed
+by <code>-f 2</code>, and neither of them makes sense on its own
+</p>
+</li><li> <p>
+Incorrect ... this removes all chars up to and including the final
+semicolon in the line, and this gives the 4th field on each line
+</p>
+</li><li> <p>
+Correct
+</p>
+</li></ol>
+</div>
+<p></p></li><li><p>
+Which one of the following Perl commands would acheive the same
+effect as in the previous question (i.e. extract the student id
+field)?
+</p><ol type="a">
+<li> <p> <code>perl -e '{while (&lt;&gt;) { split /;/; print;}}'</code> </p>
+</li><li> <p> <code>perl -e '{while (&lt;&gt;) { split /;/; print $2;}}'</code> </p>
+</li><li> <p> <code>perl -e '{while (&lt;&gt;) { @x = split /;/; print "$x[1]\n";}}'</code> </p>
+</li><li> <p> <code>perl -e '{while (&lt;&gt;) { @x = split /;/; print "$x[2]\n";}}'</code> </p>
+</li></ol>
+<div class="answer">
+<ol type="a">
+<li> <p>
+Incorrect ... this splits the line, but doesn't save the result of the
+splitting, and then prints the default value, which is the whole line
+read
+</p>
+</li><li> <p>
+Incorrect ... <code>$2</code> does not refer to the second field in Perl
+</p>
+</li><li> <p>
+Correct ... the <code>split</code> saves the result in the <code>@x</code> list,
+and the index <code>[1]</code> selects the second value from the list
+</p>
+</li><li> <p>
+Incorrect ... the <code>split</code> saves the result in the <code>@x</code> list,
+but the index <code>[2]</code> selects the third value from the list
+</p>
+</li></ol>
+</div>
+<p></p></li><li><p>
+What is the URL-encoded version of the string <code>Dad &amp; Dave</code>
+(the hexadecimal ascii code for the ampersand charcter is <code>26</code>)?
+</p><ol type="a">
+<li> <p> <code>Dad+&amp;+Dave</code> </p>
+</li><li> <p> <code>dad+%26+dave</code> </p>
+</li><li> <p> <code>Dad+%26+Dave</code> </p>
+</li><li> <p> <code>%Dad+%26+%Dave</code> </p>
+</li></ol>
+<div class="answer">
+<ol type="a">
+<li> <p>
+Incorrect ... the <code>&amp;</code> character is used to separate parameters
+in a URL, so this would "pass" <code>"Dad "</code> and <code>" Dave"</code>
+</p>
+</li><li> <p>
+Incorrect ... URL parameter values are case-sensitive
+</p>
+</li><li> <p>
+Correct ... the spaces are replaced by <code>+</code>'s and the ampersand is
+replaced by <code>%26</code>, as required by URL-encoding
+</p>
+</li><li> <p>
+Incorrect ... the code <code>%D</code> refers to the newline character,
+not to the letter capital-<code>D</code>
+</p>
+</li></ol>
+</div>
+<p></p></li><li><p>
+Which of the following CGI.pm function calls produces a popup menu
+associated with the parameter <code>choice</code> and with the numbers
+<code>1</code>, <code>2</code> and <code>3</code> as choices?
+</p><ol type="a">
+<li> <p> <code>popup_menu(-name=&gt;'choice',-values=&gt;{'1','2','3'})</code> </p>
+</li><li> <p> <code>popup_menu(-name=&gt;'choice',-values=&gt;['1','2','3'])</code> </p>
+</li><li> <p> <code>popup_menu(-name=&gt;'choice',-values=&gt;{'One','Two','Three'})</code> </p>
+</li><li> <p> <code>popup_menu(-name=&gt;'choice',-values=&gt;['One','Two','Three'])</code> </p>
+</li></ol>
+<div class="answer">
+<ol type="a">
+<li> <p>
+Incorrect ... the type of the <code>values</code> parameter value must be
+a reference to an array; the <code>{'1','2','3'}</code> is a block
+</p>
+</li><li> <p>
+Correct
+</p>
+</li><li> <p>
+Incorrect ... the type of the <code>values</code> parameter is incorrect
+and the values themselves are also incorrect
+</p>
+</li><li> <p>
+Incorrect ... the type of the <code>values</code> parameter is correct
+but the values themselves are incorrect
+</p>
+</li></ol>
+</div>
+<!--
+<li><p>
+The purpose of <i>program testing</i> is
+<ol type="a">
+<li> <p> to establish that a piece of software is 100% bug-free </p>
+<li> <p> to ensure that the code is readable and well-structured </p>
+<li> <p> to determine whether a piece of software contains errors </p>
+<li> <p> to check the execution efficiency of a piece of software </p>
+</ol>
+<div class="answer">
+<ol type="a">
+<li> <p>
+Incorrect ... testing can never establish that software is 100% bug-free; this
+can only be acheived by formal verification methods
+</p>
+<li> <p>
+Incorrect ... testing has nothing to do with checking style parameters
+</p>
+<li> <p>
+Correct ... all that testing can do is to (possibly) reveal errors
+</p>
+<li> <p>
+Incorrect ... testing is not aimed at checking performance parameters
+</p>
+</ol>
+</div>
+-->
+<!--
+<li><p>
+The purpose of setting a <i>break point</i> in a debugger such as <code>gdb</code>
+is to
+<ol type="a">
+<li> <p> introduce an error into the executing program to make it crash </p>
+<li> <p> slow the program execution down to make it easier to watch </p>
+<li> <p> halt the program at a particular point so that you can examine its state </p>
+<li> <p> capture a profile of the program's execution for performance tuning </p>
+</ol>
+<div class="answer">
+<ol type="a">
+<li> <p>
+Incorrect ... meaningless answer
+</p>
+<li> <p>
+Incorrect ... breakpoints stop program execution, not just slow it
+</p>
+<li> <p>
+Correct
+</p>
+<li> <p>
+Incorrect ... breakpoints are a debugging mechanism, not a performance
+analysis mechanism
+</p>
+</ol>
+</div>
+-->
+<!--
+<li><p>
+Consider the following simple <code>Makefile</code>:
+<pre class="command_line">
+CC     = gcc
+CFLAGS = -pg
+fred : fred.c
+<kbd class="shell">(CC) -o fred fred.c</kbd>
+</pre>
+What command will be executed by the shell if the <code>make</code> is run
+using this <code>Makefile</code> and the source code is newer than the
+executable?
+<ol type="a">
+<li>  <code>gcc -pg fred.c</code>
+<li>  <code>gcc -o fred fred.c</code>
+<li>  <code>$(CC) -o fred fred.c</code>
+<li>  <code>gcc -pg -o fred fred.c</code>
+</ol>
+<div class="answer">
+<ol type="a">
+<li> <p>
+Incorrect ... this does not correspond to the command in the <code>Makefile</code>,
+which contains <code>-o fred</code>
+</p>
+<li> <p>
+Correct ... the <code>$(CC)</code> expands to <code>gcc</code> and the rest
+of the command is litterally as written in the <code>Makefile</code>
+</p>
+<li> <p>
+Incorrect ... the command <code>$(CC)</code> will not be executed because
+<code>make</code> expands all variables before running the command
+</p>
+<li> <p>
+Incorrect ... the <code>$(CC)</code> expands to <code>gcc</code> but, since an
+explicit command is used to run the compile, <code>CFLAGS</code> is not used
+</p>
+</ol>
+</div>
+-->
+<p></p></li><li><p>
+For each of the following questions, give <em>brief</em> written answers
+preferably in point form.
+Around half a page should be sufficient for each question, and you should
+certainly write <b>no more than one page</b> for any one question.
+Where appropriate, give examples to illustrate your points.
+</p>
+<ol type="a">
+<li>
+<p>
+Consider the following Perl program that processes its standard input:
+</p>
+<pre class="command_line">#!/usr/local/bin/perl
+while (&lt;STDIN&gt;) {
+    @marks = split;
+    $studentID = $marks[0];
+    for (i = 0; i &lt; $#marks; i++) {
+        $totalMark += $marks[$i];
+    }
+    printf "%s %d\n", $studentID, $totalMark;
+}
+</pre>
+<p>
+This program has several common mistakes in it. Indicate and describe
+the nature of each of these mistakes, and say what the program is
+attempting to do.
+</p>
+<div class="answer">
+<p><b>Sample solution:</b></p>
+<ul>
+<li>
+The <code>for</code> loop uses the "variable" <code>i</code> but forgets to
+prefix it with the <code>$</code> symbol, so it will be treated as a
+constant and an error message generated
+</li><li>
+The iteration over the marks is incorrect; the value <code>$#marks</code>
+gives the index of the last array element; since the loop runs to less
+than <code>$#marks</code> it will miss the last element
+</li><li>
+A related point: since the first element in the array is the student
+ID and not a mark, it should not be included in the <code>$totalMark</code>;
+the loop iteration should start from <code>$i = 1</code>.
+</li><li>
+The value of <code>$totalMark</code> is not reset for each student, so
+the total simply increases continually and does not reflect the sum
+of marks for any individual except the first student
+</li></ul>
+</div>
+</li><li>
+<p>
+Does the CGI.pm library really make it easier to write Perl code to
+produce HTML output? Discuss this <em>briefly</em>.
+Provide at least one example where the CGI.pm functions provide a
+definite advantage over writing the HTML yourself, and at least
+one example where HTML strings are simpler than CGI.pm functions.
+
+
+</p><div class="answer">
+<p><b>Sample solution:</b></p>
+<ul>
+<li> <p>For some constructs, <code>CGI.pm</code> requires smaller expressions.</p>
+<p> Example: generating a regular table ...</p>
+<pre class="program">table(
+    tr([td(["1,1",1,2",1,3",1,4"]),
+    tr([td(["2,1",2,2",2,3",2,4"]),
+    tr([td(["3,1",3,2",3,3",3,4"]),
+    tr([td(["4,1",4,2",4,3",4,4"]),
+)
+</pre>
+<p>compared to</p>
+<pre class="program">&lt;table&gt;
+    &lt;tr&gt; &lt;td&gt;1,1&lt;/td&gt;&lt;td&gt;1,2&lt;/td&gt;&lt;td&gt;1,3&lt;/td&gt;&lt;td&gt;1,4&lt;/td&gt; &lt;/tr&gt;
+    &lt;tr&gt; &lt;td&gt;2,1&lt;/td&gt;&lt;td&gt;2,2&lt;/td&gt;&lt;td&gt;2,3&lt;/td&gt;&lt;td&gt;2,4&lt;/td&gt; &lt;/tr&gt;
+    &lt;tr&gt; &lt;td&gt;3,1&lt;/td&gt;&lt;td&gt;3,2&lt;/td&gt;&lt;td&gt;3,3&lt;/td&gt;&lt;td&gt;3,4&lt;/td&gt; &lt;/tr&gt;
+    &lt;tr&gt; &lt;td&gt;4,1&lt;/td&gt;&lt;td&gt;4,2&lt;/td&gt;&lt;td&gt;4,3&lt;/td&gt;&lt;td&gt;4,4&lt;/td&gt; &lt;/tr&gt;
+&lt;/table&gt;
+</pre>
+</li><li> <p>
+For other constructs, <code>CGI.pm</code> requires similar or longer expressions,
+and gives you less control over the outcome.
+</p>
+<p>Example: generating an ordinary paragaph</p>
+<pre class="program">p("This is some text")
+</pre>
+<p> compared to </p>
+<pre class="program">&lt;P&gt;This is some text&lt;/P&gt;
+</pre>
+</li></ul>
+</div>
+<p></p></li><li>
+<p>
+You are given a program that claims to compute the average of exam marks
+that appear as the final item of each line of a space-separated file of
+student information e.g.
+</p>
+<pre class="program">John Smith 22334455 75
+Jane Alison Smith 2133567 75
+</pre>
+<p>
+What kind of validity checking should such a program be performing?
+Suggest suitable test data for testing the correctness and reliability
+of this program. Distinguish between reliability and correctness tests.
+
+</p><div class="answer">
+<p><b>Points to note:</b></p>
+<ul>
+<li><p>
+Correctness tests aim to establish whether the system meets it
+requirement (i.e. whether given valid input it produces valid output).
+Reliability tests aim to check whether the system behaves in
+a "reasonable" way when it is given invalid input.
+</p>
+</li><li><p> Examples of invalid input for reliability testing </p>
+<ul>
+<li> A line with no name (just student ID and mark)
+</li><li> A student with invalid student ID (no indentity)
+</li><li> A student with invalid marks value (outside 0..100 range)
+</li><li> A completely empty line
+</li><li> Completely empty input
+</li><li> etc. etc.
+</li></ul>
+<p> Examples of correct input for correctness testing </p>
+<ul>
+<li> Input with exactly zero, one, two students
+</li><li> Input with all students with same/different marks
+</li><li> Students with 1/2/3 components to their names
+</li><li> etc. etc.
+</li></ul>
+</li></ul>
+</div>
+<!--
+Question
+<li>
+<p>
+Compare and contrast the processes of <i>benchmarking</i> and <i>profiling</i>.
+What is the aim of each? When would each of them be used?
+</p>
+<div class="answer">
+<p><b>Sample solution:</b></p>
+<ul>
+<li> Benchmarking aims to measure global performance characteristics
+<li> It uses a set of test data inputs, and measures cpu/elapsed time
+    to complete each task
+<li> It gives an overview of performance on a range of data
+<li> May need to average out results to account for sampling variation
+<li> Profiling aims to identiy specific regions of "intense computation"
+<li> Profiling requires the executable to be compiled with <code>-pg</code> flag
+<li> Statistics are collected on each run
+<li> Statistics say how much time was spent in each function, and
+    which functions required most execution time
+<li> Graph profile also says which functions called which other functions.
+</ul>
+</div>
+<li>
+<p>
+What is the difference between "black box" and "glass box"
+(aka "white box") testing?
+Using the following program, give examples of each kind of testing.
+</p>
+<pre class="command_line">
+/*
+ * Compute the function mega(X)
+ *
+ * Pre: X:integer && x > 0
+ * Post: return = mega(X)
+ */
+int mega(int x)
+{
+    if (x > 99)
+        return(x + mega(x/2));
+    else if (x &lt; 50)
+        return(x/2);
+    else
+        return(mega(x+30));
+}
+</pre>
+<div class="answer">
+<p><b>Sample solution:</b></p>
+<ul>
+<li> Black box testing is when you develop test cases based soley
+    on the external specification of the program
+<li> White box testing is when you develop test cases based on an
+    detailed understanding of the internals of the program (ensures
+    that all control paths are exercised)
+<li> In each style of testing, test cases aim to test the software
+    at its "boundaries" and to exercise all control
+<li>
+    Black box examples: <code>x==0, x==1, x==2, x>2</code>
+<li>
+    White box examples: <code>x==98/99/100, x==49/50/51</code>
+</ul>
+</div>
+-->
+<p></p></li></ol>
+</li><li>
+
+Write a <i>shell script</i> called <code>rmall.sh</code> that removes all of the
+files and directories below the directory supplied as its single
+command-line argument.
+The script should prompt the user with <code>Delete</code> <i>X</i><code>?</code>
+before it starts deleting the contents of any directory <i>X</i>.
+If the user responds <code>yes</code> to the prompt, <code>rmall</code>
+should remove all of the plain files in the directory, and then
+check whether the contents of the subdirectories should be removed.
+The script should also check the validity of its command-line arguments.
+
+<div class="answer">
+Sample solution
+
+
+<pre class="program">#!/bin/sh
+
+# check whether there is a cmd line arg
+case $# in
+1) # ok ... requires exactly one arg
+    ;;
+*)
+    echo "Usage: $0 dir"
+    exit 1
+esac
+
+# then make sure that it is a directory
+if test ! -d $1
+then
+    echo "$1 is not a directory"
+    echo "Usage: $0 dir"
+    exit 1
+fi
+
+# change into the specified directory
+cd $1
+
+# for each plain file in the directory
+for f in .* *
+do
+    case $f in
+    .|..) # ignore . and ..
+        ;;
+    *)
+        if test -f $f
+        then
+            rm $f
+        fi
+        ;;
+    esac
+done
+
+# for each subdirectory
+for d in .* *
+do
+    case $d in
+    .|..) # ignore . and ..
+        ;;
+    *)
+        if test -d $d
+        then
+            echo -n "Delete $d? "
+            read answer
+            if test "$answer" = "yes"
+            then
+                rmall $d
+            fi
+        fi
+        ;;
+    esac
+done
+</pre>
+</div>
+</li><li>
+
+Write a <i>shell script</i> called <code>check</code> that looks for duplicated
+student ids in a file of marks for a particular subject.
+The file consists of lines in the following format:
+
+<pre class="command_line">2233445 David Smith 80
+2155443 Peter Smith 73
+2244668 Anne Smith 98
+2198765 Linda Smith 65
+</pre>
+
+The output should be a list of student ids that occur 2+ times, separated by newlines.
+(i.e. any student id that occurs more than once should be displayed on a line by itself on the standard output).
+
+<div class="answer">
+
+Sample solution
+
+
+<pre class="program">#!/bin/sh
+
+cut -d' ' -f1 &lt; Marks | sort | uniq -c | egrep -v '^  *1 ' | sed -e 's/^.*   //'
+</pre>
+<b>Explanation:</b>
+<ol>
+<li> <p>
+<code>cut -d' ' -f1 &lt; Marks</code> ... extracts the student ID from each line
+</p>
+</li><li> <p>
+<code>sort | uniq -c</code> ... sorts and counts the occurrences of each ID
+</p>
+</li><li> <p>
+IDs that occur once will be on a line that begins with spaces followed
+by <code>1</code> followed by a TAB
+</p>
+</li><li> <p>
+<code>grep -v '^  *1  '</code> removes such lines, leaving only IDs that occur multiple times
+</p>
+</li><li> <p>
+<code>sed -e 's/^.* //'</code> gets rid of the counts that <code>uniq -c</code> placed
+at the start of each line
+</p>
+</li></ol>
+</div>
+</li><li>
+<p>
+Write a <i>Perl script</i> that reverses the fields on each line
+of its standard input.
+Assume that the fields are separated by spaces, and that only one space
+is required between fields in the output.
+</p>
+<div class="answer">
+
+Sample solution
+
+
+<pre class="program">#!/usr/local/bin/perl
+
+while (&lt;STDIN&gt;)
+{
+    chomp;
+    @fields = split;
+    @fields = reverse @fields;
+    $outline = join(' ',@fields);
+    print "$outline\n";
+}
+</pre>
+
+or, as a one-liner
+
+
+<pre class="program">#!/usr/local/bin/perl
+
+while (&lt;STDIN&gt;) { chomp; print join(' ', reverse(split)),"\n"; }
+</pre>
+</div>
+</li><li>
+
+Consider the following table of student enrolment data:
+<p>
+</p><center>
+<table>
+<tbody><tr><th>StudentID</th><th>Course</th><th>Year</th><th>Session</th><th>Mark</th><th>Grade</th></tr>
+<tr><td>2201440</td><td>COMP1011</td><td>1999</td><td>S1</td><td>57</td><td>PS</td></tr>
+<tr><td>2201440</td><td>MATH1141</td><td>1999</td><td>S1</td><td>51</td><td>PS</td></tr>
+<tr><td>2201440</td><td>MATH1081</td><td>1999</td><td>S1</td><td>60</td><td>PS</td></tr>
+<tr><td>2201440</td><td>PHYS1131</td><td>1999</td><td>S1</td><td>52</td><td>PS</td></tr>
+<tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+</tbody></table>
+</center>
+<p></p><p>
+A file containing a large data set in this format for the years 1999
+to 2001 and ordered by student ID is available in the file <i>data</i>.
+</p>
+<p>
+Write a program that computes the average mark for a specified course
+for each of the sessions that it has run.
+The course code is specified as a command-line argument, and the
+data is read from standard input.
+All output from the program should be written to the standard output.
+</p>
+<p>
+If no command-line argument is given, the program should write the
+following message and quit:
+</p>
+<pre class="command_line">    Usage: ex3 Course
+</pre>
+<p>
+The program does <em>not</em> have to check whether the argument is
+valid (i.e. whether it looks like a real course code). However,
+if the specified course code (<i>CCODE</i>) does not appear anywhere
+in the data file, the program should write the following message:
+</p>
+<pre class="command_line">    No marks for course CCODE
+</pre>
+<p>
+Otherwise, it should write one line for each session that the
+course was offered. The line should contain the course code, the
+year, the session and the average mark for the course
+(with one digit after the decimal point).
+You can assume that a course will not be offered more than 100 times.
+The entries should be written in chronological order.
+</p>
+<p>
+The following shows an example input/output pair for this program:
+</p>
+<center>
+<table border="1" cellpadding="5">
+<tbody><tr><td><b>Sample Input Data</b></td><td><b>Corresponding Output</b></td></tr>
+<tr valign="top">
+<td>
+<pre class="command_line">COMP1011
+</pre>
+</td><td>
+<pre class="command_line">COMP1011 1999 S1 62.5
+COMP1011 2000 S1 69.1
+COMP1011 2001 S1 66.8
+</pre>
+</td>
+</tr>
+</tbody></table>
+</center>
+<div class="answer">
+
+Sample Perl solution
+
+
+<pre class="program">#!/usr/bin/perl
+
+if (@ARGV &lt; 1) {
+    print "Usage: ex3 Course\n"; exit 0
+}
+else {
+    $c = $ARGV[0];
+}
+
+while (&lt;STDIN&gt;) {
+    chomp;
+    my ($sid,$course,$year,$sess,$mark,$grade) = split;
+
+    if ($course eq $c) {
+        $sum{"$year $sess"} += $mark;
+        $count{"$year $sess"}++;
+        $nofferings++;
+    }
+}
+
+if ($nofferings == 0) {
+    print "No marks for course $c\n";
+}
+else {
+    foreach $s (sort keys %sum) {
+        printf "$c $s %0.1f\n", $sum{"$s"}/$count{"$s"};
+    }
+}
+</pre>
+
+Sample Shell solution (advanced: piping to control structures and use of awk as calculator)
+
+
+<pre class="program">#!/bin/sh
+
+case $# in
+1) ;;
+*) echo "Usage: ex3 Course"; exit 1;;
+esac
+
+cat &gt; tmp
+
+course="$1"
+nrecs=`egrep "$1" tmp | wc -l`
+if [ "$nrecs" -eq "0" ]
+then
+    echo "No marks for course $course"
+    rm tmp
+    exit 0
+fi
+
+egrep "$1" tmp | awk '{print $3" "$4}' | sort | uniq | \
+while read year sess
+do
+#    patt="$course  $year  $sess"
+    patt="$course[[:space:]]*$year[[:space:]]*$sess"
+    count=`egrep "$patt" tmp | wc  -l`
+    total=`egrep "$patt" tmp | awk '{sum+=$5}END{print sum}'`
+    if [ "$count" -ne "0" ]
+    then
+        avg=`expr $total / $count`
+        printf "$course $year $sess %0.1f\n" $avg
+    fi
+done
+
+rm tmp
+</pre>
+</div>
+</li><li>
+Write a program that prints a count of how often each letter ('a'..'z'
+and 'A'..'Z') and digit ('0'..'9') occurs in its input.  Your program
+should follow the output format indicated in the examples below exactly.
+<p>
+No count
+should be printed for letters or digits which do not occur in the input.
+</p><p>
+The counts should be printed in dictionary order ('0'..'9','A'..'Z','a'..'z').
+</p><p>
+Characters other than
+letters and digits should be ignored.
+</p><p>
+The following shows an example input/output pair for this program:
+</p>
+<center>
+<table border="1" cellpadding="5">
+<tbody><tr><td><b>Sample Input Data</b></td><td><b>Corresponding Output</b></td></tr>
+<tr valign="top">
+<td>
+<pre class="command_line">The  Mississippi is
+1800 miles long!
+</pre>
+</td><td>
+<pre class="command_line">'0' occurred 2 times
+'1' occurred 1 times
+'8' occurred 1 times
+'M' occurred 1 times
+'T' occurred 1 times
+'e' occurred 2 times
+'g' occurred 1 times
+'h' occurred 1 times
+'i' occurred 6 times
+'l' occurred 2 times
+'m' occurred 1 times
+'n' occurred 1 times
+'o' occurred 1 times
+'p' occurred 2 times
+'s' occurred 6 times
+</pre>
+</td>
+</tr>
+</tbody></table>
+</center>
+<div class="answer">
+
+Sample Perl solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+while (&lt;&gt;) {
+    for (split //) {
+        $count{$_}++ if /[a-zA-Z0-9]/;
+    }
+}
+print "'$_' occurred $count{$_} times\n" for sort keys %count;
+</pre>
+
+Another Sample Perl solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+# courtesy aek@cse.unsw.EDU.AU
+# letter count- count number of occurrences of each letter
+
+# map letters to counts
+my %lettercount = ();
+while (&lt;&gt;) {
+        chomp;
+
+        # remove anything but letters and numbers
+        s/[^A-Za-z0-9]//g;
+
+        # split the line into an array of characters
+        @chars = split //;
+        foreach $letter (@chars) {
+                # record count in hash table
+                $lettercount{$letter}++;
+        }
+}
+
+# output count of each letter, sorted on the keys (letters)
+foreach $letter (sort keys %lettercount) {
+        print "'$letter' occurred $lettercount{$letter} times\n";
+        # (look up count for each letter from table)
+}
+</pre>
+</div>
+</li><li>
+
+Write a program that maps all lower-case vowels (a,e,i,o,u) in
+its standard input into their upper-case equivalents and, at the
+same time, maps all upper-case vowels (A, E, I, O, U) into their
+lower-case equivalents.
+<p>
+The following shows an example input/output pair for this program:
+</p>
+<center>
+<table border="1" cellpadding="5">
+<tbody><tr><td><b>Sample Input Data</b></td><td><b>Corresponding Output</b></td></tr>
+<tr valign="top">
+<td>
+<pre class="command_line">This is some boring text.
+A little foolish perhaps?
+</pre>
+</td><td>
+<pre class="command_line">ThIs Is sOmE bOrIng tExt.
+a lIttlE fOOlIsh pErhAps?
+</pre>
+</td>
+</tr>
+</tbody></table>
+</center>
+<div class="answer">
+
+Sample C solution
+
+
+<pre class="program">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;ctype.h&gt;
+
+int main(int argc, char *argv[])
+{
+    int   ch;
+    char *smallVowels = "aeiou";
+    char *largeVowels = "AEIOU";
+
+    while ((ch = getchar()) != EOF) {
+        if (index(smallVowels,ch) != NULL)
+            putchar(toupper(ch));
+        else if (index(largeVowels,ch) != NULL)
+            putchar(tolower(ch));
+        else
+            putchar(ch);
+    }
+    return 0;
+}
+</pre>
+
+Sample Perl solution
+
+
+<pre class="program">#!/usr/bin/perl
+
+@lines = &lt;STDIN&gt;;
+map {tr /aeiouAEIOU/AEIOUaeiou/} @lines;
+print @lines;
+
+</pre>
+
+Another Sample Shell solution
+
+
+<pre class="program">#!/bin/sh
+
+tr aeiouAEIOU AEIOUaeiou
+</pre>
+</div>
+</li><li>
+
+A "hill vector" is structured as an <em>ascent</em>,
+followed by an <em>apex</em>, followed by a <em>descent</em>, where
+<p>
+</p><ul>
+<li> the <em>ascent</em> is a non-empty strictly ascending sequence that ends with the apex
+</li><li> the <em>apex</em> is the maximum value, and must occur only once
+</li><li> the <em>descent</em> is a non-empty strictly descending sequence that starts with the apex
+</li></ul>
+<p></p><p>
+For example, [1,2,3,4,3,2,1] is a hill vector (with apex=4) and
+[2,4,6,8,5] is a hill vector (with apex=8).
+The following vectors are not hill vectors:
+[1,1,2,3,3,2,1] (not strictly ascending and multiple apexes),
+[1,2,3,4] (no descent), and
+[2,6,3,7,8,4] (not ascent then descent).
+No vector with less than three elements is considered to be a hill.
+</p>
+<p>
+Write a program that determines whether a sequence of numbers (integers)
+read from standard input forms a "hill vector".
+The program should write "hill" if the input <i>does</i>  form a hill
+vector and write "not hill" otherwise.
+</p><p>
+Your program's input will only contain digits and white space.
+Any amount of whitespace may precede or follow integers.
+</p><p>
+Multiple integers may occur on the same line.
+</p><p>
+A line may contain no integers.
+</p><p>
+You can assume all the integers are positive.
+The following shows all example input/output pairs for this program:
+</p><p></p><center>
+<table border="1" cellpadding="5">
+<tbody><tr><td><b>Sample Input Data</b></td><td><b>Corresponding Output</b></td></tr>
+<tr valign="top">
+<td>
+<pre class="command_line">1 2 4 8 5 3 2
+</pre>
+</td><td>
+<pre class="command_line">hill
+</pre>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<pre class="command_line">1 2
+</pre>
+</td><td>
+<pre class="command_line">not hill
+</pre>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<pre class="command_line">1 3 1
+</pre>
+</td><td>
+<pre class="command_line">hill
+</pre>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<pre class="command_line">  3
+1   1
+</pre>
+</td><td>
+<pre class="command_line">not hill
+</pre>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<pre class="command_line">2 4 6 8 10 10 9 7 5 3 1
+</pre>
+</td><td>
+<pre class="command_line">not hill
+</pre>
+</td>
+</tr>
+</tbody></table>
+</center>
+<div class="answer">
+
+Sample Perl solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+@n = split /\D+/, join(' ', &lt;&gt;);
+$i= 0;
+$i++ while $i &lt; $#n &amp;&amp; $n[$i] &lt; $n[$i+1];
+$j = $#n;
+$j-- while $j &gt; 0 &amp;&amp; $n[$j] &lt; $n[$j-1];
+print "not " if $i != $j || $i == 0 || $j == $#n;
+print "hill\n";
+</pre>
+
+Sample C solution
+
+
+<pre class="program">#include &lt;stdio.h&gt;
+
+int main(void)
+{
+    int i, n, v[101], max, ok;
+
+    n = 0;
+    while (scanf("%d",&amp;i) == 1 &amp;&amp; n &lt; 100)
+        v[n++] = i;
+    if (n &lt; 3) {
+        printf("not hill\\n");
+        return 0;
+    }
+    max = 0;
+    for (i = 1; i &lt; n; i++)
+        if (v[i] &gt; v[max])
+            max = i;
+
+    ok = max &gt; 0 &amp;&amp; max &lt; n-1;
+    for (i = 0; ok &amp;&amp; i &lt; max; i++)
+        if (v[i] &gt;= v[i+1])
+            ok = 0;
+    for (i = max; ok &amp;&amp; i &lt; n-1; i++)
+        if (v[i] &lt;= v[i+1])
+            ok = 0;
+
+    if (ok)
+        printf("hill\n");
+    else
+        printf("not hill\n");
+    return 0;
+}
+</pre>
+
+(GRW, 05s1): a solution closer to the classic
+partition algorithm (a la Quicksort) is
+
+
+<pre class="program">#include &lt;stdio.h&gt;
+
+int main(void)
+{
+    int i, j, n, v[101];
+
+    n = 0;
+    while (scanf("%d",&amp;i) == 1 &amp;&amp; n &lt; 100)
+        v[n++] = i;
+    if (n &lt; 3) {
+        printf("not hill\\n");
+        return 0;
+    }
+    i = 0;
+    while (i &lt; n-1 &amp;&amp; v[i] &lt; v[i+1]) i++;
+    // v[i] &gt;= v[i+1] &amp;&amp; ascending(v[0..i-1])
+
+    j = n-1;
+    while (j &gt; 0 &amp;&amp; v[j] &lt; v[j-1]) j--;
+    // v[j] &lt;= v[j-1] &amp;&amp; descending(v[j+1..n-1])
+
+    // v is a hill iff i and j identify a single, interior peak
+    if (i == j &amp;&amp; i &gt; 0 &amp;&amp; j &lt; n-1)
+        printf("hill\n");
+    else
+        printf("not hill\n");
+    return 0;
+}
+</pre>
+This version could be easily extended to identify a "plateau vector"
+as well.
+
+</div>
+<p></p></li><li>
+
+A list  <!-- MATH
+<kbd class="shell">a_1,~a_2,~...~a_n$</kbd>
+ -->
+<span class="MATH"><img width="96" height="30" align="MIDDLE" border="0" src="./Week 13 Tutorial_files/img4.png" alt="$a_1,~a_2,~...~a_n$"></span> is said to be <em>converging</em> if
+<br><p></p>
+<div align="CENTER" class="mathdisplay">
+<!-- MATH
+ \begin{displaymath}
+a_1~~>~~a_2~~>~~...~~>~~a_{n - 1}~~>~~a_n
+\end{displaymath}
+ -->
+<img width="264" height="28" border="0" src="./Week 13 Tutorial_files/img5.png" alt="\begin{displaymath}a_1~~&gt;~~a_2~~&gt;~~...~~&gt;~~a_{n - 1}~~&gt;~~a_n \end{displaymath}">
+</div>
+<br clear="ALL">
+<p></p>
+and
+<br><p></p>
+<div align="CENTER" class="mathdisplay">
+<!-- MATH
+ \begin{displaymath}
+\forall i, 1 < i < n,~~a_{i-1}~-~a_{i}~~>~~a_{i}~-~a_{i+1}
+\end{displaymath}
+ -->
+<img width="293" height="28" border="0" src="./Week 13 Tutorial_files/img6.png" alt="\begin{displaymath}\forall i, 1 &lt; i &lt; n,~~a_{i-1}~-~a_{i}~~&gt;~~a_{i}~-~a_{i+1} \end{displaymath}">
+</div>
+<br clear="ALL">
+<p></p>
+<p>
+In other words, the list is strictly decreasing and the difference between consecuctive list elements
+always decreases as you go down the list.
+</p><p>
+Write a program that determines whether a sequence of positive integers
+read from standard input is converging.
+The program should write "converging" if the input is converging
+and write "not converging" otherwise.
+It should produce no other output.
+</p><p>
+</p><div align="CENTER">
+<table cellpadding="3" border="1">
+<tbody><tr><th align="LEFT"><span class="textbf">Sample Input Data</span></th>
+<th align="LEFT"><span class="textbf">Corresponding Output</span></th>
+</tr>
+<tr><td align="LEFT"><table width="227">
+<tbody><tr><td>
+<pre class="command_line">2010 6 4 3
+</pre></td></tr>
+</tbody></table></td>
+<td align="LEFT"><table width="227">
+<tbody><tr><td>
+<pre class="command_line">converging
+</pre></td></tr>
+</tbody></table></td>
+</tr>
+<tr><td align="LEFT"><table width="227">
+<tbody><tr><td>
+<pre class="command_line">20
+15
+9
+</pre></td></tr>
+</tbody></table></td>
+<td align="LEFT"><table width="227">
+<tbody><tr><td>
+<pre class="command_line">not converging
+</pre></td></tr>
+</tbody></table></td>
+</tr>
+<tr><td align="LEFT"><table width="227">
+<tbody><tr><td>
+<pre class="command_line">1000
+     100   10
+     1
+</pre></td></tr>
+</tbody></table></td>
+<td align="LEFT"><table width="227">
+<tbody><tr><td>
+<pre class="command_line">converging
+</pre></td></tr>
+</tbody></table></td>
+</tr>
+<tr><td align="LEFT"><table width="227">
+<tbody><tr><td>
+<pre class="command_line">  6
+  5
+2 2
+</pre></td></tr>
+</tbody></table></td>
+<td align="LEFT"><table width="227">
+<tbody><tr><td>
+<pre class="command_line">not converging
+</pre></td></tr>
+</tbody></table></td>
+</tr>
+<tr><td align="LEFT"><table width="227">
+<tbody><tr><td>
+<pre class="command_line">  1 2 4 8
+</pre></td></tr>
+</tbody></table></td>
+<td align="LEFT"><table width="227">
+<tbody><tr><td>
+<pre class="command_line">not converging
+</pre></td></tr>
+</tbody></table></td>
+</tr>
+</tbody></table>
+</div>
+<p></p><p>
+
+Your program's input will only contain digits and white space.
+Any amount of whitespace may precede or follow integers.
+</p><p>
+Multiple integers may occur on the same line.
+</p><p>
+A line may contain no integers.
+</p><p>
+You can assume your input contains at least 2 integers.all the integers are positive.
+</p><p>
+You can assume all the integers are positive.
+
+</p><div class="answer">
+
+Sample Perl solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+@n = split /\D+/, join(' ', &lt;&gt;);
+foreach $i (1..$#n) {
+    if ($n[$i] &gt;= $n[$i+1]) {
+        print "not converging\n";
+        exit;
+    }
+}
+foreach $i (2..$#n) {
+    if ($n[$i-2] - $n[$i-1] &lt;= $n[$i-1] - $n[$i]) {
+        print "not converging\n";
+        exit;
+    }
+}
+print "converging\n";
+</pre>
+</div>
+<p></p></li><li>
+
+The <i>weight</i> of a number in a list is its value multiplied by
+how many times it occurs in the list.
+Consider the list <code> 1 6 4 7 3 4 6 3 3]</code>.
+The number 7 occurs once so it has weight 7. The number 3 occurs 3 times so it has weight 9.
+The number 4 occurs twice so it has weight 8.
+<p>
+Write a program which takes 1 or more positive integers as arguments and prints the heaviest.
+</p><p>
+Your program should print one integer and no other output.
+</p><p>
+Your program it is given only positive integers as arguments
+</p><p>
+For example, if you program is named <code>a.out</code> here is how it should behave :
+</p><p>
+</p><pre class="command_line"><kbd class="shell">./heaviest.pl 1 6 4 7 3 4 6 3 3
+</kbd><samp>6
+</samp><kbd class="shell"> ./heaviest.pl 1 6 4 7 3 4 3 3
+</kbd><samp>3
+</samp><kbd class="shell"> ./heaviest.pl 1 6 4 7 3 4 3
+</kbd><samp>4
+</samp><kbd class="shell"> ./heaviest.pl 1 6 4 7 3 3
+</kbd><samp>7
+</samp></pre>
+<div class="answer">
+
+Sample Perl solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+foreach $n (@ARGV) {
+    $w{$n * grep {$_ == $n} @ARGV} = $n;
+}
+print $w{(sort {$b &lt;=&gt; $a} keys %w)[0]}, "\n";</pre>
+</div>
+<p></p><p></p></li><li>
+We wish to create a web site named myAddressBook where users can stores their address book.
+<p>
+After users login to the web site it should show them their current addressbook.
+</p><p>
+Then should be able to add and delete name/address pairs from their addressbook.
+</p><p>
+Write a CGI script <code>myAddressBook.cgi</code> to perform this task.
+</p><p>
+Here is an  <a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/tut/perlcgi/myAddressBook.cgi">example implementation</a>.
+</p><p>
+</p><div class="answer">
+<div class="program_description">
+Sample solution
+</div>
+<pre class="program">#!/usr/bin/perl
+# Simple CGI script written by andrewt@cse.unsw.edu.au
+
+use CGI qw/:all/;
+use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
+
+print header, start_html('My addressbook');
+warningsToBrowser(1);
+
+$data_directory = "./addresses/";
+mkdir $data_directory or die "Cannot create $data_directory: $!\n" if !-d $data_directory;
+
+$login = param('login');
+
+if (!$login) {
+    print    start_form,
+            'Enter your login: ', textfield('login'),
+            end_form,
+            end_html;
+    exit 0;
+}
+
+$login =~ s/[^\w\s]//g;          # remove all but expected characters
+$login = substr $login, 0, 64;   # limit login to 64 characters
+print h2("My Addressbook for $login");
+
+$user_directory = "$data_directory/$login/";
+mkdir $user_directory or die "Cannot create $user_directory: $!\n" if !-d $user_directory;
+
+if (param('add_name') &amp;&amp; param('add_address')) {
+    my $name = param('add_name');
+    $name =~ s/[^\w\s-_]//g;        # remove all but expected characters
+    $name = substr $name, 0, 256;   # limit name to 256 characters
+    $address = param('add_address');
+    $address =~ s/[^\w\s-_\/]//g;          # remove all but expected characters
+    $address = substr $address, 0, 1024;   # limit address to 1024 characters
+    open F, "&gt;$user_directory/$name" or die "Cannot create $user_directory/$name: $!\n";
+    print F $address;
+    close F;
+}
+
+if (param('Delete')) {
+    my $name = param('delete_name');
+    $name =~ s/[^\w\s-_]//g;        # remove all but expected characters
+    $name = substr $name, 0, 256;   # limit name to 256 characters
+    unlink "$user_directory/$name" or die "Cannot unlink $user_directory/$name: $!\n";
+}
+
+@address_files = glob "$user_directory/*";
+
+if (!@address_files) {
+    print "Your addressbook is empty, $login.";
+} else {
+    print "&lt;table border=1&gt;";
+    foreach $address_file (@address_files) {
+        open F, $address_file or die "Cannot access $address_file: $!\n";
+        my @address = &lt;F&gt;;
+        close F;
+        my $name = $address_file;
+        $name =~ s/.*\///;
+        print "&lt;tr&gt;&lt;td&gt;$name&lt;td&gt;@address\n";
+    }
+    print "&lt;/table&gt;";
+}
+
+print start_form,
+    hr,
+    h4('Add a new address'),
+    'Name: ', textfield('add_name'),
+    ' Address: ', textfield('add_address'), ' ',
+    hidden(login),
+    submit('Add'),
+    end_form;
+
+if (@address_files) {
+    my @names = @address_files;
+    s/.*\/// foreach @names;
+    print start_form,
+        hr,
+        h4('Delete the address for:'),
+        'Name: ',   popup_menu('delete_name', \@names),
+        hidden(login),
+        submit('Delete'),
+        hr,
+        end_form;
+}
+print end_html;
+</pre>
+</div>
+<p></p><p></p></li><li>
+Modify the CGI script to store the user's login in a cookie and log them in automatically on future visits.
+<p>
+</p><div class="answer"><div class="program_description">
+Sample solution
+</div>
+<pre class="program answer">
+</pre><pre class="program">#!/usr/bin/perl
+# Simple CGI script written by andrewt@cse.unsw.edu.au
+
+use CGI qw/:all/;
+use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
+use CGI::Cookie;
+
+%cookies = CGI::Cookie-&gt;fetch;
+$login = '';
+if (defined param('login')) {
+    $login =  param('login');
+} elsif ($cookies{'myAddressBookLogin'}) {
+    $login = $cookies{'myAddressBookLogin'}-&gt;value
+}
+
+$login =~ s/[^\w\s]//g;          # remove all but expected characters
+$login = substr $login, 0, 64;   # limit login to 64 characters
+
+if (!$login) {
+    print   header,
+            start_html('My addressbook'),
+            start_form,
+            'Enter your login: ', textfield('login'),
+            end_form,
+            end_html;
+    exit 0;
+}
+
+my $cookie = CGI::Cookie-&gt;new(-name =&gt; 'myAddressBookLogin', -value =&gt; $login, -expires =&gt; '+3M');
+print   header(-cookie=&gt;$cookie),
+        start_html('My addressbook'),
+        h2("My Addressbook for $login");
+warningsToBrowser(1);
+
+$data_directory = "./addresses/";
+mkdir $data_directory or die "Cannot create $data_directory: $!\n" if !-d $data_directory;
+$user_directory = "$data_directory/$login/";
+mkdir $user_directory or die "Cannot create $user_directory: $!\n" if !-d $user_directory;
+
+if (param('add_name') &amp;&amp; param('add_address')) {
+    my $name = param('add_name');
+    $name =~ s/[^\w\s-_]//g;        # remove all but expected characters
+    $name = substr $name, 0, 256;   # limit name to 256 characters
+    $address = param('add_address');
+    $address =~ s/[^\w\s-_\/]//g;          # remove all but expected characters
+    $address = substr $address, 0, 1024;   # limit address to 1024 characters
+    open F, "&gt;$user_directory/$name" or die "Cannot create $user_directory/$name: $!\n";
+    print F $address;
+    close F;
+}
+
+if (param('Delete')) {
+    my $name = param('delete_name');
+    $name =~ s/[^\w\s-_]//g;        # remove all but expected characters
+    $name = substr $name, 0, 256;   # limit name to 256 characters
+    unlink "$user_directory/$name" or die "Cannot unlink $user_directory/$name: $!\n";
+}
+
+@address_files = glob "$user_directory/*";
+
+if (!@address_files) {
+    print "Your addressbook is empty, $login.";
+} else {
+    print "&lt;table border=1&gt;";
+    foreach $address_file (@address_files) {
+        open F, $address_file or die "Cannot access $address_file: $!\n";
+        my @address = &lt;F&gt;;
+        close F;
+        my $name = $address_file;
+        $name =~ s/.*\///;
+        print "&lt;tr&gt;&lt;td&gt;$name&lt;td&gt;@address\n";
+    }
+    print "&lt;/table&gt;";
+}
+
+print start_form,
+    hr,
+    h4('Add a new address'),
+    'Name: ', textfield('add_name'),
+    ' Address: ', textfield('add_address'), ' ',
+    hidden(login), # in case cookies are disbaled
+    submit('Add'),
+    end_form;
+
+if (@address_files) {
+    my @names = @address_files;
+    s/.*\/// foreach @address_files;
+    print start_form,
+        hr,
+        h4('Delete the address for:'),
+        'Name: ',   popup_menu('delete_name', \@names),
+        hidden(login), # in case cookies are disbaled
+        submit('Delete'),
+        hr,
+        end_form;
+}
+print end_html;
+</pre>
+</div>
+<p></p></li><li>
+If there is any remaining time revisit any uncompleted questions
+on CGI scripts from last week.
+</li></ol>
+<script src="./Week 13 Tutorial_files/2041.js.download"></script>
+</div>
+</div>
+
+
+
+<div id="extension-is-installed"></div></body></html>

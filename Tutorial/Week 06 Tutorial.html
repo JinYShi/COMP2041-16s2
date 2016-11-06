@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/answers.py?tut/week06.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Week 06 Tutorial</title>
+<link href="./Week 06 Tutorial_files/2041.css" rel="stylesheet">
+</head>
+<body data-shoptagr-mini="yes">
+<div class="container">
+<div id="heading"><a class="heading_link" target="_blank" id="left_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">COMP[29]041 16s2</a>
+More Perl
+<a class="heading_link" target="_blank" id="right_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">Software Construction</a></div>
+<div class="tutlab tut">
+<ol>
+<li>
+
+Write a Perl program <code>./merge_whales.pl</code> which reads a list of whales observations
+from its standard input and prints them to its standard output, merging adjacent counts
+of the same species. For example, given this input:
+<pre class="command_line">3 beluga
+10 humpback
+15 humpback
+2 sperm whale
+3 humpback
+5 humpback
+8 humpback
+1 beluga
+3 beluga
+</pre>
+
+Your program should produce this output:
+
+<pre class="command_line">3 beluga
+25 humpback
+2 sperm whale
+16 humpback
+4 beluga
+</pre>
+<div class="answer">
+Sample Perl solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+$current_count = 0;
+$current_species = "";
+
+while ($line = &lt;STDIN&gt;) {
+	if ($line =~ /(\d+)\s*(.+)\s*$/) {
+		$count = $1;
+		$species = $2;
+		if ($species eq $current_species) {
+			$current_count += $count;
+		} else {
+			print "$current_count $current_species\n" if $current_count;
+			$current_count = $count;
+			$current_species = $species;
+		}
+	} else {
+		print "Sorry couldn't parse: $line\n";
+	}
+}
+
+print "$current_count $current_species\n" if $current_count;
+</pre>
+
+Sample Python solution
+
+
+<pre class="program">#!/usr/bin/python
+
+import re, sys
+
+current_count = 0
+current_species = ""
+for line in sys.stdin:
+    m = re.search(r'(\d+)\s*(.+)$', line)
+    if m:
+        count = int(m.group(1))
+        species = m.group(2)
+        if species  == current_species:
+            current_count += count
+        else:
+            if current_count:
+                print(current_count + " " +current_species)
+            current_count = count
+            current_species = species
+    else:
+        print("Sorry couldn't parse: %s" % line)
+
+if current_count:
+    print(current_count + " " +current_species)
+</pre>
+</div>
+</li><li>
+
+Write a Perl program, <code>phone_numbers.pl</code> which given the URL of a web
+page fetches it by running <i>wget</i> and prints any strings that might be
+phone numbers in the web page.
+<p>
+Assume the digits of phone numbers may be separated  by zero or more spaces or hyphens('-')
+and can contain between 8 and 15 digits inclusive.
+</p><p>
+You should print the phone numbers one per line with spaces &amp; hyphens removed.
+</p><p>
+For example
+</p><pre class="command_line"><kbd class="shell">./phone_numbers.pl http://www.unsw.edu.au</kbd>
+20151028
+11187777
+841430912571345
+413200225
+61293851000
+57195873179
+</pre>
+<div class="answer">
+Sample Perl solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+# there are perl libraries which provide a  better way to fetch web pages
+foreach $url (@ARGV) {
+    open F, "wget -q -O- $url|" or die;
+    while ($line = &lt;F&gt;) {
+        @numbers = split /[^\d\- ]/, $line;
+        foreach $number (@numbers) {
+            $number =~ s/\D//g;
+            print "$number\n" if length $number &gt;= 8 &amp;&amp; length $number &lt;= 15;
+        }
+    }
+}</pre>
+
+Another sample Perl solution for phone_numbers.1.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+# there are perl libraries which provide a  better way to fetch web pages
+foreach $url (@ARGV) {
+    open F, "wget -q -O- $url|" or die;
+    while ($line = &lt;F&gt;) {
+        @numbers = $line =~ /[\d\- ]+/g;
+        foreach $number (@numbers) {
+            $number =~ s/\D//g;
+            print "$number\n" if length $number &gt;= 8 &amp;&amp; length $number &lt;= 15;
+        }
+    }
+}</pre>
+
+Python solution
+
+
+<pre class="program">#!/usr/bin/python
+import sys, re, subprocess
+# there are python libraries which provide a  better way to fetch web pages
+for url in sys.argv[1:]:
+    webpage = subprocess.Popen(["wget","-q","-O-",url], stdout=subprocess.PIPE).communicate()[0]
+    for number in re.findall(r'[\d \-]+', webpage):
+        number = re.sub(r'\D', '', number)
+        if len(number) &gt;= 8 and len(number) &lt;= 15:
+            print(number)
+</pre>
+</div>
+<p></p></li><li>
+
+What does each of the following Perl code fragments print
+(no, don't just clip the lines and pass them to Perl,
+think about what they're doing):
+
+<ol type="a">
+<li>
+<pre class="program">$x = 'x';
+for ($i = 1; $i &lt;= 3; $i++) {
+    $x = "($x)";
+}
+print "$x\n";
+</pre>
+<div class="answer">
+
+It iterates three times through the loop, and each iteration wraps
+a pair of parentheses around what was there on the last iteration so
+it prints:
+
+<pre class="program">(((x)))
+</pre>
+</div>
+</li><li>
+<pre class="program">@hi = split //,"hello";
+for ($i = 0; $i &lt; 4; $i++) {
+    print $hi[$i];
+}
+print "\n";
+</pre>
+<div class="answer">
+<p>
+The idiom <code>split //</code> splits a string into an array of
+individual characters (in this case <code>("h","e","l","l","o")</code>.
+The loop iterates over the first four of these characters.
+So it prints:
+</p><p>
+</p><pre class="code">hell
+</pre>
+<p></p></div>
+</li><li>
+<pre class="program">@vec = (10 .. 20);
+print "@vec[1..3]\n";
+</pre>
+<div class="answer">
+The first statement produces an array containing the integers between
+10 and 20 inclusive; the expression in the <code>print</code> statement
+takes a slice of this array from the 2nd to the 4th elements (remember
+that index values start at zero) so i prints:
+<p>
+</p><pre class="program">11 12 13
+</pre>
+<p></p></div>
+</li><li>
+<pre class="program">foreach $n (1..10) {
+    last if ($n &gt; 5);
+    print "$n ";
+    next if ($n % 2 == 0);
+    print "$n ";
+}
+print "\n";
+</pre>
+<div class="answer">
+The loop iterates with <code>$n</code> set to the values from
+1 to 10 inclusive. The <code>last</code> terminates the loop
+as soon as the value of <code>$n</code> exceeds five (cf.
+<code>break</code> in C or Java). The <code>next</code> starts
+the next iteration straight away whenever the test succeeds;
+which occurs for each even number, so that the evens only
+get printed once so it prints:
+<p>
+</p><pre class="program">1 1 2 3 3 4 5 5
+</pre>
+<p></p></div>
+</li></ol>
+</li><li>
+
+Write a Perl program <code>source_count.pl</code> which prints the number of line of C source code
+in the current directory.  In other words, this Perl program should
+behave similarly to <code>wc -l *.[ch]</code>.  (Note: you are not
+allowed to use <code>wc</code> or other Unix programs from within the
+Perl script). For example:
+<p>
+</p><pre class="command_line"><kbd class="shell">./source_count.pl</kbd>
+    383 cyclorana.c
+    280 cyclorana.h
+     15 enum.c
+    194 frequency.c
+    624 model.c
+    293 parse.c
+    115 random.c
+     51 smooth.c
+    132 util.c
+     16 util.h
+    410 waveform.c
+   2513 total
+</pre>
+<div class="answer">
+Sample Perl solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+# written by andrewt@cse.unsw.edu.au for COMP2041
+# count lines of C source code
+$total = 0;
+foreach $file (glob("*.[ch]")) {
+    open FILE, $file or die "Can not open $file: $!";
+    @lines = &lt;FILE&gt;;
+    $n_lines = @lines;
+    # Why wouldn't   $n_lines = &lt;FILE&gt;;   work?
+
+    printf "%7d %s\n", $n_lines, $file;
+    $total += $n_lines;
+    close FILE;
+}
+printf "%7d total\n", $total;
+</pre>
+
+Sample Python solution
+
+
+<pre class="program">#!/usr/bin/python
+# written by andrewt@cse.unsw.edu.au for COMP2041
+# count lines of C source code
+import glob
+total = 0
+for filename in glob.glob("*.[ch]"):
+    with open(filename) as f:
+        lines = f.readlines()
+        n_lines = len(lines)
+        print("%7d %s" % (n_lines, filename))
+        total += n_lines
+print("%7d total"%total)
+</pre>
+</div>
+<p></p></li><li>
+
+Write a Perl program, <code>cut.pl</code> which takes three arguments, <i>n</i>, <i>m</i> and a file name.
+It should print characters <i>n</i>-<i>m</i> of each line of the file.
+For example:
+
+<pre class="command_line"><kbd class="shell">./cut.pl 1 8 file</kbd>
+</pre>
+
+should print the 8 characters of every line in <code>file</code>.
+<p>
+Implement a version of the program which invokes <code>/usr/bin/cut</code>
+and a version which performs the operations directly in Perl.
+
+</p><div class="answer">
+Sample Perl solution calling /usr/bin/cut
+
+
+<pre class="program">#!/usr/bin/perl -w
+system "cut -c$ARGV[0]-$ARGV[1] $ARGV[2]";
+</pre>
+
+Sample solution in Perl itself
+
+
+<pre class="program">#!/usr/bin/perl -w
+die "Usage: $0 &lt;n&gt; &lt;m&gt; &lt;file" if @ARGV != 3;
+open F, "&lt;$ARGV[2]" or die "$0: can not open $ARGV[2]: $!";
+while ($line = &lt;F&gt;) {
+    chomp $line;
+    @chars = split //, $line;
+    print @chars[$ARGV[0]-1..$ARGV[1]-1], "\n";
+}
+</pre>
+
+Sample solution implementing more of cut in Perl
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+$delim = "\t";
+if ($ARGV[0] =~ /-d./) {
+    ($delim = $ARGV[0]) =~ s/-d//;
+    shift;
+}
+if ($ARGV[0] =~ /-f*/) {
+    ($flist = $ARGV[0]) =~ s/-f//;
+    if ($flist eq "")
+        { shift; $flist = $ARGV[0]; }
+    @fields = split(/,/,$flist);
+    shift;
+}
+while (&lt;&gt;) {
+    chomp;
+    @words = split /$delim/;
+    @outs = ();
+    $nf = $#words;
+    foreach $f (@fields) {
+        push @outs, $words[$f-1] if ($f &lt;= $nf+1);
+    }
+    print join($delim,@outs)."\n";
+}
+</pre>
+
+Python solution calling /usr/bin/cut
+
+
+<pre class="program">#!/usr/bin/python
+import subprocess, sys
+print()
+subprocess.call(["cut","-c%s-%s"%(sys.argv[1:3]), sys.argv[3]])
+</pre>
+
+Sample solution in Python
+
+
+<pre class="program">#!/usr/bin/python
+
+import sys
+
+if len(sys.argv) != 4:
+    sys.stderr.write("Usage: %s &lt;n&gt; &lt;m&gt; &lt;file&gt;\n" % sys.argv[0])
+    sys.exit(1)
+
+for line in open(sys.argv[3]):
+    line = line.rstrip('\n')
+    print(line[int(sys.argv[1])-1:int(sys.argv[2])])
+</pre>
+</div>
+<p></p></li><li>
+
+Implement a Perl script to solve the marks-to-grades problem that
+was solved as a shell script in a previous tutorial.
+Reminder: the script reads a sequence
+of (studentID,mark) pairs from its standard input and writes
+(studentID,grade) pairs to its standard output.
+The input pairs are written on a single line, separated by spaces,
+and the output should use a similar format.
+The script should also check whether the second value on each line
+looks like a valid grade, and output an appropriate message if it
+doesn't.
+The script can ignore any extra data occuring after the mark on each line.
+<p>
+Consider the following input and corresponding output to the
+program:
+
+
+</p><table cellpadding="10">
+<tbody><tr> <th align="center">Input </th><th align="center">Output
+</th></tr><tr>
+<td>
+<pre class="command_line">2212345 65
+2198765 74
+2199999 48
+2234567 50 ok
+2265432 99
+2121212 hello
+2222111 120
+2524232 -1
+</pre>
+</td><td>
+<pre class="command_line">2212345 CR
+2198765 CR
+2199999 FL
+2234567 PS
+2265432 HD
+2121212 ?? (hello)
+2222111 ?? (120)
+2524232 ?? (-1)
+</pre>
+</td></tr></tbody></table>
+<div class="answer">
+
+Sample Perl solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+while (&lt;&gt;) {
+    chomp;
+    ($sid,$mark) = split;
+    if ($mark !~ /^\d+$/) {
+        $grade = "??";
+    }
+    else {
+        $grade = "FL" if $mark &gt;= 0 &amp;&amp; $mark &lt; 50;
+        $grade = "PS" if $mark &gt;= 50 &amp;&amp; $mark &lt; 65;
+        $grade = "CR" if $mark &gt;= 65 &amp;&amp; $mark &lt; 75;
+        $grade = "DN" if $mark &gt;= 75 &amp;&amp; $mark &lt; 85;
+        $grade = "HD" if $mark &gt;= 85 &amp;&amp; $mark &lt;= 100;
+        $grade = "??" if $mark &lt; 0 || $mark &gt; 100;
+    }
+    $err = ($grade ne "??") ? "" : " ($mark)";
+    print "$sid $grade$err\n";
+}</pre>
+</div>
+<p></p></li><li>
+
+Write a program <code>addressbook.pl</code> that reads two files <code>people.txt</code> and <code>phones.txt</code> containing data in CSV
+(comma-separated values) format and uses this data to print
+an address book in the format below:
+
+
+<pre class="command_line"><kbd class="shell">cat people.txt
+</kbd><samp>andrew,Andrew Taylor,32 Lovely St,Glebe
+arun,Arun Sharma,94 Leafy Close,Brisbane
+gernot,Gernot Heiser,64 Trendy Tce,Newtown
+jas,John Shepherd,16/256 Busy Rd,Alexandria
+</samp><kbd class="shell">cat phones.txt
+</kbd><samp>jas,home,9665 6432
+arun,work,9385 5518
+jas,work,9385 6494
+arun,home,(07) 9314 6543
+andrew,work,9385 4321
+arun,mobile,0803 123 432
+</samp><kbd class="shell">./addressbook.pl
+</kbd><samp>Andrew Taylor
+32 Lovely St, Glebe
+Phones: 9385 4321 (work)
+
+Arun Sharma
+94 Leafy Close, Brisbane
+Phones: 0803 123 432 (mobile), (07) 9314 6543 (home), 9385 5518 (work)
+
+Gernot Heiser
+64 Trendy Tce, Newtown
+Phones: ?
+
+John Shepherd
+16/256 Busy Rd, Alexandria
+Phones: 9665 6432 (home), 9385 6494 (work)
+
+</samp></pre>
+<p>
+Assume that there are only three types of phone (mobile, home and work)
+and we always display them in that order.
+</p>
+<p>
+<i>Hint:</i> because the phone types are fixed, login name and phone type
+together can be the key used to look up a number.
+In this situation some suitable separator is used to create
+a composite, unambiguous key for the hash.
+
+</p><div class="answer">
+<pre class="program">#!/usr/bin/perl -w
+
+# Build hash table of phone numbers, where keys
+# are "person:phone-type" strings
+
+open PHONES, "&lt;phones.txt" or die "Can not open phones.txt:$!\n";
+
+while ($line = &lt;PHONES&gt;) {
+    chomp $line;
+    my ($id,$type,$number) = split /,/, $line;
+    $phones{"$id:$type"} = $number;
+}
+
+close PHONES;
+
+# Iterate through People, displaying values
+open PEOPLE, "&lt;people.txt" or die "Can not open peoplenes.txt:$!\n";
+
+while ($line = &lt;PEOPLE&gt;) {
+    chomp $line;
+    my ($id,$name,$street,$suburb) = split /,/, $line;
+    print "$name\n$street, $suburb\nPhones: ";
+    my $nphones = 0;
+    foreach $type ('mobile', 'home', 'work') {
+        my $key = "$id:$type";
+        if (defined($phones{$key})) {
+            $num = $phones{$key};
+            print ", " if ($nphones++ &gt; 0);
+            print "$num ($type)";
+        }
+    }
+    print "?" if ($nphones == 0);
+    print "\n\n";
+}
+
+close PEOPLE;</pre>
+</div>
+<p></p></li></ol>
+<script src="./Week 06 Tutorial_files/2041.js.download"></script>
+</div>
+</div>
+
+
+
+<div id="extension-is-installed"></div></body></html>

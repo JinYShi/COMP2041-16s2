@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/answers.py?tut/week11.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Week 11 Tutorial</title>
+<link href="./Week 11 Tutorial_files/2041.css" rel="stylesheet">
+</head>
+<body data-shoptagr-mini="yes">
+<div class="container">
+<div id="heading"><a class="heading_link" target="_blank" id="left_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">COMP[29]041 16s2</a>
+Need dynamic web content - you want Perl
+<a class="heading_link" target="_blank" id="right_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">Software Construction</a></div>
+<div class="tutlab tut">
+<ol>
+<li>
+The  ass2 starting point contains this function. Discuss how it works.
+<pre class="program">sub user_page {
+    my $n = param('n') || 0;
+    my @users = sort(glob("$users_dir/*"));
+    my $user_to_show  = $users[$n % @users];
+    my $details_filename = "$user_to_show/details.txt";
+    open my $p, "$details_filename" or die "can not open $details_filename: $!";
+    $details = join '', &lt;$p&gt;;
+    close $p;
+    my $next_user = $n + 1;
+    return &lt;&lt;eof
+&lt;div class="matelook_user_details"&gt;
+$details
+&lt;/div&gt;
+&lt;p&gt;
+&lt;form method="POST" action=""&gt;
+    &lt;input type="hidden" name="n" value="$next_user"&gt;
+    &lt;input type="submit" value="Next user" class="matelook_button"&gt;
+&lt;/form&gt;
+eof
+}
+</pre>
+</li><li>
+The starting point code for assignment 2 starts by
+prints out these lines?
+
+<pre class="program">Content-Type: text/html
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+&lt;title&gt;matelook&lt;/title&gt;
+&lt;link href="matelook.css" rel="stylesheet"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class="matelook_heading"&gt;
+matelook
+&lt;/div&gt;
+</pre>
+
+Quickly discuss why these lines are being printed, in particular
+
+<ol>
+<li> Why is line 2 blank?
+</li><li> What else might appear in the first 2 lines?
+</li><li> What does <code>class="matelook_heading"</code> mean?
+</li></ol>
+<div class="answer">
+<ol>
+<li> The blank line marks the finish of the header.
+</li><li> Cookies!
+</li><li> The attribute <code>class="matelook_heading"</code> results in the style <code>.matelook_heading</code> from <code>matelook.css</code> being applied to the div (see next question) .
+</li></ol>
+</div>
+</li><li>
+
+The file <code>matelook.css</code> supplied for the assignment contains this:
+
+<pre class="program">.matelook_heading {
+    padding-top: 1em;
+    padding-bottom: 1em;
+    text-align: center;
+    font-size: x-large;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.matelook_user_details {
+    background-color: #ABCDEF;
+    color: #204142;
+    white-space: pre;
+    border:thin solid #204142;
+    border-radius: 1em;
+    padding-left: 0.42em;
+}
+
+.matelook_button {
+    background-color: #FEDBCA;
+    border:thin solid #904142;
+    border-radius: 0.42em;
+    color: #904142;
+}
+</pre>
+
+CSS isn't really covered in COMP[29]041 - but can you quickly guess what the CSS does?
+
+
+
+
+</li><li>
+
+A good way to test out code for assignment 2 is to write
+small programs which can be run from the command line.
+<p>
+A COMP[29]041 student wrote this small  program 
+to test  Perl that wanted to use in <code>matebook.cgi</code>.
+</p><p>
+It takes a zid as a command-line argument and is meant 
+to print the filenames of the user's posts in reverse chronological order (most recent first).
+
+
+</p><pre class="program">#!/usr/bin/perl -w
+
+$dataset ="dataset-medium";
+foreach $user (@ARGV) {
+    my $posts_dir = "$dataset/$user/posts";
+    foreach $post_filename (reverse (glob "$dataset/$user/posts/*/post.txt")) {
+        print "$post_filename\n";
+    }
+}
+</pre>
+
+Unfortunately   it prints them in the wrong order.
+
+Note <code>dataset-medium/z5023159/posts/17/post.txt</code> is the most recent post so should be printed first.
+
+
+<pre class="command_line"><kbd class="shell">print_posts.pl z5023159
+</kbd><samp>dataset-medium/z5023159/posts/9/post.txt
+dataset-medium/z5023159/posts/8/post.txt
+dataset-medium/z5023159/posts/7/post.txt
+dataset-medium/z5023159/posts/6/post.txt
+dataset-medium/z5023159/posts/5/post.txt
+dataset-medium/z5023159/posts/4/post.txt
+dataset-medium/z5023159/posts/3/post.txt
+dataset-medium/z5023159/posts/2/post.txt
+dataset-medium/z5023159/posts/17/post.txt
+dataset-medium/z5023159/posts/16/post.txt
+dataset-medium/z5023159/posts/15/post.txt
+dataset-medium/z5023159/posts/14/post.txt
+dataset-medium/z5023159/posts/13/post.txt
+dataset-medium/z5023159/posts/12/post.txt
+dataset-medium/z5023159/posts/11/post.txt
+dataset-medium/z5023159/posts/10/post.txt
+dataset-medium/z5023159/posts/1/post.txt
+dataset-medium/z5023159/posts/0/post.txt
+</samp></pre>
+
+Rewrite the code, fixing the bug.
+
+<div class="answer">
+</div>
+<p></p><p></p></li><li>
+Write a CGI script which pseudo-randomly chooses a number between 1 and 100
+and allows a user to guess it, indicating higher, lower or correct for each guess it.
+<p>
+</p><p>
+Match the behaviour of this example implementation:
+
+
+
+</p><div class="cgi_display">
+<div class="cgi_display_title">
+<a target="_blank" href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/tut/perlcgi/guess_number.cgi">guess_number.cgi</a>
+</div>
+<div class="cgi_output_panel">
+<iframe class="cgi_output_display" src="./Week 11 Tutorial_files/guess_number.html" onload="show_html_source(this)">
+</iframe>
+</div>
+<div class="html_source_panel">
+<div class="html_source_display">&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Guess A Number&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+I've  thought of number 0..99
+    &lt;form method="POST" action=""&gt;
+        &lt;input type="textfield" name="guess"&gt;
+        &lt;input type="hidden" name="number_to_guess" value="80"&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</div>
+</div>
+</div>
+<div class="answer">
+Sample solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+use CGI qw/:all/;
+use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
+
+# Simple CGI script written by andrewt@cse.unsw.edu.au
+# Outputs a form which will rerun the script
+# An input field of type hidden is used to pass an integer
+# to successive invocations
+
+$max_number_to_guess = 99;
+
+print &lt;&lt;eof;
+Content-Type: text/html
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;title&gt;Guess A Number&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+eof
+
+warningsToBrowser(1);
+
+$number_to_guess = param('number_to_guess');
+$guess = param('guess');
+
+$game_over = 0;
+
+if (defined $number_to_guess and defined $guess) {
+    $guess =~ s/\D//g;
+    $number_to_guess =~ s/\D//g;
+    if ($guess == $number_to_guess) {
+        print "You guessed right, it was $number_to_guess.\n";
+        $game_over = 1;
+    } elsif ($guess &lt; $number_to_guess) {
+        print "Its higher than $guess.\n";
+    } else {
+        print "Its lower than $guess.\n";
+    }
+} else {
+    $number_to_guess = 1 + int(rand $max_number_to_guess);
+    print "I've  thought of number 0..$max_number_to_guess\n";
+}
+
+if ($game_over) {
+print &lt;&lt;eof;
+    &lt;form method="POST" action=""&gt;
+        &lt;input type="submit" value="Play Again"&gt;
+    &lt;/form&gt;
+eof
+} else {
+print &lt;&lt;eof;
+    &lt;form method="POST" action=""&gt;
+        &lt;input type="textfield" name="guess"&gt;
+        &lt;input type="hidden" name="number_to_guess" value="$number_to_guess"&gt;
+    &lt;/form&gt;
+eof
+}
+
+print &lt;&lt;eof;
+&lt;/body&gt;
+&lt;/html&gt;
+eof
+</pre>
+</div>
+<p></p></li><li>
+Write a shell pipeline that reports any  e-mail address which is being used
+by more than 1 matelook users in the large dataset
+
+<div class="answer">
+<pre class="command_line"><kbd class="shell">egrep '^email' dataset-large/*/user.txt|sed 's/.*email=//'|sort|uniq -d</kbd>
+</pre>
+
+The above pipeline break if the string 'email=' appears in an email address.
+One way to avoid it is this:
+
+<div class="answer">
+<pre class="command_line"><kbd class="shell">egrep '^email' dataset-large/*/user.txt|cut -d= -f2- |sort|uniq -d</kbd>
+</pre>
+
+egrep also as a -h flag which supresses printing of the filename:
+
+<pre class="command_line"><kbd class="shell">egrep -h '^email' dataset-large/*/user.txt|sort|uniq -d</kbd>
+</pre>
+</div>
+</div></li></ol>
+<script src="./Week 11 Tutorial_files/2041.js.download"></script>
+</div>
+</div>
+
+
+
+<div id="extension-is-installed"></div></body></html>

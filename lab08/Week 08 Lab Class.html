@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/answers.py?lab/week08.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Week 08 Lab Class</title>
+<link href="./Week 08 Lab Class_files/2041.css" rel="stylesheet">
+</head>
+<body data-shoptagr-mini="yes">
+<div class="container">
+<div id="heading"><a class="heading_link" target="_blank" id="left_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">COMP[29]041 16s2</a>
+You can Do Anything With Perl
+<a class="heading_link" target="_blank" id="right_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">Software Construction</a></div>
+<div class="tutlab lab">
+<h3>Aims</h3>
+This week we develop your Perl programming skills.
+<h3>Assessment</h3>
+<table border="0" cellpadding="3">
+<tbody><tr><td><b>Submission:</b></td><td><code>give cs2041 lab08 courses.pl lectures0.pl lectures1.pl lectures2.pl [tags.py shortest_path.py]</code></td></tr>
+<tr><td><b>Deadline:</b></td><td>either during the lab, or Monday October 19 11:59pm (midnight)</td></tr>
+<tr><td><b>Assessment:</b></td><td>
+Make sure that you are familiar with the
+<a href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/lab/assessment.html">lab assessment criteria</a>.
+</td></tr>
+</tbody></table>
+<p>
+</p><h3>Background</h3>
+<p></p><p>
+We have covered only a small amount of Perl in lectures. In fact, to
+cover the whole language in detail would take a whole semester, so
+we're going to rely on you finding out about the language yourself
+in tutes, labs and assignments. A good place to start is
+the Perl documentation &amp; tutorial links on the class home page
+For example you might find these useful:
+</p>
+<ul>
+<li> <a target="doc" href="http://search.cpan.org/dist/perl/pod/perlsyn.pod">Perl language syntax</a>
+</li><li> <a target="doc" href="http://search.cpan.org/dist/perl/pod/perlsub.pod">Perl functions</a>
+</li><li> <a target="doc" href="http://search.cpan.org/dist/perl/pod/perlop.pod">Perl operators</a>
+</li></ul>
+
+As usual  <b>lab08</b> sub-directory of your git repo:
+
+<pre class="command_line"><kbd class="shell">cd</kbd>
+<kbd class="shell">cd 2041-labs/lab08</kbd>
+<kbd class="shell">gedit courses.pl &amp;</kbd>
+</pre>
+<h3>Exercise: Scraping Course Codes</h3>
+Write a Perl script <code>courses.pl</code> which prints the course codes with a given prefix of all UNSW courses with lectures on the
+Kensington Campus this session.  For example:
+<p>
+</p><pre class="command_line"><kbd class="shell">./courses.pl VISN</kbd>
+VISN1101
+VISN1111
+VISN1221
+VISN2111
+VISN2211
+VISN2231
+VISN3111
+VISN3211
+VISN4003
+</pre>
+<p></p><p>
+<b>Hints:</b> The course codes with prefix <code>VISN</code> can be found in this web page:
+<a href="http://www.timetable.unsw.edu.au/current/VISNKENS.html"><code>http://www.timetable.unsw.edu.au/current/VISNKENS.html</code></a>.  You can assume this is the case
+for all prefixes.  You saw how to retrieve a web page using wget in a previous lab.
+So you can perform this task in less than 10 lines of Perl.
+
+</p><div class="answer">
+Sample Perl solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+foreach $prefix (@ARGV) {
+    open F, "wget -q -O- http://www.timetable.unsw.edu.au/current/${prefix}KENS.html|" or die;
+    while (&lt;F&gt;) {
+        print "$1\n" if /&gt;($prefix\d\d\d\d)&lt;/;
+    }
+}
+</pre>
+
+Sample Shell solution
+
+
+<pre class="program">#!/bin/sh
+for course in "$@"
+do
+    wget -q -O- http://www.timetable.unsw.edu.au/current/${course}KENS.html|
+    egrep -oP "$course\d\d\d\d"|
+    sort|
+    uniq
+done
+</pre>
+</div>
+
+
+
+As usual:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab08 courses.pl</kbd>
+<kbd class="shell">git add courses.pl</kbd>
+<kbd class="shell">git commit -a -m "courses.pl was easy - Perl is cool"</kbd>
+</pre>
+<h3>Exercise: Scraping Lecture Times</h3>
+
+Write a Perl script <code>lectures0.pl</code> which given course codes as arguments prints details of their
+lectures.
+
+<pre class="command_line"><kbd class="shell">./lectures0.pl COMP2041</kbd>
+COMP2041: S2 Tue 13:00 - 15:00 (Weeks:1-9,10-12), Thu 17:00 - 18:00 (Weeks:1-9,10-12)
+<kbd class="shell">./lectures0.pl PSYC1011 COMP9024 COMP3231</kbd>
+PSYC1011: S2 Mon 11:00 - 12:00 (Weeks:1-9,10-12), Wed 14:00 - 15:00 (Weeks:1-9,10-12), Thu 12:00 - 13:00 (Weeks:1-9,10-12)
+PSYC1011: S2 Mon 18:00 - 19:00 (Weeks:1-9,10-12), Wed 18:00 - 19:00 (Weeks:1-9,10-12), Thu 18:00 - 19:00 (Weeks:1-9,10-12)
+COMP9024: S1 Tue 18:00 - 21:00 (Weeks:1-4,5-12)
+COMP9024: S2 Thu 18:00 - 21:00 (Weeks:1-9,10-12)
+COMP3231: S1 Tue 14:00 - 16:00 (Weeks:1-4,5-12), Wed 16:00 - 17:00 (Weeks:1-4,5-12)
+</pre>
+<b>Hint:</b> You can assume that a course's lecture times will be found in a web page equivalent to:
+<a href="http://timetable.unsw.edu.au/current/COMP2041.html">http://timetable.unsw.edu.au/current/COMP2041.html</a>.
+Its difficult to use a regexp to match the line containing the lecture description but you
+match a previous line, then skip a certain number of lines.
+<p></p><p>
+You can also get the teaching period this way.  Don't panic if you can't get this quite right
+your tutor will be generous  with hints.
+</p><p>
+<b>Hint:</b> a hash can be easily used to avoid repeated output.
+</p><p>
+<b>Hint:</b> make sure you have the URL exactly as above - e.g. don't have repeated slashes (the timetable website uses fragile rewriting rules).
+
+</p><div class="answer">
+
+Sample solution for lectures0.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+
+$base_url = "http://timetable.unsw.edu.au/current";
+
+foreach $course (@ARGV) {
+    my %lectures_seen;
+    open F, "wget -q -O- $base_url/$course.html|" or die "Can not fetch web page for $course: $!";
+    while ($line = &lt;F&gt;) {
+        next if $line !~ /href.*&gt;Lecture&lt;/;
+
+        my $session = "";
+        $line = &lt;F&gt;;
+        $session = $&amp; if $line =~ /[A-Z][0-9]/;
+
+        &lt;F&gt; foreach 1..4; # skip 4 lines
+
+        $line = &lt;F&gt;;
+        chomp $line;
+        $line =~ s/&lt;.*?&gt;//g;
+        $line =~ s/^\s*//g;
+        $line =~ s/\s*$//g;
+
+        next if !$line;
+        next if $lectures_seen{$line}++;
+        print "$course: $session $line\n";
+    }
+}
+</pre>
+</div>
+
+
+
+As usual:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab08 lectures0.pl</kbd>
+<kbd class="shell">git add lectures0.pl</kbd>
+<kbd class="shell">git commit -a -m "lectures0.pl passes autotest"</kbd>
+</pre>
+<h3>Semi-Challenge Exercise: Lecture Times as Tuples</h3>
+
+The output from <code>lectures0.pl</code> is (more or less) human readable but is less convenient for other uses.
+Copy <code>lectures0.pl</code> to <code>lectures1.pl</code> and
+modify it so that if a -d option is specified it prints the
+hourly details of lectures in the format shown in the examples below:
+
+<pre class="command_line"><kbd class="shell">./lectures1.pl COMP2041</kbd>
+COMP2041: S2 Tue 13:00 - 15:00 (Weeks:1-9,10-12), Thu 17:00 - 18:00 (Weeks:1-9,10-12)
+<kbd class="shell">./lectures1.pl -d COMP2041</kbd>
+S2 COMP2041 Tue 13
+S2 COMP2041 Tue 14
+S2 COMP2041 Thu 17
+<kbd class="shell">./lectures1.pl -d COMP4121</kbd>
+S2 COMP4121 Mon 11
+S2 COMP4121 Mon 12
+S2 COMP4121 Thu 9
+S2 COMP4121 Thu 10
+<kbd class="shell">./lectures1.pl -d COMP1927</kbd>
+X1 COMP1927 Wed 9
+X1 COMP1927 Wed 10
+X1 COMP1927 Wed 11
+X1 COMP1927 Fri 9
+X1 COMP1927 Fri 10
+X1 COMP1927 Fri 11
+S1 COMP1927 Tue 16
+S1 COMP1927 Tue 17
+S1 COMP1927 Wed 12
+S2 COMP1927 Mon 10
+S2 COMP1927 Mon 11
+S2 COMP1927 Wed 15
+S2 COMP1927 Wed 16
+<kbd class="shell">./lectures1.pl -d PSYC1011 COMP9024 COMP3231</kbd>
+S2 PSYC1011 Mon 11
+S2 PSYC1011 Wed 14
+S2 PSYC1011 Thu 12
+S2 PSYC1011 Mon 18
+S2 PSYC1011 Wed 18
+S2 PSYC1011 Thu 18
+S1 COMP9024 Tue 18
+S1 COMP9024 Tue 19
+S1 COMP9024 Tue 20
+S2 COMP9024 Thu 18
+S2 COMP9024 Thu 19
+S2 COMP9024 Thu 20
+S1 COMP3231 Tue 14
+S1 COMP3231 Tue 15
+S1 COMP3231 Wed 16
+</pre>
+
+Getting this exercise completely correct is difficult - your tutor will be generous with
+nearly correct attempts.
+
+<div class="answer">
+
+See sample solution for lectures2.pl
+
+</div>
+
+
+
+As usual:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab08 lectures1.pl</kbd>
+<kbd class="shell">git add lectures1.pl</kbd>
+<kbd class="shell">git commit -a -m "lectures1.pl working for 1 hour lectures"</kbd>
+</pre>
+<h3>Semi-Challenge Exercise: Lecture Times as a Table</h3>
+
+Copy <code>lectures1.pl</code> to <code>lectures2.pl</code> and
+modify itso that when a -t option is specified it prints a
+count of many lectures occur at each day/time in an ASCII table in the format
+shown in the example below.
+
+<pre class="command_line"><kbd class="shell">./lectures2.pl COMP9020 COMP9021 COMP9024</kbd>
+COMP9020: S1 Fri 14:00 - 17:00 (Weeks:1-4,5-12)
+COMP9020: S2 Thu 12:00 - 15:00 (Weeks:1-9,10-12)
+COMP9021: S1 Tue 18:00 - 21:00 (Weeks:1-4,5-12)
+COMP9021: S2 Thu 18:00 - 21:00 (Weeks:1-9,10-12)
+COMP9024: S1 Tue 18:00 - 21:00 (Weeks:1-4,5-12)
+COMP9024: S2 Thu 18:00 - 21:00 (Weeks:1-9,10-12)
+<kbd class="shell">./lectures2.pl -d COMP9020 COMP9021 COMP9024</kbd>
+S1 COMP9020 Fri 14
+S1 COMP9020 Fri 15
+S1 COMP9020 Fri 16
+S2 COMP9020 Thu 12
+S2 COMP9020 Thu 13
+S2 COMP9020 Thu 14
+S1 COMP9021 Tue 18
+S1 COMP9021 Tue 19
+S1 COMP9021 Tue 20
+S2 COMP9021 Thu 18
+S2 COMP9021 Thu 19
+S2 COMP9021 Thu 20
+S1 COMP9024 Tue 18
+S1 COMP9024 Tue 19
+S1 COMP9024 Tue 20
+S2 COMP9024 Thu 18
+S2 COMP9024 Thu 19
+S2 COMP9024 Thu 20
+<kbd class="shell">./lectures2.pl -t COMP9020 COMP9021 COMP9024</kbd>
+S1       Mon   Tue   Wed   Thu   Fri
+09:00
+10:00
+11:00
+12:00
+13:00
+14:00                             1
+15:00                             1
+16:00                             1
+17:00
+18:00           2
+19:00           2
+20:00           2
+S2       Mon   Tue   Wed   Thu   Fri
+09:00
+10:00
+11:00
+12:00                       1
+13:00                       1
+14:00                       1
+15:00
+16:00
+17:00
+18:00                       2
+19:00                       2
+20:00                       2
+<kbd class="shell">./lectures2.pl -t COMP1911 COMP2041 COMP2121 COMP3121 COMP3311 COMP3331 COMP4121 COMP3421 COMP9020 COMP9021 COMP9024</kbd>
+S1       Mon   Tue   Wed   Thu   Fri
+09:00     1
+10:00     1
+11:00     2           1
+12:00     1           1
+13:00           1     1     1
+14:00           1     1           1
+15:00                 1     1     1
+16:00                 1           1
+17:00                 1
+18:00           2
+19:00           2
+20:00           2
+S2       Mon   Tue   Wed   Thu   Fri
+09:00                       1
+10:00                       1
+11:00     1
+12:00     1                 1
+13:00           1           1
+14:00           1     1     2
+15:00           1           2
+16:00     1     1           1
+17:00     1                 1
+18:00                       2
+19:00                       2
+20:00                       2
+</pre>
+
+Getting this exercise completely correct is difficult - your tutor will generous with
+nearly correct attempts.
+<p></p><p>
+</p><div class="answer">
+
+Sample solution for lectures2.pl
+
+
+<pre class="program">#!/usr/bin/perl -w
+$option_day_time = 0;
+$option_table = 0;
+$base_url = "http://timetable.unsw.edu.au/current";
+$debug = 0;
+foreach $arg (@ARGV) {
+    if ($arg eq "-d") {
+        $option_day_time = 1;
+    } elsif ($arg eq "-t") {
+        $option_table = 1;
+    } elsif ($arg eq "--debug") {
+        $debug = 1;
+    } else {
+        push @courses, $arg;
+    }
+}
+foreach $course (@courses) {
+    my %lectures_seen;
+    open F, "wget -q -O- $base_url/$course.html|" or die "Can not fetch web page for $course: $!";
+    while ($line = &lt;F&gt;) {
+        next if $line !~ /href.*&gt;Lecture/;
+        print "found line: '$line'\n" if $debug;
+        my $session = "";
+        $line = &lt;F&gt;;
+        $session = $&amp; if $line =~ /[A-Z][0-9]/;
+        &lt;F&gt; foreach 1..4; # skip 5 lines
+        $line = &lt;F&gt;;
+        chomp $line;
+        print "raw line = '$line'\n" if $debug;
+        $line =~ s/&lt;.*?&gt;//g;
+        $line =~ s/^\s*//g;
+        $line =~ s/\s*$//g;
+
+        next if !$line;
+        next if $lectures_seen{$line}++;
+
+        print "$course: $session $line\n" if !$option_day_time &amp;&amp; !$option_table;
+
+        foreach $lecture (split /\), /, $line) {
+            print "lecture='$lecture'\n" if $debug;
+            my @days = $lecture =~ /\b([a-z]{3})\b/gi ;
+            print "\@days='@days'\n" if $debug;
+
+            my ($start_hour,$finish_hour,$finish_minute) = $lecture =~ /(\d\d):\d\d - (\d\d):(\d\d)/ or next;
+            $finish_hour++ if $finish_minute ne "00";
+            print "start_hour=$start_hour finish_hour=$finish_hour\n" if $debug;
+
+            foreach $day (@days) {
+                foreach $time ($start_hour..$finish_hour-1) {
+                    if (!$lecture{$session}{$day}{$time}{$course}++ and $option_day_time) {
+                        print "$session $course $day $time\n";
+                    }
+                }
+            }
+        }
+    }
+}
+
+if ($option_table) {
+    foreach $session (sort keys %lecture) {
+        my @days =qw/Mon Tue Wed Thu Fri/;
+        my $width = 6;
+        printf "%-${width}s", $session;
+        printf "%${width}s",$_ foreach @days;
+        print "\n";
+        foreach $time (9..20) {
+            printf "%02d:00", $time;
+            foreach $day (@days) {
+                my $n_lectures =  keys %{$lecture{$session}{$day}{$time}};
+                printf "%${width}s", $n_lectures || "";
+            }
+            print "\n";
+        }
+    }
+}</pre>
+</div>
+
+
+
+As usual:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab08 lectures2.pl</kbd>
+<kbd class="shell">git add lectures2.pl</kbd>
+<kbd class="shell">git commit -a -m "lectures2.pl half working"</kbd>
+</pre>
+<h3>Challenge Exercise: Extracting Tags in Python</h3>
+
+The  introduction to Python in lectures will come later.
+<p></p><p>
+The <a href="http://cgi.cse.unsw.edu.au/~cs2041/lec/python/examples.index.html">example Python scripts</a> and links
+to external Python resources should help - but you may need more info - Google is your friend.
+
+
+Write a Python program, <code>tags.py</code> which given the URL of a web
+page fetches it by running <i>wget</i> and prints the HTML tags it uses.
+</p><p>
+Don't count closing tags (e.g. <code>&lt;/a&gt;</code>)
+</p><p>
+The tag should be converted to lower case and printed in sorted order
+with a count of often each is used.
+</p><p>
+You are expected (not required) to use regexes but there are problems processing HTML
+this way - don't be surprised if its hard to get right.
+</p><p>
+<b>Hint:</b> make sure you don't print tags within HTML comments.
+</p><p>
+
+For example:
+
+
+</p><pre class="command_line"><kbd class="shell">./tags.py http://www.cse.unsw.edu.au/~cs2041/intro.html
+</kbd><samp>a 20
+b 8
+body 1
+br 17
+center 1
+div 2
+em 2
+font 15
+h1 1
+h3 18
+head 1
+hr 2
+html 1
+li 52
+link 1
+ol 2
+p 32
+pre 1
+script 1
+small 15
+table 3
+tbody 1
+td 20
+th 5
+title 1
+tr 9
+ul 11
+</samp><kbd class="shell">./tags.py http://www.cse.unsw.edu.au/~cs2041/15s2/
+</kbd><samp>a 138
+b 3
+body 1
+br 27
+code 1
+div 9
+em 36
+head 1
+html 1
+link 1
+p 1
+script 1
+small 3
+table 3
+tbody 3
+td 162
+th 11
+thead 3
+title 1
+tr 29
+</samp><kbd class="shell">./tags.py http://www.cse.unsw.edu.au
+</kbd><samp>a 151
+body 1
+br 2
+div 421
+fieldset 1
+form 1
+h2 27
+h3 1
+head 1
+html 1
+img 24
+input 6
+label 2
+legend 1
+li 81
+link 10
+meta 11
+p 15
+script 9
+span 39
+title 1
+ul 13
+</samp></pre>
+
+Add an <code>-f</code> option to <code>tags.py</code> which indicates the tags are to printed
+in order of frequency.  For example:
+
+
+<pre class="command_line"><kbd class="shell">./tags.py -f http://www.cse.unsw.edu.au/~cs2041/intro.html
+</kbd><samp>pre 1
+h1 1
+title 1
+tbody 1
+html 1
+body 1
+head 1
+link 1
+center 1
+script 1
+em 2
+hr 2
+ol 2
+div 2
+table 3
+th 5
+b 8
+tr 9
+ul 11
+font 15
+small 15
+br 17
+h3 18
+td 20
+a 20
+p 32
+li 52
+</samp></pre>
+<div class="answer">
+
+Sample solution using wget
+
+
+<pre class="program">#!/usr/bin/python
+# written by andrewt@cse.unsw.edu.au as a COMP2041 example
+# fetch specified web pages and count the HTML tags in them
+#
+# There are python libraries which provide a  better way to fetch web pages
+#
+# subprocess.check_output was introduced in Python 2.7.
+# In previous version you might use:
+# webpage = subprocess.Popen(["wget","-q","-O-",url], stdout=subprocess.PIPE).communicate()[0]
+#
+#
+# The regex code below doesn't handle a number of cases.  It is often
+# better to use a library to properly parse HTML before processing it.
+# But beware illegal HTML is common &amp; often causes problems for parsers.
+
+import sys, re, subprocess, collections
+tag_count = collections.defaultdict(lambda:0)
+
+for url in sys.argv[1:]:
+    webpage = subprocess.check_output(["wget","-q","-O-",url], universal_newlines=True)
+    webpage = re.sub(r'&lt;!--.*?--&gt;','', webpage) # remove comments
+    webpage = webpage.lower()
+    for tag in re.findall(r'&lt;\s*(\w+)', webpage):
+        if tag:
+            tag_count[tag] += 1
+for tag in sorted(tag_count.keys()):
+    print("%s %d"%(tag, tag_count[tag]))
+</pre>
+
+Sample solution using urllib &amp; adding -f option
+
+
+<pre class="program">#!/usr/bin/python
+
+# writen by andrewt@cse.unsw.edu.au as a COMP2041 example
+# fetch a web page remove HTML tags, constants,
+# text between script blank lines
+# and print non-empty lines
+
+# The regex code below doesn't handle a number of cases.  It is often
+# better to use a library to properly parse HTML before processing it.
+# But beware illegal HTML is common &amp; often causes problems for parsers.
+
+import sys, re, collections
+
+# urllib package names changed in Python 3
+try:
+    from urllib import urlopen # Python 2
+except ImportError:
+    from urllib.request import urlopen # Python 3
+
+if len(sys.argv) &gt; 1 and sys.argv[1] == "-f":
+    sort_by_frequency = 1
+    urls = sys.argv[2:]
+else:
+    sort_by_frequency = 0
+    urls = sys.argv[1:]
+
+tag_count = collections.defaultdict(lambda:0)
+for url in urls:
+    webpage = urlopen(url).read().decode('utf-8')  # would be better to check encoding rather than assume utf-8
+    webpage = re.sub(r'&lt;!--.*?--&gt;','', webpage)    # remove comments
+    webpage = webpage.lower()
+    for tag in re.findall(r'&lt;\s*(\w+)', webpage):
+        if tag:
+            tag_count[tag] += 1
+
+if sort_by_frequency:
+    ordered_tags = sorted(list(tag_count.keys()), key=lambda t: tag_count[t])
+else:
+    ordered_tags = sorted(tag_count.keys())
+for tag in ordered_tags:
+    print("%s %d"%(tag, tag_count[tag]))
+</pre>
+
+Sample solution using Beautiful soup to parse HTML
+
+
+<pre class="program">#!/usr/bin/python2
+# writen by andrewt@cse.unsw.edu.au as a COMP2041 example
+# fetch a web page remove HTML tags, constants,
+# text between script blank lines
+# and print non-empty lines
+
+import sys, re, collections
+
+from urllib import urlopen
+import BeautifulSoup
+
+# on Python 3 instead do
+# from urllib.request import urlopen # Python 3
+# import bs4 as BeautifulSoup
+# and change BeautifulSoup(webpage) to BeautifulSoup(webpage, "lxml")
+
+if len(sys.argv) &gt; 1 and sys.argv[1] == "-f":
+    sort_by_frequency = 1
+    urls = sys.argv[2:]
+else:
+    sort_by_frequency = 0
+    urls = sys.argv[1:]
+
+tag_count = collections.defaultdict(lambda:0)
+for url in urls:
+    webpage = urlopen(url).read()
+    soup = BeautifulSoup.BeautifulSoup(webpage)
+    for tag in soup.findAll():
+        tag_count[tag.name] += 1
+
+if sort_by_frequency:
+    ordered_tags = sorted(tag_count.keys(), key=lambda t: tag_count[t])
+else:
+    ordered_tags = sorted(tag_count.keys())
+for tag in ordered_tags:
+    print("%s %d"%(tag, tag_count[tag]))
+</pre>
+</div>
+<b>Hint:</b> see last week's tute for a sample solution in Perl.
+
+As usual:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab08 tags.py</kbd>
+<kbd class="shell">git add tags.py</kbd>
+<kbd class="shell">git commit -a -m "tags.py almost working"</kbd>
+</pre>
+<h3>Challenge Exercise: Finding the Shortest Journey in Python</h3>
+
+
+Write a Python program shortest_path.py that given the road distances between
+a number of towns (on standard input) calculates the shortest journey
+between two towns specified as arguments.
+Here is an example of how your program should behave.
+
+<pre class="command_line"><kbd class="shell"><b>./shortest_path.py Parkes Gilgandra</b></kbd>
+<kbd>Bourke Broken-Hill   217
+Bourke Dubbo          23
+Bourke Gilgandra      62
+Bourke Parkes         71
+Canowindra Dubbo      35
+Canowindra Gilgandra  13
+Canowindra Parkes    112
+Dubbo Gilgandra       91
+Dubbo Parkes          57</kbd>
+<i>&lt;cntrl-d&gt;</i>
+Shortest route is length = 105: Parkes Dubbo Canowindra Gilgandra.
+</pre>
+<p></p><p>
+Hints: Python's strings have a
+<a href="http://en.wikibooks.org/wiki/Python_Programming/Strings#split.2C_splitlines">split method</a> which can
+break up input lines. Its easy to implement <a href="http://en.wikibooks.org/wiki/Python_Programming/Sets">Sets in python</a>.
+
+</p><div class="answer">
+Python sample solution translated from Perl
+
+
+<pre class="program">#!/usr/bin/python
+
+import fileinput, re, sys, collections
+
+(start,finish) = sys.argv[1:]
+
+distance = {}
+for line in sys.stdin:
+    (town1,town2,dist) = line.split()
+    distance[(town1,town2)] = int(dist)
+    distance[(town2,town1)] = int(dist)
+
+shortest_journey = {start:0}
+route = {start:''}
+unprocessed_towns = set(d[0] for d in distance.keys())
+next_town = start
+while next_town and next_town != finish:
+    unprocessed_towns.remove(next_town)
+    for town in unprocessed_towns:
+        if (next_town,town) in distance:
+            d = shortest_journey[next_town] + distance[(next_town,town)]
+            if town not in shortest_journey or shortest_journey[town] &gt; d:
+                shortest_journey[town] = d
+                route[town] = route[next_town] + " " + next_town
+    min_distance = 1e99  # must be larger than any possible distance
+    next_town = ""
+    for town in unprocessed_towns:
+        if town in shortest_journey and shortest_journey[town] &lt; min_distance:
+            min_distance = shortest_journey[town]
+            next_town = town
+
+if finish not in shortest_journey:
+    print("No route from %s to %s" % (start, finish))
+else:
+    print("Shortest route is length = %s:%s %s." % (shortest_journey[finish], route[finish], finish))
+
+</pre>
+
+More python-ish sample solution
+
+
+<pre class="program">#!/usr/bin/python
+
+import fileinput, re, sys, collections
+
+(start,finish) = sys.argv[1:]
+distance = {}
+for line in sys.stdin:
+    (town1,town2,dist) = line.split()
+    distance[(town1,town2)] = int(dist)
+    distance[(town2,town1)] = int(dist)
+
+shortest_journey = {start:0}
+route = {start:''}
+unprocessed_towns = set(d[0] for d in distance.keys())
+next_town = start
+while next_town and next_town != finish:
+    unprocessed_towns.remove(next_town)
+    for town in unprocessed_towns:
+        if (next_town,town) in distance:
+            d = shortest_journey[next_town] + distance[(next_town,town)]
+            if town not in shortest_journey or shortest_journey[town] &gt; d:
+                shortest_journey[town] = d
+                route[town] = route[next_town] + " " + next_town
+    next_town = min((shortest_journey[town],town) for town in unprocessed_towns if town in shortest_journey)[1]
+
+if finish not in shortest_journey:
+    print("No route from %s to %s" % (start, finish))
+else:
+    print("Shortest route is length = %s: %s %s." % (shortest_journey[finish], route[finish], finish))
+
+</pre>
+
+Slightly different python-ish sample solution
+
+
+<pre class="program">#!/usr/bin/python
+
+import fileinput, re, sys, collections
+
+(start,finish) = sys.argv[1:]
+
+distance = {}
+for line in sys.stdin:
+    (town1,town2,dist) = line.split()
+    distance[(town1,town2)] = int(dist)
+    distance[(town2,town1)] = int(dist)
+
+shortest_journey = {start:0}
+route = {start:''}
+unprocessed_towns = set(d[0] for d in distance.keys())
+next_town = start
+while next_town and next_town != finish:
+    unprocessed_towns.remove(next_town)
+    for town in unprocessed_towns:
+        if (next_town,town) in distance:
+            d = shortest_journey[next_town] + distance[(next_town,town)]
+            if town not in shortest_journey or shortest_journey[town] &gt; d:
+                shortest_journey[town] = d
+                route[town] = route[next_town] + " " + next_town
+    next_town = min(unprocessed_towns&amp;set(shortest_journey.keys()), key=shortest_journey.get)
+
+if finish not in shortest_journey:
+    print("No route from %s to %s" % (start, finish))
+else:
+    print("Shortest route is length = %s: %s %s." % (shortest_journey[finish], route[finish], finish))
+
+</pre>
+</div>
+<b>Hint:</b> see last week's tute for a sample solution in Perl.
+
+As usual:
+
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab08 shortest_path.py</kbd>
+<kbd class="shell">git add shortest_path.py</kbd>
+<kbd class="shell">git commit -a -m "my shortest_path.py rocks!"</kbd>
+</pre>
+<h3>Testing</h3>
+You will need to do your own testing but to assist you
+as usual some autotest tests are available for this lab.
+<p></p><p>
+To run all tests:
+</p><pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab08</kbd>
+</pre>
+You can run a single test if you also pass the test label as the second argument to autotest.
+For example, to run just test <code>courses_2</code> type:
+<pre class="command_line"><kbd class="shell">~cs2041/bin/autotest lab08 courses_2</kbd>
+</pre>
+<h3>Finalising</h3>
+You must show your solutions to your tutor and be able to explain
+how they work.
+Once your tutor has discussed your answers with you, you should
+submit them using:
+<pre class="command_line"><kbd class="shell">give cs2041 lab08 courses.pl lectures0.pl lectures1.pl lectures2.pl [tags.py shortest_path.py]</kbd>
+</pre>
+Whether you discuss your solutions
+with your tutor this week or next week, you must submit them before
+the above deadline.
+<script src="./Week 08 Lab Class_files/2041.js.download"></script>
+<p></p></div>
+</div>
+
+
+
+<div id="extension-is-installed"></div></body></html>

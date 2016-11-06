@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/answers.py?tut/week09.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Week 09 Tutorial</title>
+<link href="./Week 09 Tutorial_files/2041.css" rel="stylesheet">
+<script src="./Week 09 Tutorial_files/2041.js.download"></script>
+</head>
+<body data-shoptagr-mini="yes">
+<div class="container">
+<div id="heading"><a class="heading_link" target="_blank" id="left_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">COMP[29]041 16s2</a>
+Need data from the web - you want Perl
+<a class="heading_link" target="_blank" id="right_heading_link" href="http://www.cse.unsw.edu.au/~cs2041/16s2/">Software Construction</a></div>
+<div class="tutlab tut">
+<ol>
+<li>
+<p>
+Write a Perl program which reads from STDIN
+a username then a password (not both simultaneously).
+</p><p>
+It should then check the password matches one stored for user <i>username</i> in
+the file <code>users/</code><i>username</i><code>.password</code>.
+</p><p>
+It should print a message indicating the user is unknown  if this file does not exist
+otherwise print an appropiate message indicating whether the password matches.
+</p><p>
+For example:
+
+</p><pre class="command_line"><kbd class="shell">mkdir users</kbd>
+<kbd class="shell">echo 'correct horse battery staple' &gt;users/andrewt.password</kbd>
+<kbd class="shell">login.pl</kbd>
+username: <kbd>jas</kbd>
+password: <kbd>beer</kbd>
+Unkown username!
+<kbd class="shell">login.pl</kbd>
+username: <kbd>andrewt</kbd>
+password: <kbd>42</kbd>
+Incorrect password!
+<kbd class="shell">login.pl</kbd>
+username: <kbd>andrewt</kbd>
+password: <kbd>correct horse battery staple</kbd>
+You are authenticated.
+</pre>
+<div class="answer">
+Sample Perl solution
+
+
+<pre class="program">#!/usr/bin/perl -w
+print "username: ";
+$username = &lt;STDIN&gt;;
+chomp $username;
+print "password: ";
+$password = &lt;STDIN&gt;;
+chomp $password;
+
+# sanitize username
+$username = substr $username, 0, 256;
+$username =~ s/\W//g;
+$password_file = "accounts/$username/password";
+if (!open F, "&lt;$password_file") {
+    print "Unknown username!\n";
+} else {
+    $correct_password = &lt;F&gt;;
+    chomp $correct_password;
+    if ($password eq $correct_password) {
+        print "You are authenticated.\n";
+    } else {
+        print "Incorrect password!\n";
+    }
+}
+</pre>
+</div>
+<p></p></li><li>
+
+How are CGI scripts run?
+
+<div class="answer">
+CGI script are run when a web server receives a request for a particular URL.
+<p>
+Web servers can be configured to run CGI scripts in response to
+any or all URLs.
+</p></div>
+</li><li>
+
+Write a shell CGI script which prints details of the context in which it is run.
+Here is an example implementation:
+
+
+
+<div class="cgi_display">
+<div class="cgi_display_title">
+<a target="_blank" href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/code/cgi/show_execution_context.sh.cgi">show_execution_context.sh.cgi</a>
+</div>
+<div class="cgi_output_panel">
+<iframe class="cgi_output_display" src="./Week 09 Tutorial_files/show_execution_context.sh.html" onload="show_html_source(this)">
+</iframe>
+</div>
+<div class="html_source_panel">
+<div class="html_source_display">&lt;html&gt;
+&lt;head&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;h2&gt;Execution Environment&lt;/h2&gt;
+&lt;pre&gt;pwd: /tmp_amd/kamen/export/kamen/3/cs2041cgi/public_html/16s2/code/cgi
+id: uid=14380(cs2041cgi) gid=14380(cs2041cgi) groups=14380(cs2041cgi)
+hostname: dvorak
+uname -a: Linux dvorak 3.2.0-4-686-pae #1 SMP Debian 3.2.82-1 i686 GNU/Linux
+&lt;/pre&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</div>
+</div>
+</div>
+
+
+Discuss how security concerns might have affect CSE's choices
+for configuring how student CGI scripts are run on its web server.
+
+<div class="answer">
+CSE web server includes a mechanism to runs student CGI scripts as the student's uid.
+<p>
+Otherwise students could gain privileges by constructing appropriate CGI scripts.
+</p><p>
+As CGI scripts are prone to externally accessible security holes.
+CGI script are run with only some files accessible - only as user's <code>public_html</code>
+is visible - mounted as <code>/web/<i>user</i></code>
+</p><p>
+CGI scripts are also run on separate servers.
+
+
+</p><pre class="program">#!/bin/sh
+# Simple CGI script written by andrewt@cse.unsw.edu.au
+# Print some HTML plus information about the environment
+# in which the CGI script has been run
+
+cat &lt;&lt;eof
+Content-type: text/html
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;h2&gt;Execution Environment&lt;/h2&gt;
+&lt;pre&gt;
+eof
+
+for command in pwd id hostname 'uname -a'
+do
+    echo "$command: `$command`"
+done
+
+cat &lt;&lt;eof
+&lt;/pre&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+eof
+
+</pre>
+<p></p></div>
+</li><li>
+
+Web servers pass some useful information to CGI scripts as environment variables.
+<p>
+Write a shell CGI script which prints details of the environment variables it has been passed.
+Here is an example implementation:
+
+
+
+</p><div class="cgi_display">
+<div class="cgi_display_title">
+<a target="_blank" href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/code/cgi/show_environment_variables.sh.cgi">show_environment_variables.sh.cgi</a>
+</div>
+<div class="cgi_output_panel">
+<iframe class="cgi_output_display" src="./Week 09 Tutorial_files/show_environment_variables.sh.html" onload="show_html_source(this)">
+</iframe>
+</div>
+<div class="html_source_panel">
+<div class="html_source_display">&lt;html&gt;
+&lt;head&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;h2&gt;Environment Variables&lt;/h2&gt;
+&lt;pre&gt;SERVER_SIGNATURE=&lt;address&gt;Apache/1.3.34 Server at cgi.cse.unsw.edu.au Port 80&lt;/address&gt;
+
+UNIQUE_ID=WB7rCoFe8h4AAApCDf4
+REDIRECT_SCRIPT_URL=/~cs2041cgi/16s2/code/cgi/show_environment_variables.sh.cgi
+HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.87 Safari/537.36
+SERVER_PORT=80
+REDIRECT_SCRIPT_URI=http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/code/cgi/show_environment_variables.sh.cgi
+HTTP_HOST=cgi.cse.unsw.edu.au
+DOCUMENT_ROOT=/var/apache
+SCRIPT_FILENAME=/web/cs2041cgi/16s2/code/cgi/show_environment_variables.sh.cgi
+REQUEST_URI=/~cs2041cgi/16s2/code/cgi/show_environment_variables.sh.cgi
+SCRIPT_NAME=/~cs2041cgi/16s2/code/cgi/show_environment_variables.sh.cgi
+SCRIPT_URI=http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/code/cgi/show_environment_variables.sh.cgi
+HTTP_CONNECTION=keep-alive
+REMOTE_PORT=54494
+AE_PROFILED=yes
+PATH=/bin:/usr/bin:/usr/local/bin
+SCRIPT_URL=/~cs2041cgi/16s2/code/cgi/show_environment_variables.sh.cgi
+PWD=/tmp_amd/kamen/export/kamen/3/cs2041cgi/public_html/16s2/code/cgi
+SERVER_ADMIN=ss@cse.unsw.edu.au
+REDIRECT_UNIQUE_ID=WB7rCoFe8h4AAApCDf4
+REDIRECT_STATUS=200
+HTTP_ACCEPT_LANGUAGE=en-GB,en-US;q=0.8,en;q=0.6
+PATH_TRANSLATED=/web/cs2041cgi/16s2/code/cgi/show_environment_variables.sh.cgi
+HTTP_REFERER=http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/answers.py?tut/week09.html
+HTTP_ACCEPT=text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+REMOTE_ADDR=101.164.19.232
+SHLVL=1
+SERVER_NAME=cgi.cse.unsw.edu.au
+SERVER_SOFTWARE=Apache/1.3.34 (Debian)
+QUERY_STRING=
+SERVER_ADDR=129.94.242.30
+GATEWAY_INTERFACE=CGI/1.1
+HTTP_UPGRADE_INSECURE_REQUESTS=1
+SERVER_PROTOCOL=HTTP/1.1
+HTTP_ACCEPT_ENCODING=gzip, deflate, sdch
+REDIRECT_URL=/~cs2041cgi/16s2/code/cgi/show_environment_variables.sh.cgi
+REQUEST_METHOD=GET
+HTTP_COOKIE=_jsuid=748869655; __utma=207128449.2032362457.1453293622.1468745172.1468825724.33; __utmz=207128449.1468825724.33.15.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided); lbsid=ZMQo-NTqaAZB4_cE18CpCBroVvoy7LK7WuTZCcwRckgW4-yBWRzn!-116216377!1478156145898; loginID=z3413158; password=internet; aids=0; _ga=GA1.3.1249674342.1472203514
+_=/usr/bin/env
+&lt;/pre&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</div>
+</div>
+</div>
+
+
+Discuss what some of these environment variables might indicate.
+
+<div class="answer">
+Sample solution
+
+
+<pre class="program">#!/bin/sh
+# Simple CGI script written by andrewt@cse.unsw.edu.au
+# Print some HTML plus the environment
+# passed to CGI script by the web server
+# Note a &lt; character in environment variable values will be interpreted as a HTML tag
+
+cat &lt;&lt;eof
+Content-type: text/html
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;h2&gt;Environment Variables&lt;/h2&gt;
+&lt;pre&gt;
+`env`
+&lt;/pre&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+eof
+
+</pre>
+</div>
+<p></p></li><li>
+
+A HTTP request can pass parameters to a web server.  The web server passes
+these on to the CGI script typically in environment variable(s) for GET request
+and on STDIN for POST requests.
+<p>
+Write a shell CGI script which prints whether it was invoked with a GET request
+or a POST request and prints details of the parameters it has been passed.
+Here is an example implementation:
+
+
+
+</p><div class="cgi_display">
+<div class="cgi_display_title">
+<a target="_blank" href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/code/cgi/show_input_parameters.sh.cgi?comp2041=best-course-ever">show_input_parameters.sh.cgi?comp2041=best-course-ever</a>
+</div>
+<div class="cgi_output_panel">
+<iframe class="cgi_output_display" src="./Week 09 Tutorial_files/show_input_parameters.sh.html" onload="show_html_source(this)">
+</iframe>
+</div>
+<div class="html_source_panel">
+<div class="html_source_display">&lt;html&gt;
+&lt;head&gt;&lt;/head&gt;
+&lt;body&gt;
+
+&lt;h2&gt;GET Request - Input Parameters&lt;/h2&gt;
+&lt;pre&gt;comp2041=best-course-ever
+&lt;/pre&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</div>
+</div>
+</div>
+<div class="answer">
+Sample solution
+
+
+<pre class="program">#!/bin/sh
+# Simple CGI script written by andrewt@cse.unsw.edu.au
+# Output some simple HTML and the input parameters
+# the web server has passed on to the CGI script.
+
+if test "$REQUEST_METHOD" = POST
+then
+    parameters="`cat`"
+else
+    parameters="$QUERY_STRING"
+fi
+
+cat &lt;&lt;eof
+Content-type: text/html
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;&lt;/head&gt;
+&lt;body&gt;
+
+&lt;h2&gt;$REQUEST_METHOD Request - Input Parameters&lt;/h2&gt;
+&lt;pre&gt;
+$parameters
+&lt;/pre&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+eof
+
+
+</pre>
+</div>
+<p></p></li><li>
+
+A HTTP request can pass pararmeters to a web server.  The web server passes
+these on to the CGI script typically in environment variable(s) for GET request
+and on STDIN for POST requests
+<p>
+Write a shell CGI script which (given no parameters) prints a form allowing 2 numbers to be entered.
+The form should run the same CGI script, and the CGI script should
+print the sum of the numbers and a form allowing two more numbers to be entered and the script to
+be run again.
+Here is an example implementation:
+
+
+
+</p><div class="cgi_display">
+<div class="cgi_display_title">
+<a target="_blank" href="http://cgi.cse.unsw.edu.au/~cs2041cgi/16s2/code/cgi/sum_two_numbers.sh.cgi">sum_two_numbers.sh.cgi</a>
+</div>
+<div class="cgi_output_panel">
+<iframe class="cgi_output_display" src="./Week 09 Tutorial_files/sum_two_numbers.sh.html" onload="show_html_source(this)">
+</iframe>
+</div>
+<div class="html_source_panel">
+<div class="html_source_display">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Sum Two Numbers&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;form method="GET" action=""&gt;
+&lt;input type="textfield" name="x" value=""&gt;
++
+&lt;input type="textfield" name="y" value=""&gt;
+=
+?
+&lt;input type="submit" value="calculate"&gt;
+&lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</div>
+</div>
+</div>
+<div class="answer">
+Sample solution
+
+
+<pre class="program">#!/bin/sh
+# Simple CGI script written by andrewt@cse.unsw.edu.au
+# Sum two numbers and outputs a form which will rerun the script
+
+
+# Note removal of characters other than 0-9 . - + to avoid potential security problems
+
+if test $REQUEST_METHOD = "GET"
+then
+    parameters="$QUERY_STRING"
+else
+    read parameters
+fi
+
+x=`echo $parameters|sed '
+    s/.*x=//
+    s/&amp;.*//
+    s/[^0-9\-\.\+]//g
+    '`
+y=`echo $parameters|sed '
+    s/.*y=//
+    s/&amp;.*//
+    s/[^0-9\-\.\+]//g
+    '`
+
+cat &lt;&lt;eof
+Content-type: text/html
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+&lt;title&gt;Sum Two Numbers&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+eof
+
+sum="?"
+test "$x" -a "$y" &amp;&amp; sum=`expr "$x" '+' "$y"`
+
+cat &lt;&lt;eof
+
+&lt;form method="GET" action=""&gt;
+&lt;input type=textfield name=x value=$x&gt;
++
+&lt;input type=textfield name=y value=$y&gt;
+=
+$sum
+&lt;input type="submit" value="calculate"&gt;
+&lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+eof
+
+</pre>
+</div>
+<p></p></li></ol>
+</div>
+</div>
+
+
+
+<div id="extension-is-installed"></div></body></html>
