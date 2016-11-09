@@ -75,7 +75,7 @@ Write a program which reads data in the first format from its standard input and
 
 MY ANSWER:
 #!/usr/bin/perl -w
-while ($line = <>){
+while ($line = <STDIN>){
     if ($line =~ /(.*\|)(.*)\,([^\|]*)(\|.*)/){
             $line = $1.$3." ".$2.$4;
     }

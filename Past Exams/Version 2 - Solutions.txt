@@ -114,7 +114,7 @@ You do not have to handle any other input format.
 
 
 #!/usr/bin/perl -w
-while ($line = <>){
+while ($line = <STDIN>){
     # start with 00 then add 12 and put am at end
     if ($line =~ /(.*\s)00(:\d\d:\d\d)(\s.*)/){
         $line = $1."12".$2."am".$3;
@@ -151,7 +151,7 @@ You may assume that pathnames and commands do not contain the character '>'.
 
 MY SOLUTION (KINDA WRONG I THINK - HAVEN'T TESTED WITH THE DIRECTORIES)
 #!/usr/bin/perl -w
-while ($line = <>){
+while ($line = <STDIN>){
     while ($line =~ /^(.*)<!([^>]*)>(.*)$/){
             $line = $1.`$2`.$3;
     }
